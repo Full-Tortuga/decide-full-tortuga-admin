@@ -3,11 +3,11 @@ import json
 from random import choice
 
 from locust import (
-    HttpLocust,
-    TaskSequence,
+    HttpUser,
+    SequentialTaskSet,
     TaskSet,
-    seq_task,
     task,
+    between
 )
 
 
@@ -22,17 +22,14 @@ class DefVisualizer(TaskSet):
         self.client.get("/visualizer/{0}/".format(VOTING))
 
 
-class DefVoters(TaskSequence):
+class DefVoters(SequentialTaskSet):
 
     def on_start(self):
         with open('voters.json') as f:
             self.voters = json.loads(f.read())
         self.voter = choice(list(self.voters.items()))
 
-    def on_quit(self):
-        self.voter = None
-
-    @seq_task(1)
+    @task
     def login(self):
         username, pwd = self.voter
         self.token = self.client.post("/authentication/login/", {
@@ -40,11 +37,12 @@ class DefVoters(TaskSequence):
             "password": pwd,
         }).json()
 
-    @seq_task(2)
+    @task
     def getuser(self):
-        self.user = self.client.post("/authentication/getuser/", self.token).json()
+        self.usr= self.client.post("/authentication/getuser/", self.token).json()
+        print( str(self.user))
 
-    @seq_task(3)
+    @task
     def voting(self):
         headers = {
             'Authorization': 'Token ' + self.token.get('token'),
@@ -56,16 +54,22 @@ class DefVoters(TaskSequence):
                 "a": "12",
                 "b": "64"
             },
-            "voter": self.user.get('id'),
+            "voter": self.usr.get('id'),
             "voting": VOTING
         }), headers=headers)
 
 
-class Visualizer(HttpLocust):
+    def on_quit(self):
+        self.voter = None
+
+class Visualizer(HttpUser):
     host = HOST
-    task_set = DefVisualizer
+    tasks = [DefVisualizer]
+    wait_time = between(3,5)
 
 
-class Voters(HttpLocust):
+
+class Voters(HttpUser):
     host = HOST
-    task_set = DefVoters
+    tasks = [DefVoters]
+    wait_time= between(3,5)
