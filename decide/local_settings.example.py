@@ -18,7 +18,7 @@ MODULES = [
 BASEURL = 'http://localhost:8000'
 
 APIS = {
-    'admin': BASEURL,
+    'administration': BASEURL,
     'authentication': BASEURL,
     'base': BASEURL,
     'booth': BASEURL,
@@ -37,7 +37,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'decide',
         'PASSWORD': 'decide',
-        'HOST': 'db',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
