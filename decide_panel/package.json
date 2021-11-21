@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@nextui-org/react": "*",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "axios": "^0.24.0",
+    "primeflex": "^3.1.0",
+    "primeicons": "^5.0.0",
+    "primereact": "^7.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "^4.0.3",
+    "react-transition-group": "^4.4.2",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
