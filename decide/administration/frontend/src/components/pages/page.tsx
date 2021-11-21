@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import { Box } from "@mui/material";
 
-import { Title } from "../01-atoms/Title";
+import { Title } from "components/01-atoms";
 
 const Page = (props: {
   title: string;

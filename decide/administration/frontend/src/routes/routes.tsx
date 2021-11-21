@@ -6,10 +6,9 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { Loader } from "../components/01-atoms";
-import { NotFoundPage, UsersPage, HomePage } from "../components/pages";
-
-import Menu from "../components/templates/menu";
+import { Loader } from "components/01-atoms";
+import { Menu } from "components/templates";
+import { NotFoundPage, UsersPage, HomePage } from "components/pages";
 
 export const AppRoutes = () => {
   return (

@@ -1,8 +1,8 @@
 import React from "react";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 
-import { UserData } from "src/types/user";
-import { Table } from "../../02-molecules";
+import { userType } from "types";
+import { Table } from "components/02-molecules";
 
 // todo: set correct columns
 
@@ -40,7 +40,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-const Component = (props: { users: UserData[] }) => {
+const Component = (props: { users: userType.User[] }) => {
   return <Table rows={props.users} columns={columns} />;
 };
 
