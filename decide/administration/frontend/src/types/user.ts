@@ -1,5 +1,5 @@
 //todo replace with user correct data
-export type UserData = {
+export type User = {
   id: number;
   lastName: string;
   firstName?: string | null;

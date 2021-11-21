@@ -1,5 +1,5 @@
 import React from "react";
-import { UserTable } from "../../templates/users";
+import { UserTable } from "components/templates/users";
 
 import Page from "../page";
 
