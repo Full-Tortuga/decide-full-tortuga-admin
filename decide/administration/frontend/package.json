@@ -5,7 +5,9 @@
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@mui/icons-material": "^5.1.1",
     "@mui/material": "^5.0.6",
+    "@mui/x-data-grid": "^5.0.1",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -13,9 +15,13 @@
     "@types/node": "^12.20.36",
     "@types/react": "^17.0.34",
     "@types/react-dom": "^17.0.11",
+    "axios": "^0.24.0",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "postcss": "^8.3.11",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^6.0.0",
+    "react-router-dom": "^6.0.2",
     "react-scripts": "4.0.3",
     "typescript": "^4.4.4",
     "web-vitals": "^1.1.2"
@@ -24,13 +30,30 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "css": "postcss ./src/styles/tailwind.css -o ./src/styles/tailwind.generated.css",
+    "prestart": "npm run css",
+    "prebuild": "npm run css"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
     ]
+  },
+  "moduleNameMapper": {
+    "@api": "<rootDir>/src/api",
+    "@routes": "<rootDir>/src/routes",
+    "@assets": "<rootDir>/src/assets",
+    "@util": "<rootDir>/src/util",
+    "@types": "<rootDir>/src/types",
+    "@redux": "<rootDir>/src/redux",
+    "@protons": "<rootDir>/src/components/0-protons",
+    "@atoms": "<rootDir>/src/components/1-atoms",
+    "@molecules": "<rootDir>/src/components/2-molecules",
+    "@organisms": "<rootDir>/src/components/3-organisms",
+    "@templates": "<rootDir>/src/components/templates",
+    "@pages": "<rootDir>/src/components/pages"
   },
   "browserslist": {
     "production": [
@@ -43,5 +66,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.8.6",
+    "postcss-cli": "^9.0.2",
+    "tailwindcss": "^2.2.19"
   }
 }
