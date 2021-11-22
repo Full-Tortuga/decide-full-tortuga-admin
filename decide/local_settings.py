@@ -1,7 +1,7 @@
 ALLOWED_HOSTS = ["*"]
 
 # Modules in use, commented modules that you won't use
-MODULES = [
+'''MODULES = [
     'authentication',
     'base',
     'booth',
@@ -11,7 +11,7 @@ MODULES = [
     'store',
     'visualizer',
     'voting',
-]
+]'''
 
 APIS = {
     'authentication': 'http://localhost:8000',
@@ -29,12 +29,11 @@ BASEURL = 'http://localhost:8000'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'decide',
-	'PASSWORD': 'practica',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': 'djongo',
+        'NAME': 'prueba',
+        'CLIENT': {
+           'host': '127.0.0.1',
+        }
     }
 }
 

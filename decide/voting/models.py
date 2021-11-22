@@ -1,9 +1,10 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from base import mods
+
+
+
 from base.models import Auth, Key
 
 
@@ -39,8 +40,10 @@ class Voting(models.Model):
     pub_key = models.OneToOneField(Key, related_name='voting', blank=True, null=True, on_delete=models.SET_NULL)
     auths = models.ManyToManyField(Auth, related_name='votings')
 
-    tally = JSONField(blank=True, null=True)
-    postproc = JSONField(blank=True, null=True)
+    #Create a new attribute called `tally` that is a list of integers.
+
+    tally = models.Field(blank=True, null=True, default=[])
+    postproc = models.Field(blank=True, null=True, default=[])
 
     def create_pubkey(self):
         if self.pub_key or not self.auths.count():
@@ -55,6 +58,7 @@ class Voting(models.Model):
         pk = Key(p=key["p"], g=key["g"], y=key["y"])
         pk.save()
         self.pub_key = pk
+
         self.save()
 
     def get_votes(self, token=''):
@@ -66,15 +70,14 @@ class Voting(models.Model):
     def tally_votes(self, token=''):
         '''
         The tally is a shuffle and then a decrypt
+
         '''
-
         votes = self.get_votes(token)
-
         auth = self.auths.first()
         shuffle_url = "/shuffle/{}/".format(self.id)
         decrypt_url = "/decrypt/{}/".format(self.id)
         auths = [{"name": a.name, "url": a.url} for a in self.auths.all()]
-
+        
         # first, we do the shuffle
         data = { "msgs": votes }
         response = mods.post('mixnet', entry_point=shuffle_url, baseurl=auth.url, json=data,
@@ -82,7 +85,7 @@ class Voting(models.Model):
         if response.status_code != 200:
             # TODO: manage error
             pass
-
+        
         # then, we can decrypt that
         data = {"msgs": response.json()}
         response = mods.post('mixnet', entry_point=decrypt_url, baseurl=auth.url, json=data,
@@ -90,11 +93,11 @@ class Voting(models.Model):
 
         if response.status_code != 200:
             # TODO: manage error
-            pass
-
+            pass    
+        
         self.tally = response.json()
+        
         self.save()
-
         self.do_postproc()
 
     def do_postproc(self):
