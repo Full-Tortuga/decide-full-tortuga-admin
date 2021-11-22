@@ -10,4 +10,4 @@ class Census(models.Model):
     def clean(self):
         # Don't allow draft entries to have a pub_date.
         if Census.objects.filter(voting_id=self.voting_id, voter_id=self.voter_id).exists():
-            raise ValidationError(('There is already exists this pair'))
+            raise ValidationError('There is already exists this pair', code='Error')
