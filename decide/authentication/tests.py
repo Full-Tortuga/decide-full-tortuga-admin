@@ -105,16 +105,6 @@ class AuthTestCase(APITestCase):
         response = self.client.post('/authentication/register/', token, format='json')
         self.assertEqual(response.status_code, 400)
 
-    def test_register_user_already_exist(self):
-        data = {'username': 'admin', 'password': 'admin'}
-        response = self.client.post('/authentication/login/', data, format='json')
-        self.assertEqual(response.status_code, 200)
-        token = response.json()
-
-        token.update(data)
-        response = self.client.post('/authentication/register/', token, format='json')
-        self.assertEqual(response.status_code, 400)
-
     def test_register(self):
         data = {'username': 'admin', 'password': 'admin'}
         response = self.client.post('/authentication/login/', data, format='json')
@@ -128,3 +118,13 @@ class AuthTestCase(APITestCase):
             sorted(list(response.json().keys())),
             ['token', 'user_pk']
         )
+
+    def test_register_user_already_exist(self):
+        data = {'username': 'admin', 'password': 'admin'}
+        response = self.client.post('/authentication/login/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+        token = response.json()
+
+        token.update(data)
+        response = self.client.post('/authentication/register/', token, format='json')
+        self.assertEqual(response.status_code, 400)
