@@ -30,14 +30,15 @@ class QuestionOption(models.Model):
 
 
 class Voting(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     desc = models.TextField(blank=True, null=True)
     question = models.ForeignKey(Question, related_name='voting', on_delete=models.CASCADE)
 
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-
-    pub_key = models.OneToOneField(Key, related_name='voting', blank=True, null=True, on_delete=models.SET_NULL)
+    
+    pub_key = models.OneToOneField(Key, related_name='voting', blank=True, null=True, on_delete=models.SET_NULL, primary_key=False)
     auths = models.ManyToManyField(Auth, related_name='votings')
 
     #Create a new attribute called `tally` that is a list of integers.
@@ -46,8 +47,6 @@ class Voting(models.Model):
     postproc = models.Field(blank=True, null=True, default=[])
 
     def create_pubkey(self):
-        if self.pub_key or not self.auths.count():
-            return
 
         auth = self.auths.first()
         data = {
