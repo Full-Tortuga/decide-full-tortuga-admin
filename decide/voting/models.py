@@ -1,8 +1,8 @@
-from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from base import mods
-
+from djongo import models
+from django.core.exceptions import ValidationError
 
 
 from base.models import Auth, Key
@@ -33,18 +33,26 @@ class Voting(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     desc = models.TextField(blank=True, null=True)
-    question = models.ForeignKey(Question, related_name='voting', on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, related_name='voting', on_delete=models.CASCADE, primary_key=False, db_index=False)
 
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
     
-    pub_key = models.OneToOneField(Key, related_name='voting', blank=True, null=True, on_delete=models.SET_NULL, primary_key=False)
+    #Create a new attribute called 'pub_key' that is a foreign key to the Key model and is not included in index 
+    #(so it is not searchable).
+    pub_key = models.ForeignKey(Key, related_name='voting', on_delete=models.CASCADE, null=True, blank=True, db_index=False)
     auths = models.ManyToManyField(Auth, related_name='votings')
 
     #Create a new attribute called `tally` that is a list of integers.
 
     tally = models.Field(blank=True, null=True, default=[])
     postproc = models.Field(blank=True, null=True, default=[])
+
+
+    def clean(self):
+        # Don't allow draft entries to have a pub_date.
+        if (self.pub_key is not None) and (Voting.objects.filter(pub_key=self.pub_key).exists()):
+            raise ValidationError('There is already exists this public key', code='Error') 
 
     def create_pubkey(self):
 

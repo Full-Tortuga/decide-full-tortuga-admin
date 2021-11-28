@@ -30,7 +30,7 @@ BASEURL = 'http://localhost:8000'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'mongolo',
+        'NAME': 'decide',
         'CLIENT': {
            'host': '127.0.0.1',
         }

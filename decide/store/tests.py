@@ -23,7 +23,7 @@ class StoreTextCase(BaseTestCase):
         super().setUp()
         self.question = Question(desc='qwerty')
         self.question.save()
-        self.voting = Voting(id = 9000,name='voting example',
+        self.voting = Voting(id = 5001,name='voting example',
                              question=self.question,
                              start_date=timezone.now(),
         )
@@ -36,7 +36,6 @@ class StoreTextCase(BaseTestCase):
         voting = Voting(id=id, name='v1', question=self.question, start_date=timezone.now(),
                 end_date=timezone.now() + datetime.timedelta(days=1))
 
-        print("HOLA: ", voting)
         voting.save()
 
     def get_or_create_user(self, pk):
@@ -53,7 +52,7 @@ class StoreTextCase(BaseTestCase):
             a = random.randint(2, 500)
             b = random.randint(2, 500)
             self.gen_voting(v)
-            '''random_user = random.choice(users)
+            random_user = random.choice(users)
             user = self.get_or_create_user(random_user)
             self.login(user=user.username)
             census = Census(voting_id=v, voter_id=random_user)
@@ -66,7 +65,7 @@ class StoreTextCase(BaseTestCase):
             response = self.client.post('/store/', data, format='json')
             self.assertEqual(response.status_code, 200)
 
-        self.logout()'''
+        self.logout()
         return votings, users
 
     def test_gen_vote_invalid(self):
@@ -120,7 +119,7 @@ class StoreTextCase(BaseTestCase):
 
     def test_filter(self):
         votings, voters = self.gen_votes()
-        '''v = votings[0]
+        v = votings[0]
 
         response = self.client.get('/store/?voting_id={}'.format(v), format='json')
         self.assertEqual(response.status_code, 401)
@@ -141,7 +140,7 @@ class StoreTextCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         votes = response.json()
 
-        self.assertEqual(len(votes), Vote.objects.filter(voter_id=v).count())'''
+        self.assertEqual(len(votes), Vote.objects.filter(voter_id=v).count())
 
     def test_hasvote(self):
         votings, voters = self.gen_votes()
