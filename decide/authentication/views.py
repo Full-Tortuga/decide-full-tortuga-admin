@@ -64,7 +64,25 @@ class UsersAPI(APIView):
         if tk.user.is_superuser is True:
             query = User.objects.all()
             rest = UserSerializer(query, many=True).data
-            return Response({"Users": rest}, status=HTTP_200_OK)
+            return Response(rest, status=HTTP_200_OK)
+
+    def post(self, request):
+        key = request.META.get("HTTP_TOKEN", "")
+        try:
+            tk = get_object_or_404(Token, key=key)
+        except Http404:
+            return Response({"Error": "Invalid token"}, status=HTTP_401_UNAUTHORIZED)
+
+        if tk.user.is_superuser is True:
+            user = UserSerializer(data=request.data)
+            if not user.is_valid():
+                return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
+            else:
+                user.save()
+                return Response({}, status=HTTP_200_OK)
+        else:
+            return Response({"Error": "You are not authenticated to perform this request"},
+                            status=HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
         key = request.META.get("HTTP_TOKEN", "")
@@ -78,7 +96,7 @@ class UsersAPI(APIView):
 
 
 class UserAPI(APIView):
-    def get(self, request):
+    def get(self, request, user_id):
         key = request.META.get("HTTP_TOKEN", "")
         try:
             tk = get_object_or_404(Token, key=key)
@@ -86,17 +104,17 @@ class UserAPI(APIView):
             return Response({"Error": "Invalid token"}, status=HTTP_401_UNAUTHORIZED)
 
         if tk.user.is_superuser is True:
-            iduser = request.query_params.get("id")
-            if not iduser:
-                return Response({"result": "Id attribute is mandatory"}, status=HTTP_400_BAD_REQUEST)
-            query = User.objects.filter(id=iduser).get()
+            try:
+                query = User.objects.filter(id=user_id).get()
+            except ObjectDoesNotExist:
+                return Response({}, status=HTTP_404_NOT_FOUND)
             rest = UserSerializer(query).data
-            return Response({"User": rest}, status=HTTP_200_OK)
+            return Response(rest, status=HTTP_200_OK)
         else:
             return Response({"Error": "You are not authenticated to perform this request"},
                             status=HTTP_401_UNAUTHORIZED)
 
-    def post(self, request):
+    def put(self, request, user_id):
         key = request.META.get("HTTP_TOKEN", "")
         try:
             tk = get_object_or_404(Token, key=key)
@@ -104,29 +122,14 @@ class UserAPI(APIView):
             return Response({"Error": "Invalid token"}, status=HTTP_401_UNAUTHORIZED)
 
         if tk.user.is_superuser is True:
-            user = UserSerializer(data=request.data.get("User"))
-            if not user.is_valid():
+            if not UserSerializer(data=request.data).is_valid():
                 return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
             else:
-                user.save()
-                return Response({}, status=HTTP_200_OK)
-        else:
-            return Response({"Error": "You are not authenticated to perform this request"},
-                            status=HTTP_401_UNAUTHORIZED)
-
-    def put(self, request):
-        key = request.META.get("HTTP_TOKEN", "")
-        try:
-            tk = get_object_or_404(Token, key=key)
-        except Http404:
-            return Response({"Error": "Invalid token"}, status=HTTP_401_UNAUTHORIZED)
-
-        if tk.user.is_superuser is True:
-            if not UserSerializer(data=request.data.get("User")).is_valid():
-                return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
-            else:
-                user = User.objects.filter(id=request.data.get("User").get("id")).get()
-                for key, value in request.data.get("User").items():
+                try:
+                    user = User.objects.filter(id=user_id).get()
+                except ObjectDoesNotExist:
+                    return Response({}, status=HTTP_404_NOT_FOUND)
+                for key, value in request.data.items():
                     setattr(user, key, value)
                 user.save()
                 return Response({}, status=HTTP_200_OK)
@@ -134,17 +137,14 @@ class UserAPI(APIView):
             return Response({"Error": "You are not authenticated to perform this request"},
                             status=HTTP_401_UNAUTHORIZED)
 
-    def delete(self, request):
+    def delete(self, request, user_id):
         key = request.META.get("HTTP_TOKEN", "")
         try:
             tk = get_object_or_404(Token, key=key)
         except Http404:
             return Response({"Error": "Invalid token"}, status=HTTP_401_UNAUTHORIZED)
         if tk.user.is_superuser is True:
-            iduser = request.query_params.get("id")
-            if not iduser:
-                return Response({"result": "Id attribute is mandatory"}, status=HTTP_400_BAD_REQUEST)
-            query = User.objects.all().filter(id=iduser).delete()
+            query = User.objects.all().filter(is_superuser=False, id=user_id).delete()
             return Response({}, status=HTTP_200_OK)
         else:
             return Response({"Error": "You are not authenticated to perform this request"},
