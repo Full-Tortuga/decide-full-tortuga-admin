@@ -62,7 +62,10 @@ fichero requirements.txt:
     pip install -r requirements.txt
 
 Además, será necesario instalar las dependencias correspondientes al panel de control desarrollado con
-React. Para ello, entramos en la carpeta del panel (cd decide_panel) y ejecutamos el siguiente comando:
+React. Para ello, primero se deberán tener instaldas las siguientes librerías de js con sus correspondientes
+versiones: Node=14.15.0, npm=7.8.0.
+
+A continuación, entramos en la carpeta del panel (cd decide_panel) y ejecutamos el siguiente comando:
 
     npm install
 
