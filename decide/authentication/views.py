@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 
 from .serializers import UserSerializer
-import json as Json
 
 
 class GetUserView(APIView):
