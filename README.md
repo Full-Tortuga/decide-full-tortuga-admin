@@ -61,14 +61,22 @@ fichero requirements.txt:
 
     pip install -r requirements.txt
 
+Además, será necesario instalar las dependencias correspondientes al panel de control desarrollado con
+React. Para ello, primero se deberán tener instaldas las siguientes librerías de js con sus correspondientes
+versiones: Node=14.15.0, npm=7.8.0.
+
+A continuación, entramos en la carpeta del panel (cd decide_panel) y ejecutamos el siguiente comando:
+
+    npm install
+
 Tras esto tendremos que crearnos nuestra base de datos con postgres:
 
     sudo su - postgres
     psql -c "create user decide with password 'decide'"
     psql -c "create database decide owner decide"
 
-Entramos en la carpeta del proyecto (cd decide) y realizamos la primera migración para preparar la
-base de datos que utilizaremos:
+Situados en el directorio raíz del proyecto, entramos en la carpeta del proyecto (cd decide) y 
+realizamos la primera migración para preparar la base de datos que utilizaremos:
 
     ./manage.py migrate
 
@@ -76,6 +84,10 @@ Por último, ya podremos ejecutar el módulos o módulos seleccionados en la con
 siguiente manera:
 
     ./manage.py runserver
+
+También debemos lanzar el panel de control, para ello dentro de la carpeta decide_panel ejecutamos:
+
+    npm start
 
 Ejecutar con docker
 -------------------
