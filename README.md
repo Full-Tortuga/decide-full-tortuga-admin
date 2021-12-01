@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.com/wadobo/decide.svg?branch=master)](https://travis-ci.com/wadobo/decide) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wadobo/decide&amp;utm_campaign=Badge_Grade) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&utm_medium=referral&utm_content=wadobo/decide&utm_campaign=Badge_Coverage)
 
 Plataforma voto electrónico educativa
-=====================================
 
 El objetivo de este proyecto es implementar una plataforma de voto
 electrónico seguro, que cumpla una serie de garantías básicas, como la
@@ -80,6 +79,17 @@ En caso de fallo al instalar las dependencias, es necesario instalas el paquete 
 
 Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
+Además, será necesario instalar las dependencias correspondientes al panel de control desarrollado con
+React. Para ello, primero se deberán tener instaldas las siguientes librerías de js con sus correspondientes
+versiones: Node=14.15.0, npm=7.8.0.
+
+A continuación, entramos en la carpeta del panel (cd decide_panel) y ejecutamos el siguiente comando:
+
+    npm install
+
+Situados en el directorio raíz del proyecto, entramos en la carpeta del proyecto (cd decide) y 
+realizamos la primera migración para preparar la base de datos que utilizaremos:
+
     ./manage.py makemigrations
     ./mange.py migrate
 
@@ -87,6 +97,10 @@ Por último, ya podremos ejecutar el módulos o módulos seleccionados en la con
 siguiente manera:
 
     ./manage.py runserver
+
+También debemos lanzar el panel de control, para ello dentro de la carpeta decide_panel ejecutamos:
+
+    npm start
 
 Ejecutar con docker
 -------------------
