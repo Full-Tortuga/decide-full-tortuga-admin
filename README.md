@@ -56,21 +56,32 @@ Para configurar el proyecto, podremos crearnos un fichero local_settings.py basa
 local_settings.example.py, donde podremos configurar la ruta de nuestras apps o escoger que módulos
 ejecutar.
 
-Una vez hecho esto, será necesario instalar las dependencias del proyecto, las cuales están en el
+Se hará uso de la base de datos MongoDB, para el correcto funcionamiento de la aplicación será necesaria la instalación de dicha base de datos siguiendo las instrucciones de la documentación oficial según el SO que estemos utilizando:
+
+Windows: 
+    - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+
+Ubuntu:
+    - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+WSL:
+    - https://docs.microsoft.com/es-es/windows/wsl/tutorials/wsl-database#install-mongodb
+
+MacOs:
+    - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
+
+Una vez hecho esto, y corriendo la base de datos, será necesario instalar las dependencias del proyecto, las cuales están en el
 fichero requirements.txt:
 
     pip install -r requirements.txt
 
-Tras esto tendremos que crearnos nuestra base de datos con postgres:
+En caso de fallo al instalar las dependencias, es necesario instalas el paquete wheel y volver al comando anterior:
+    pip install wheel
 
-    sudo su - postgres
-    psql -c "create user decide with password 'decide'"
-    psql -c "create database decide owner decide"
+Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
-Entramos en la carpeta del proyecto (cd decide) y realizamos la primera migración para preparar la
-base de datos que utilizaremos:
-
-    ./manage.py migrate
+    ./manage.py makemigrations
+    ./mange.py migrate
 
 Por último, ya podremos ejecutar el módulos o módulos seleccionados en la configuración de la
 siguiente manera:
