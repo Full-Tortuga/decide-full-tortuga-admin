@@ -22,6 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^##ydkswfu0+=ofw0l#$kv^8n)0$i(qd&d&ol#p9!b$8*5%j1+'
 
+# Token for telegram bot
+TELEGRAM_TOKEN = '2111051748:AAH1R736I0_HsZEW6_22Tf0r-OqihtF5x88'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -157,6 +160,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#temporary link to visualizer page for bots (until hosted)
+VISUALIZER_VIEW="http://127.0.0.1:8000/visualizer/"
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256

@@ -4,15 +4,15 @@ from django.conf import settings
 from django.http import Http404
 
 from base import mods
-
+from .telegramBot import init_bot
 
 class VisualizerView(TemplateView):
     template_name = 'visualizer/visualizer.html'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         vid = kwargs.get('voting_id', 0)
-
+        
         try:
             r = mods.get('voting', params={'id': vid})
             context['voting'] = json.dumps(r[0])
@@ -20,3 +20,7 @@ class VisualizerView(TemplateView):
             raise Http404
 
         return context
+    
+#call to initialize bot
+init_bot() 
+    
