@@ -46,20 +46,6 @@
       "react-app/jest"
     ]
   },
-  "moduleNameMapper": {
-    "@api": "<rootDir>/src/api",
-    "@routes": "<rootDir>/src/routes",
-    "@assets": "<rootDir>/src/assets",
-    "@util": "<rootDir>/src/util",
-    "@types": "<rootDir>/src/types",
-    "@redux": "<rootDir>/src/redux",
-    "@protons": "<rootDir>/src/components/0-protons",
-    "@atoms": "<rootDir>/src/components/1-atoms",
-    "@molecules": "<rootDir>/src/components/2-molecules",
-    "@organisms": "<rootDir>/src/components/3-organisms",
-    "@templates": "<rootDir>/src/components/templates",
-    "@pages": "<rootDir>/src/components/pages"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
