@@ -21,8 +21,19 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd decide/administration/frontend
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm run test
-    - run: npm run start
+    - name: Install dependencies
+      run: |
+          cd decide/administration/frontend &&
+          npm install
+    - name: Build app
+      run: |
+          cd decide/administration/frontend &&
+          npm run build --if-present
+    - name: Test app
+      run: |
+          cd decide/administration/frontend &&
+          npm run test
+    - name: Start development enviroment
+      run: |
+          cd decide/administration/frontend &&
+          npm run start
