@@ -33,7 +33,3 @@ jobs:
       run: |
           cd decide/administration/frontend &&
           npm run test
-    - name: Start development enviroment
-      run: |
-          cd decide/administration/frontend &&
-          npm run start
