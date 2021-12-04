@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.com/wadobo/decide.svg?branch=master)](https://travis-ci.com/wadobo/decide) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wadobo/decide&amp;utm_campaign=Badge_Grade) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&utm_medium=referral&utm_content=wadobo/decide&utm_campaign=Badge_Coverage)
 
 Plataforma voto electrónico educativa
-=====================================
 
 El objetivo de este proyecto es implementar una plataforma de voto
 electrónico seguro, que cumpla una serie de garantías básicas, como la
@@ -56,10 +55,29 @@ Para configurar el proyecto, podremos crearnos un fichero local_settings.py basa
 local_settings.example.py, donde podremos configurar la ruta de nuestras apps o escoger que módulos
 ejecutar.
 
-Una vez hecho esto, será necesario instalar las dependencias del proyecto, las cuales están en el
+Se hará uso de la base de datos MongoDB, para el correcto funcionamiento de la aplicación será necesaria la instalación de dicha base de datos siguiendo las instrucciones de la documentación oficial según el SO que estemos utilizando:
+
+Windows: 
+    - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+
+Ubuntu:
+    - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+WSL:
+    - https://docs.microsoft.com/es-es/windows/wsl/tutorials/wsl-database#install-mongodb
+
+MacOs:
+    - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
+
+Una vez hecho esto, y corriendo la base de datos, será necesario instalar las dependencias del proyecto, las cuales están en el
 fichero requirements.txt:
 
     pip install -r requirements.txt
+
+En caso de fallo al instalar las dependencias, es necesario instalas el paquete wheel y volver al comando anterior:
+    pip install wheel
+
+Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
 Además, será necesario instalar las dependencias correspondientes al panel de control desarrollado con
 React. Para ello, primero se deberán tener instaldas las siguientes librerías de js con sus correspondientes
@@ -69,16 +87,11 @@ A continuación, entramos en la carpeta del panel (cd decide_panel) y ejecutamos
 
     npm install
 
-Tras esto tendremos que crearnos nuestra base de datos con postgres:
-
-    sudo su - postgres
-    psql -c "create user decide with password 'decide'"
-    psql -c "create database decide owner decide"
-
 Situados en el directorio raíz del proyecto, entramos en la carpeta del proyecto (cd decide) y 
 realizamos la primera migración para preparar la base de datos que utilizaremos:
 
-    ./manage.py migrate
+    ./manage.py makemigrations
+    ./mange.py migrate
 
 Por último, ya podremos ejecutar el módulos o módulos seleccionados en la configuración de la
 siguiente manera:

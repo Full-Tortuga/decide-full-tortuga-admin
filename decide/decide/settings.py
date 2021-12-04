@@ -65,12 +65,19 @@ MODULES = [
     'base',
     'booth',
     'census',
+    'voting',
     'mixnet',
     'postproc',
     'store',
     'visualizer',
-    'voting',
 ]
+
+''''
+    'mixnet',
+    'postproc',
+    'store',
+    'visualizer',
+    'voting','''
 
 BASEURL = 'http://localhost:8000'
 
@@ -111,12 +118,11 @@ WSGI_APPLICATION = 'decide.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'decide',
-        'USER': 'decide',
-        'PASSWORD': 'decide',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'djongo',
+        'NAME': 'prueba',
+        'CLIENT': {
+           'host': '127.0.0.1',
+        }
     }
 }
 
