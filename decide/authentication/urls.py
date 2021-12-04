@@ -9,7 +9,4 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('getuser/', GetUserView.as_view()),
     path('register/', RegisterView.as_view()),
-    path('api/users/', UsersAPI.as_view()),
-    path('api/users/<int:user_id>/', UserAPI.as_view()),
-
 ]
