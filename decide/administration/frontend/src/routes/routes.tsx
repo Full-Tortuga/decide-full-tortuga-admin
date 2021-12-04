@@ -8,9 +8,12 @@ import {
 
 import { Loader } from "components/01-atoms";
 import { Menu } from "components/templates";
-import { NotFoundPage, UsersPage, HomePage } from "components/pages";
+import { NotFoundPage, UsersPage, HomePage, LoginPage } from "components/pages";
+import { localStore } from "store";
 
 export const AppRoutes = () => {
+  const isAuthenticated = localStore.getToken() !== null;
+
   return (
     <Suspense
       fallback={
@@ -22,10 +25,16 @@ export const AppRoutes = () => {
       <Router basename="/administration">
         <Menu />
         <Routes>
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/404" element={<NotFoundPage />} />
-          <Route path="*" element={<Navigate to="/home" />} />
+          {isAuthenticated ? (
+            <>
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/404" element={<NotFoundPage />} />
+              <Route path="*" element={<Navigate to="/404" />} />
+            </>
+          ) : (
+            <Route path="*" element={<LoginPage />} />
+          )}
         </Routes>
       </Router>
     </Suspense>

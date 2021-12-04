@@ -8,9 +8,8 @@ const Page = (props: {
   children?: ReactElement | ReactElement[] | string;
 }) => {
   return (
-    <Box className="m-10 justify-center">
-      <Title title={props.title} variant="h1" />
-
+    <Box className="m-1 md:m-5 xl:m-10 justify-center">
+      <Title title={props.title} variant="h2" />
       <Box id="content" className="m-2 inline-block w-10/12">
         {props.children}
       </Box>
