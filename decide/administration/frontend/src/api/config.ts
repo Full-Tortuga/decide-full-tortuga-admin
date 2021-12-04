@@ -29,6 +29,7 @@ axios.interceptors.response.use(
   (error) => {
     // todo: handle errors
     const message = error.response?.data?.message || error.message;
+    console.warn(message);
     return Promise.reject(error);
   }
 );
