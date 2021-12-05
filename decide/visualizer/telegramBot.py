@@ -2,13 +2,21 @@ from django.conf import settings
 from django.db.models import query
 from voting import models
 from store import models as stmodels
-from telegram import Update, CallbackQuery, InputMediaPhoto, Bot
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters , CallbackContext, CallbackQueryHandler
+from telegram import InputMediaPhoto, Bot
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-import datetime,logging
+import datetime,logging, os, sys
 from .website_scrapping import get_graphs
 from .models import TelegramBot
+from threading import Thread
+
+
+#auth and front-end for '@VotitosBot'
+UPDATER = Updater(settings.TELEGRAM_TOKEN,
+                use_context=True)
+
+BOT=Bot(token=settings.TELEGRAM_TOKEN)
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
@@ -16,28 +24,27 @@ def init_bot():
     #logging
     logging.basicConfig(level=logging.ERROR,
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    #auth token needed
-    updater = Updater(settings.TELEGRAM_TOKEN,
-                    use_context=True)
-
-    setup_commands(updater) 
-    
+    setup_commands(UPDATER) 
+ 
     #starts the bot
-    updater.start_polling()
+    UPDATER.start_polling()
        
 #configures commands and handlers for the bot
 def setup_commands(votitos):
 
-    votitos.dispatcher.add_handler(CommandHandler('start', start))
-    votitos.dispatcher.add_handler(CommandHandler('results', show_results))
-    votitos.dispatcher.add_handler(CommandHandler('details', show_details))
-    votitos.dispatcher.add_handler(CommandHandler('auto', change_auto_status))
-    votitos.dispatcher.add_handler(CommandHandler('help', help))
-    votitos.dispatcher.add_handler(MessageHandler(Filters.command, unknown_command))
-    votitos.dispatcher.add_handler(CallbackQueryHandler(results_query_handler, pattern="^[1-9][0-9]*$"))
-    votitos.dispatcher.add_handler(CallbackQueryHandler(details_query_handler, pattern="^d[1-9][0-9]*$")) 
-    votitos.dispatcher.add_handler(CallbackQueryHandler(auto_query_handler, pattern="(^True$|^False$)"))
-        
+    dp=votitos.dispatcher
+    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('relaunch', relaunch, Filters.user(user_id=1931864468)))
+    dp.add_handler(CommandHandler('stop', stop, Filters.user(user_id=1931864468)))
+    dp.add_handler(CommandHandler('results', show_results))
+    dp.add_handler(CommandHandler('details', show_details))
+    dp.add_handler(CommandHandler('auto', change_auto_status))
+    dp.add_handler(CommandHandler('help', help))
+    dp.add_handler(MessageHandler(Filters.command, unknown_command))
+    dp.add_handler(CallbackQueryHandler(results_query_handler, pattern="^[1-9][0-9]*$"))
+    dp.add_handler(CallbackQueryHandler(details_query_handler, pattern="^d[1-9][0-9]*$")) 
+    dp.add_handler(CallbackQueryHandler(auto_query_handler, pattern="(^True$|^False$)"))
+         
 #gives the user a warming welcome
 def start(update, context):
     name=update.message.from_user.first_name
@@ -45,6 +52,19 @@ def start(update, context):
     context.bot.send_message(chat_id=id, text="Hola {}, a las buenas tardes. ¿En qué puedo ayudarte?".format(name))
     TelegramBot.objects.get_or_create(user_id=id)
     help(update)
+    
+# relaunch the bot and also the whole project (limited to admin)
+def relaunch(update, context):
+    Thread(target=stop_restart).start()
+    
+# aux for relaunch
+def stop_restart():
+    UPDATER.stop()
+    os.execl(sys.executable, sys.executable, *sys.argv) 
+
+#shutdowns the bot   
+def stop(update, context):
+    UPDATER.stop()
     
 #list of commands available
 def help(update):
@@ -57,7 +77,7 @@ def help(update):
     """)
 
 #replies to invalid command inputs
-def unknown_command(update):
+def unknown_command(update, context):
     update.message.reply_text("Lo siento, no sé qué es '%s'. Revisa que has escrito bien el comando o bien revisa mi lista de comandos, puedes hacerlo con\n/help" % update.message.text)
 
 #allow to select an closed voting and show its results
@@ -83,7 +103,7 @@ def show_details(update, context):
     votings=models.Voting.objects.exclude(start_date__isnull=True)
     keyboard_buttons=[[InlineKeyboardButton(text=str(v.name), callback_data="d"+str(v.id)) for v in votings]]
     keyboard=InlineKeyboardMarkup(keyboard_buttons)
-    context.bot.send_message(chat_id=update.message.chat.id, text= "Seleccione una por favor:", reply_markup=keyboard)
+    context.bot.send_message(chat_id=update.message.chat.id, text="Seleccione una por favor:", reply_markup=keyboard)
 
 #handler for '/details' command
 def details_query_handler(update, context):
@@ -161,6 +181,6 @@ def auto_notifications(voting):
     users_id_enabled=list(TelegramBot.objects.values_list('user_id', flat=True).exclude(auto_msg=False))
     msg=aux_message_builder(voting)
     for id in users_id_enabled:
-        Bot(token=settings.TELEGRAM_TOKEN).send_message(chat_id=id, text=msg, parse_mode="HTML")
+        BOT.send_message(chat_id=id, text=msg, parse_mode="HTML")
 
 
