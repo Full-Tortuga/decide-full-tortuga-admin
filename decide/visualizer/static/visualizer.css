@@ -1,0 +1,12 @@
+#bots-footer  {
+    position: fixed;
+    width: 100%;
+    bottom : 0px;  
+    height : 60px;
+    text-align: center;
+    vertical-align: middle; 
+    padding-top: 0.5 rem;
+    padding-bottom: 0.5 rem;
+    background-color: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity));
+    color: #fff;
+}

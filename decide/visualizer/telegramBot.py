@@ -1,12 +1,11 @@
 from django.conf import settings
-from django.db.models import query
 from voting import models
 from store import models as stmodels
 from telegram import InputMediaPhoto, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-import datetime,logging, os, sys
+import logging, os, sys
 from .website_scrapping import get_graphs
 from .models import TelegramBot
 from threading import Thread
@@ -25,7 +24,7 @@ def init_bot():
     logging.basicConfig(level=logging.ERROR,
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     setup_commands(UPDATER) 
- 
+    updates_setting()
     #starts the bot
     UPDATER.start_polling()
        
@@ -44,8 +43,15 @@ def setup_commands(votitos):
     dp.add_handler(CallbackQueryHandler(results_query_handler, pattern="^[1-9][0-9]*$"))
     dp.add_handler(CallbackQueryHandler(details_query_handler, pattern="^d[1-9][0-9]*$")) 
     dp.add_handler(CallbackQueryHandler(auto_query_handler, pattern="(^True$|^False$)"))
-         
-#gives the user a warming welcome
+
+#set bot configuration not to reply to old messages
+def updates_setting():
+    updates=BOT.get_updates() 
+    if updates:
+        last_update=updates[-1].update_id
+        BOT.get_updates(offset=last_update+1)  
+             
+#gives the users a warming welcome
 def start(update, context):
     name=update.message.from_user.first_name
     id=update.message.chat.id
@@ -62,11 +68,11 @@ def stop_restart():
     UPDATER.stop()
     os.execl(sys.executable, sys.executable, *sys.argv) 
 
-#shutdowns the bot   
+#shut down the bot   
 def stop(update, context):
     UPDATER.stop()
     
-#list of commands available
+#list of available commands
 def help(update):
 
     update.message.reply_text("""Esta es mi lista de comandos: 
@@ -80,7 +86,7 @@ def help(update):
 def unknown_command(update, context):
     update.message.reply_text("Lo siento, no sé qué es '%s'. Revisa que has escrito bien el comando o bien revisa mi lista de comandos, puedes hacerlo con\n/help" % update.message.text)
 
-#allow to select an closed voting and show its results
+#allows you to select a closed voting and show its results
 def show_results(update, context):
     update.message.reply_text("Aquí tienes la lista de votaciones finalizadas.")
     finished_votings=models.Voting.objects.exclude(start_date__isnull=True).exclude(end_date__isnull=True)
@@ -97,7 +103,7 @@ def results_query_handler(update, context):
     query.answer("¡A la orden!")
     results_graph(query.data, update.callback_query.message.chat_id, context)
 
-#allow to select an active or closed voting and show its details    
+#allows you to select an active or closed voting and show its details    
 def show_details(update, context):
     update.message.reply_text("Selecciona la votación de la que desea ver sus detalles") 
     votings=models.Voting.objects.exclude(start_date__isnull=True)
@@ -119,25 +125,27 @@ def details_query_handler(update, context):
 def change_auto_status(update, context):
     id=update.message.chat.id
     status_user=TelegramBot.objects.get(user_id=id)
-    if status_user is True:
-        msg="activadas"
-        choose_msg="¿Desea desactivarlas?"
+    if status_user.auto_msg:
+        choose_msg="Actualmente las notificaciones automáticas se encuentran activadas.\n¿Desea desactivarlas?"
+        keyboard_buttons=[[InlineKeyboardButton(text="Sí", callback_data="False")],
+                          [InlineKeyboardButton(text="No", callback_data="True")]]
     else:
-        msg="desativadas"
-        choose_msg="¿Desea activarlas?"
-    keyboard_buttons=[[InlineKeyboardButton(text="Sí", callback_data="True")], [InlineKeyboardButton(text="No", callback_data="False")]]  #REVISAR CALLBACK DATA
+        choose_msg="Actualmente las notificaciones automáticas se encuentran desactivadas.\n¿Desea activarlas?"
+        keyboard_buttons=[[InlineKeyboardButton(text="Sí", callback_data="True")],
+                          [InlineKeyboardButton(text="No", callback_data="False")]]
     keyboard=InlineKeyboardMarkup(keyboard_buttons)
-    update.message.reply_text("Actualmente las notificaciones automáticas se encuentran {}.".format(msg)) 
     context.bot.send_message(chat_id=id, text=choose_msg, reply_markup=keyboard)
 
 #handler for '/auto' command
 def auto_query_handler(update, context):
     query=update.callback_query
-    query.answer("¡Listo! He actualizado tus preferencia")
-    id=update.callback_query.message.chat_id
-    new_status=query.data
-    TelegramBot.objects.filter(user_id=id).update(auto_msg=new_status) 
-
+    u_id=update.callback_query.message.chat_id
+    msg_id=update.callback_query.message.message_id
+    for id in range(msg_id-2, msg_id+1):
+        context.bot.delete_message(chat_id=u_id, message_id=id)
+    TelegramBot.objects.filter(user_id=u_id).update(auto_msg=query.data) 
+    query.answer("¡Listo! He actualizado tus preferencias")
+        
 # ===================
 #  AUXILIARY METHODS
 # ===================
@@ -165,7 +173,7 @@ def aux_message_builder(voting):
     
     return msg
 
-#extract graph's images from website selected voting and send them to the user
+#extracts graph's images from website selected voting and sends them to the user
 def results_graph(id, chat_identifier, context):
     url=settings.VISUALIZER_VIEW+ str(id)
     images=get_graphs(url)

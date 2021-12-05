@@ -22,4 +22,4 @@ def get_graphs(link):
 #checks whether url is valid or not (Might be removed in a near future)
 def validate_url(link):
     parse=urlparse(link)
-    return bool(parse.netloc) and (parse.scheme) 
+    return bool(parse.netloc) and bool(parse.scheme) 
