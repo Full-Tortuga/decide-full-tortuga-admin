@@ -25,7 +25,9 @@ SECRET_KEY = '^##ydkswfu0+=ofw0l#$kv^8n)0$i(qd&d&ol#p9!b$8*5%j1+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Application definition
@@ -63,12 +65,19 @@ MODULES = [
     'base',
     'booth',
     'census',
+    'voting',
     'mixnet',
     'postproc',
     'store',
     'visualizer',
-    'voting',
 ]
+
+''''
+    'mixnet',
+    'postproc',
+    'store',
+    'visualizer',
+    'voting','''
 
 BASEURL = 'http://localhost:8000'
 
@@ -80,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'decide.urls'
@@ -108,12 +118,11 @@ WSGI_APPLICATION = 'decide.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'decide',
-        'USER': 'decide',
-        'PASSWORD': 'decide',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'djongo',
+        'NAME': 'prueba',
+        'CLIENT': {
+           'host': '127.0.0.1',
+        }
     }
 }
 
