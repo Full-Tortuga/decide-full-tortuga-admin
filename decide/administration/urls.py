@@ -9,4 +9,8 @@ urlpatterns = [
     path('api/users/<int:user_id>/', UserAPI.as_view()),
     path('api/auth/login', LoginAuthAPI.as_view()),
     path('api/auth/logout', LogoutAuthAPI.as_view()),
+    path('api/base/auth', AuthsAPI.as_view()),
+    path('api/base/auth/<int:auth_id>/', AuthAPI.as_view()),
+    path('api/base/key', KeysAPI.as_view()),
+    path('api/base/key/<int:key_id>/', KeyAPI.as_view())
 ]
