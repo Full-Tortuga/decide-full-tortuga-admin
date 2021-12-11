@@ -6,7 +6,10 @@ from django.conf import settings
 from django.http import Http404
 from django.views.generic.base import View
 
+import ast
 from base import mods
+from collections import OrderedDict
+
 
 import io
 from reportlab.platypus import SimpleDocTemplate, Table
@@ -26,10 +29,14 @@ class VisualizerView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         vid = kwargs.get('voting_id', 0)
-
         try:
             r = mods.get('voting', params={'id': vid})
-            context['voting'] = json.dumps(r[0])
+            dataList =eval(r[0]['postproc'])
+            ls_dicc = []
+            for e in dataList:
+                ls_dicc.append(dict(e))
+            voting = (r[0], ls_dicc)
+            context['voting'] = voting
         except:
             raise Http404
 
