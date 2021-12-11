@@ -40,7 +40,7 @@ class VotingAdmin(admin.ModelAdmin):
     list_display = ('name', 'start_date', 'end_date')
     readonly_fields = ('start_date', 'end_date', 'pub_key',
                        'tally', 'postproc')
-    date_hierarchy = 'start_date'
+    #date_hierarchy = 'start_date'
     list_filter = (StartedFilter,)
     search_fields = ('name', )
 
@@ -56,21 +56,11 @@ class BinaryVotingAdmin(admin.ModelAdmin):
     list_display = ('name', 'start_date', 'end_date')
     readonly_fields = ('start_date', 'end_date', 'pub_key',
                        'tally', 'postproc')
-    date_hierarchy = 'start_date'
+    #date_hierarchy = 'start_date'
     list_filter = (StartedFilter,)
     search_fields = ('name', )
 
     actions = [ start, stop, tally ]
-
-def start_vote(Modeladmin, request, queryset):
-    for v in queryset.all():
-        v.start_date = timezone.now()
-        v.save()
-
-def stop_vote(ModelAdmin, request, queryset):
-    for v in queryset.all():
-        v.end_date = timezone.now()
-        v.save()
 
 admin.site.register(Voting, VotingAdmin)
 admin.site.register(Question, QuestionAdmin)
