@@ -40,10 +40,14 @@
                         </tr>
                     </tbody>
                 </table>
+             <!---   <a href="#">Descargar datos</a>-->
             </div>
 
         </div>
+        <chart></chart>
     </div>
+        
+
 {% endblock %}
 
 {% block extrabody %}
@@ -52,15 +56,61 @@
     <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
 
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+    <!-- Vue Chart -->
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+
+    <!-- Graphics -->
     <script>
+        Vue.component('chart',{
+            extends:VueChartJs.Pie,
+            data(){
+                return{
+                    votesOptions:[],
+                    votesValue:[],
+                    bgColor:[]
+                }
+            },
+            mounted(){
+                this.loadData()
+                this.renderChart({
+                    labels: this.votesOptions,
+                    datasets: [
+                        {
+                            label: 'GRAFICOS',
+                            backgroundColor: this.bgColor,
+                            data: this.votesValue
+                        }
+                    ]
+                },{responsive:true,  maintainAspectRatio: false})
+            },
+            methods:{
+                loadData(){
+                    (voting.postproc).forEach(element =>{
+                        console.log(element.option)
+                        randomColor = Math.floor(Math.random()*16777215).toString(16);
+                        this.bgColor.push("#" + randomColor)
+                        this.votesOptions.push(element.option)
+                        this.votesValue.push(element.votes)
+                    });
+                }
+            }
+
+        })
+
         var voting = {{voting|safe}};
         var app = new Vue({
             delimiters: ['[[', ']]'],
             el: '#app-visualizer',
             data: {
                 voting: voting
+                
             }
         })
     </script>
+
+    
 </body>
 {% endblock %}
