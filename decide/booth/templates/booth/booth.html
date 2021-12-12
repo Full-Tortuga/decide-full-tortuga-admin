@@ -191,7 +191,8 @@
                         vote: {a: v.alpha.toString(), b: v.beta.toString()},
                         voting: this.voting.id,
                         voter: this.user.id,
-                        token: this.token
+                        token: this.token,
+                        type: this.voting.type
                     }
                     this.postData("{% url "gateway" "store" "/" %}", data)
                         .then(data => {

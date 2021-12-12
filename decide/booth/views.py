@@ -36,27 +36,11 @@ class BinaryBoothView(TemplateView):
 
     def get_context_data(self, voting_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        vid = kwargs.get('voting_id', 0)
+        
         try:
             voting = get_object_or_404(BinaryVoting,pk=voting_id)
-            context['voting'] = json.dumps({"id": voting.id, 
-                                                    "name": voting.name, 
-                                                    "desc": voting.desc, 
-                                                    "question": {"desc": voting.question.desc, 
-                                                                "options": [{"number": voting.question.options.all()[0].number,
-                                                                            "option": voting.question.options.all()[0].option}, 
-                                                                            {"number": voting.question.options.all()[1].number, 
-                                                                            "option": voting.question.options.all()[1].option}]},
-                                                    "start_date": str(voting.start_date),
-                                                    "end_date": str(voting.end_date),
-                                                    "pub_key": {"p": str(voting.pub_key.p), 
-                                                                "g": str(voting.pub_key.g), 
-                                                                "y": str(voting.pub_key.y)}, 
-                                                    "auths": [{"name": voting.auths.all()[0].name, 
-                                                                "url": voting.auths.all()[0].url, 
-                                                                "me": voting.auths.all()[0].me}], 
-                                                    "tally": voting.tally, 
-                                                    "postproc": voting.postproc})
+            
+            context['voting'] = json.dumps(BinaryVoting.toJson(voting))
         except:
             raise Http404
 

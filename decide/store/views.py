@@ -1,5 +1,8 @@
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from census.models import Census
+from voting.models import BinaryVoting, Voting
 import django_filters.rest_framework
 from rest_framework import status
 from rest_framework.response import Response
@@ -30,21 +33,24 @@ class StoreView(generics.ListAPIView):
         """
 
         vid = request.data.get('voting')
-        voting = mods.get('voting', params={'id': vid})
-        if not voting or not isinstance(voting, list):
-            return Response({}, status=status.HTTP_401_UNAUTHORIZED)
-        start_date = voting[0].get('start_date', None)
-        end_date = voting[0].get('end_date', None)
-        not_started = not start_date or timezone.now() < parse_datetime(start_date)
-        is_closed = end_date and parse_datetime(end_date) < timezone.now()
-        if not_started or is_closed:
-            return Response({}, status=status.HTTP_401_UNAUTHORIZED)
-
         uid = request.data.get('voter')
         vote = request.data.get('vote')
+        type = request.data.get('type')
 
         if not vid or not uid or not vote:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        if type == 'V':
+            voting = get_object_or_404(Voting,id=vid)
+        elif type == 'BV':
+            voting = get_object_or_404(BinaryVoting,pk=vid)
+
+        start_date = voting.start_date
+        end_date = voting.end_date
+        not_started = not start_date or timezone.now() < start_date
+        is_closed = end_date and end_date < timezone.now()
+        if not_started or is_closed:
+            return Response({}, status=status.HTTP_401_UNAUTHORIZED)
 
         # validating voter
         token = request.auth.key
@@ -54,16 +60,23 @@ class StoreView(generics.ListAPIView):
             return Response({}, status=status.HTTP_401_UNAUTHORIZED)
 
         # the user is in the census
-        perms = mods.get('census/{}'.format(vid), params={'voter_id': uid}, response=True)
-        if perms.status_code == 401:
-            return Response({}, status=status.HTTP_401_UNAUTHORIZED)
-
+        if type == 'BV':
+            try:
+                perms = Census.objects.get(voting_id=vid,voter_id=voter_id,type='BV')
+            except:
+                return Response({}, status=status.HTTP_401_UNAUTHORIZED) 
+        elif type == 'V':
+            try:
+                perms = Census.objects.get(voting_id=vid,voter_id=voter_id,type='V')
+            except:
+                return Response({}, status=status.HTTP_401_UNAUTHORIZED) 
+        
         a = vote.get("a")
         b = vote.get("b")
 
         defs = { "a": a, "b": b }
         v, _ = Vote.objects.get_or_create(voting_id=vid, voter_id=uid,
-                                          defaults=defs)
+                                          defaults=defs, type=voting.type)
         v.a = a
         v.b = b
 
