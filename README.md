@@ -103,6 +103,13 @@ También debemos lanzar el panel de control, para ello dentro de la carpeta deci
     npm start
 
 # Pasos a seguir para configurar y iniciar el cliente LDAP
+La instalación se ha realizado y probado en sistemas Ubuntu, no puedo garantizarles que funcione en otras distribuciones o sistemas operativos.
+Para cualquier información adicional visite la documentación oficial de los paquetes.
+## Prerequisitos
+Instale las siguientes dependencias
+```sh
+apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev slapd ldap-utils tox lcov valgrind
+```
 ## Cambiar nombre de la máquina
 Primero cambie el nombre de su maquina a ldap.decide.org utilizando el siguiente comando:
 ```sh
