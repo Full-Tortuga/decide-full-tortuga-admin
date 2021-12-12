@@ -102,6 +102,105 @@ También debemos lanzar el panel de control, para ello dentro de la carpeta deci
 
     npm start
 
+# Pasos a seguir para configurar y iniciar el cliente LDAP
+## Cambiar nombre de la máquina
+Primero cambie el nombre de su maquina a ldap.decide.org utilizando el siguiente comando:
+```sh
+sudo hostnamectl set-hostname ldap.decide.org
+```
+esto lo haremos para que el cliente LDAP cree una unueva organización con estas domain components(dc)
+
+## Instalación del cliente LDAP
+Segundo, instale el cliente LDAP en su equipo para ello utilice las siguientes instrucciones:
+```sh
+sudo apt update
+sudo apt -y install slapd ldap-utils
+```
+Durante la instalacion se abrira una ventana para que introduzcas una contraseña para el administrador. 
+Una vaz finalizada la instalación, asegúrese de que la organización junto con el perfil de administrador se han creado correctamente, para ello utilize el comando 
+```sh
+sudo slapcat
+```
+Si el comando anterior fallara y cree que ha seguido los anteriores correctamente es muy probable que el servicio de openLDAP no se esté ejecutando, para ello utilice el siguiente comando
+```sh
+systemctl enable slapd.service
+```
+## Añadir objetos a la organización
+### Organitational Units
+A continuación añadiremos las _Organitational Units_(ou) a nuestra organización,para ello cree un fichero con extensión ldif y ejecútelo con privilegios root.
+```sh
+sudo su -
+vim basedn.ldif
+dn: ou=people,dc=decide,dc=org
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=decide,dc=org
+objectClass: organizationalUnit
+ou: groups
+```
+Finalmente, ejecute el siguiente comando
+```sh
+ldapadd -x -D cn=admin,dc=decide,dc=org -W -f basedn.ldif
+```
+si obtiene la siguiente respuesta usted ha realizado correctamente este paso.
+```
+adding new entry "ou=people,dc=decide,dc=org"
+adding new entry "ou=groups,dc=decide,dc=org"
+```
+### Usuarios
+Para añadir usuarios genere una contraseña mediante el comando y cópiela en el portapapeles, la necesitará para el siguiente paso
+```sh
+slappasswd
+```
+y cree un fichero con la siguiente información y recuerde copiar la contraseña que generó en el paso anterior en **userPassword**:
+```sh
+vim ldapusers.ldif
+dn: uid=foobar,ou=people,dc=decide,dc=org
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: foo
+sn: bar
+mail: foobar@gmail.com
+userPassword: {SSHA}Zn4/E5f+Ork7WZF/alrpMuHHGufC3x0k
+loginShell: /bin/bash
+uidNumber: 2000
+gidNumber: 2000
+homeDirectory: /home/foobar
+
+
+dn: cn=foobar,ou=groups,dc=decide,dc=org
+objectClass: posixGroup
+cn: foobar
+gidNumber: 2000
+memberUid: foobar
+```
+y ejecutelo mediante la siguiente instruccion:
+```sh
+ldapadd -x -D cn=admin,dc=decide,dc=org -W -f ldapusers.ldif
+```
+sabrá que ha realizado bien el paso anterior si obtine la siguiente salida:
+```
+adding new entry "uid=foobar,ou=people,dc=decide,dc=org"
+
+adding new entry "cn=foobar,ou=groups,dc=decide,dc=org"
+```
+
+## Dependencias Djando para LDAP
+Para finalizar, debe instalar las dependencias que django necesarias para la comunicación con el cliente LDAP.
+Para ello, borre su local_settings.py y ejecute el comando pip para instalar las nuevas dependencias:
+```sh
+pip install -r requirements.txt 
+```
+una vez finalizada la instalación copie el local settings que se le ofrece como plantilla y vuelva a configurar todo como se enseñó en clases de práticas y modifique el campo **AUTH_LDAP_SERVER_URI** de la configuración LDAP con la url de sus servidor y **AUTH_LDAP_BIND_PASSWORD** con la constraseña que puso en la instalación de openLDAP.
+Para ver la dirección utilice el siguiente comando
+```sh
+ldapurl
+```
+Puede probar que funcione haciendo una petición desde Postman
+![alt text](https://i.imgur.com/3a4xwaZ.png)
+
 Ejecutar con docker
 -------------------
 
