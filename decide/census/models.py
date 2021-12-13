@@ -6,7 +6,7 @@ class Census(models.Model):
     voting_id = models.PositiveIntegerField()
     voter_id = models.PositiveIntegerField()
 
-    votingTypes = (('V', 'Voting'), ('BV', 'BinaryVoting'), ('MV', 'MultipleVoting'), ('EV', 'EscaladeVoting'))
+    votingTypes = (('V', 'Voting'), ('BV', 'BinaryVoting'), ('MV', 'MultipleVoting'), ('SV', 'ScoreVoting'))
     type = models.CharField(max_length=2, choices=votingTypes, default='V')
 
     #A new census is valid if the pair is not already in the database

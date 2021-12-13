@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from census.models import Census
-from voting.models import BinaryVoting, Voting
+from voting.models import BinaryVoting, Voting, ScoreVoting
 import django_filters.rest_framework
 from rest_framework import status
 from rest_framework.response import Response
@@ -44,6 +44,8 @@ class StoreView(generics.ListAPIView):
             voting = get_object_or_404(Voting,id=vid)
         elif type == 'BV':
             voting = get_object_or_404(BinaryVoting,pk=vid)
+        elif type == 'SV':
+            voting = get_object_or_404(ScoreVoting,pk=vid)
 
         start_date = voting.start_date
         end_date = voting.end_date
@@ -68,6 +70,11 @@ class StoreView(generics.ListAPIView):
         elif type == 'V':
             try:
                 perms = Census.objects.get(voting_id=vid,voter_id=voter_id,type='V')
+            except:
+                return Response({}, status=status.HTTP_401_UNAUTHORIZED)
+        elif type == 'SV':
+            try:
+                perms = Census.objects.get(voting_id=vid,voter_id=voter_id,type='SV')
             except:
                 return Response({}, status=status.HTTP_401_UNAUTHORIZED) 
         
