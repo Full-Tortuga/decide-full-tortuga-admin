@@ -92,8 +92,8 @@ def show_results(update, context):
     finished_votings=models.Voting.objects.exclude(start_date__isnull=True).exclude(end_date__isnull=True)
     keyboard_buttons=[]
     for v in finished_votings:
-        keyboard_buttons.append([InlineKeyboardButton(text=str(v.name), callback_data=str(v.id))])
-    keyboard=InlineKeyboardMarkup(keyboard_buttons)
+        keyboard_buttons.append(InlineKeyboardButton(text=str(v.name), callback_data=str(v.id)))
+    keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
     context.bot.send_message(chat_id=update.message.chat.id, text= "Elige por favor:", reply_markup=keyboard)
     
 #handler for '/results' command  
@@ -107,9 +107,13 @@ def results_query_handler(update, context):
 def show_details(update, context):
     update.message.reply_text("Selecciona la votación de la que desea ver sus detalles") 
     votings=models.Voting.objects.exclude(start_date__isnull=True)
-    keyboard_buttons=[[InlineKeyboardButton(text=str(v.name), callback_data="d"+str(v.id)) for v in votings]]
-    keyboard=InlineKeyboardMarkup(keyboard_buttons)
+    keyboard_buttons=[InlineKeyboardButton(text=str(v.name), callback_data="d"+str(v.id)) for v in votings]
+    keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
     context.bot.send_message(chat_id=update.message.chat.id, text="Seleccione una por favor:", reply_markup=keyboard)
+
+#constructs menu for inline buttons    
+def build_keyboard_menu(buttons, n_cols):
+    return [buttons[b:(b + n_cols)] for b in range(0, len(buttons), n_cols)]
 
 #handler for '/details' command
 def details_query_handler(update, context):

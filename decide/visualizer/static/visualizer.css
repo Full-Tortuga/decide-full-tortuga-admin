@@ -10,3 +10,22 @@
     background-color: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity));
     color: #fff;
 }
+
+#start-tlg {
+    border: #79aec8;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #fff;
+    text-transform: uppercase;
+    background-color: #79aec8;
+    letter-spacing: 0.5px;
+    padding: 8px;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -ms-border-radius: 12px;
+    -o-border-radius: 12px;
+}
+
+#start-tlg:hover{
+    background-color: #417690;
+}

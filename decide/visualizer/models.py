@@ -6,3 +6,6 @@ class TelegramBot(models.Model):
     
     def __str__(self):
         return '{}'.format(self.auto_msg)
+    
+    class Meta:
+        verbose_name = 'Telegram user'
