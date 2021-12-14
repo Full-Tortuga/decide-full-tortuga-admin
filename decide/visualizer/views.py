@@ -1,22 +1,16 @@
 import json
 from django.http import response
-from django.http.response import FileResponse
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.http import Http404
 from django.views.generic.base import View
 
-import ast
 from base import mods
 from collections import OrderedDict
 
 import json
 
-import io
-from reportlab.platypus import SimpleDocTemplate, Table
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import LETTER, landscape, portrait
-from reportlab.lib.enums import TA_CENTER
+
 
 #Generate a CSV File 
 class Votes_csv(View):
