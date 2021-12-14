@@ -10,6 +10,7 @@ import ast
 from base import mods
 from collections import OrderedDict
 
+import json
 
 import io
 from reportlab.platypus import SimpleDocTemplate, Table
@@ -36,7 +37,7 @@ class VisualizerView(TemplateView):
             for e in dataList:
                 ls_dicc.append(dict(e))
             voting = (r[0], ls_dicc)
-            context['voting'] = voting
+            context['voting'] = json.dumps(voting)
         except:
             raise Http404
 
