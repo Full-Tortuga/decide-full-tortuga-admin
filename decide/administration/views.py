@@ -123,10 +123,14 @@ class UsersAPI(APIView):
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
-        user = UserSerializer(data=request.data)
-        if not user.is_valid():
+        serializer = UserSerializer(data=request.data)
+        if not serializer.is_valid():
             return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
+            fields = request.data
+            user = User(username=fields['username'], first_name=fields['first_name'],
+                        last_name=fields['last_name'], email=fields['email'], is_staff=fields['is_staff'])
+            user.set_password(request.data['password'])
             user.save()
             return Response({}, status=HTTP_200_OK)
 
