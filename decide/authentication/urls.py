@@ -11,5 +11,5 @@ urlpatterns = [
     path('register/', RegisterView.as_view()),
     path('loginLDAP/', LDAPLogin.as_view()),
     path('login_form/', SignInView.as_view()),
-    path('bienvenida/', BienvenidaView.as_view())
+    path('bienvenida/', BienvenidaView.as_view()),
 ]

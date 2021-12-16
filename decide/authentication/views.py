@@ -104,23 +104,7 @@ class LDAPLogout(APIView):
 
 
 class SignInView(LoginView):
-    template_name = 'login_form.html'
-
-
-class SignUpView(APIView):
-    form_class = SignUpForm
-
-    def form_valid(self, form):
-        '''
-        En este parte, si el formulario es valido guardamos lo que se obtiene de él y usamos authenticate 
-        para que el usuario incie sesión luego de haberse registrado y lo redirigimos al index
-        '''
-        form.save()
-        usuario = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password1')
-        usuario = authenticate(username=usuario, password=password)
-        login(self.request, usuario)
-        return redirect('/')
+    template_name = 'index.html'
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
