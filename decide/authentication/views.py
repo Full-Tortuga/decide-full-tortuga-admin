@@ -62,9 +62,8 @@ from rest_framework.views import APIView
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView
 
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import TemplateView
 
-from .forms import SignUpForm
 
 class LDAPLogin(APIView):
     """
