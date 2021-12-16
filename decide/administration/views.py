@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from base import serializers
 from base.mods import query
 from rest_framework.status import *
@@ -11,6 +11,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
 from rest_framework.renderers import JSONRenderer
+from voting.models import Question, QuestionOption
+from administration.serializers import AdminQuestionSerializer,AdminQuestionSerializerGetPost, AdminQuestionOptionSerializer
+from voting.serializers import QuestionSerializer, QuestionOptionSerializer
 
 from authentication.serializers import UserSerializer
 from base.serializers import AuthSerializer, KeySerializer
@@ -21,6 +24,56 @@ import json
 
 def index(request):
     return render(request, "build/index.html")
+
+class QuestionsAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request):
+        query = Question.objects.all()
+        rest = AdminQuestionSerializerGetPost(query, many=True).data
+        return Response(rest, status=HTTP_200_OK)
+    
+    def post(self, request):
+        question = AdminQuestionSerializerGetPost(data=request.data)
+        if not question.is_valid():
+            return Response({"result","AdminQuestion object is not valid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            question.save()
+            return Response({}, status=HTTP_200_OK)
+        
+    def delete(self, request):
+        Question.objects.all().delete()
+        return Response({},status=HTTP_200_OK)
+
+class QuestionAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request, question_id):
+        try:
+            query = Question.objects.filter(id=question_id).get()
+        except ObjectDoesNotExist:
+            return Response({}, status=HTTP_404_NOT_FOUND)
+        rest = AdminQuestionSerializerGetPost(query).data
+        return Response(rest, status=HTTP_200_OK)
+
+    def put(self, request, question_id):
+         if not AdminQuestionSerializer(data=request.data).is_valid():
+             return Response({"result": "Question object is not valid"}, status=HTTP_400_BAD_REQUEST)
+         else:
+             try:
+                 question = Question.objects.all().filter(id=question_id).get()
+             except ObjectDoesNotExist:
+                 return Response({}, status=HTTP_404_NOT_FOUND)
+             for key, value in request.data.items():
+                 setattr(question, key, value)
+             question.save()
+             return Response({}, status=HTTP_200_OK)
+
+
+
+    def delete(self, request, question_id):
+        Question.objects.all().filter(id=question_id).delete()
+        return Response({}, status=HTTP_200_OK)
 
 class AuthsAPI(APIView):
     permission_classes = (IsAdminAPI,)

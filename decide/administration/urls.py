@@ -12,5 +12,7 @@ urlpatterns = [
     path('api/base/auth', AuthsAPI.as_view()),
     path('api/base/auth/<int:auth_id>/', AuthAPI.as_view()),
     path('api/base/key', KeysAPI.as_view()),
-    path('api/base/key/<int:key_id>/', KeyAPI.as_view())
+    path('api/base/key/<int:key_id>/', KeyAPI.as_view()),
+    path('api/votings/question', QuestionsAPI.as_view()),
+    path('api/votings/question/<int:question_id>/', QuestionAPI.as_view())
 ]
