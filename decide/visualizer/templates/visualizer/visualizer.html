@@ -40,7 +40,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <!---   <a href="#">Descargar datos</a>-->
+                <a v-bind:href="'/visualizer/votes/' + [[ voting[0]['id'] ]] ">Descargar datos en CSV</a>
                 <pie-chart></pie-chart>
                 <bar-chart></bar-chart>
             </div>
