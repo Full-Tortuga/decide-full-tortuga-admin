@@ -59,6 +59,11 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import render, redirect
+from django.contrib.auth.views import LoginView
+
+from django.views.generic import TemplateView
+
 
 class LDAPLogin(APIView):
     """
@@ -94,3 +99,11 @@ class LDAPLogout(APIView):
         logout(request)
         data={'detail': 'User logged out successfully'}
         return Response(data, status=200)
+
+
+
+class SignInView(LoginView):
+    template_name = 'index.html'
+
+class BienvenidaView(TemplateView):
+   template_name = 'bienvenida.html'

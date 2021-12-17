@@ -30,6 +30,11 @@ ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 
 
+
+#Login redirect
+LOGIN_URL = '/authentication/login_form/'
+LOGIN_REDIRECT_URL = '/authentication/bienvenida/'
+
 # Application definition
 
 INSTALLED_APPS = [
