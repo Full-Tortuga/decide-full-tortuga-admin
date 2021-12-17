@@ -167,6 +167,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 STATIC_URL = '/static/'
 
+#temporary link to visualizer page for bots (until hosted)
+VISUALIZER_VIEW="https://decide-full-tortuga-2.herokuapp.com/visualizer/"
+
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
 
