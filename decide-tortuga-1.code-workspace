@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "decide/administration"
+		},
+		{
+			"path": "decide/administration/frontend"
+		}
+	],
+	"settings": {}
+}
