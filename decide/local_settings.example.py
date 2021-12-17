@@ -16,6 +16,7 @@ MODULES = [
 
 
 BASEURL = 'http://localhost:8000'
+CORS_ORIGIN_ALLOW_ALL = True
 
 APIS = {
     'administration': BASEURL,
@@ -30,9 +31,15 @@ APIS = {
     'voting': BASEURL,
 }
 
-
 DATABASES = {
     'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'decide',
+        'CLIENT': {
+            'host': '127.0.0.1',
+        }
+    },
+    'postgres': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'decide',
