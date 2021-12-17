@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from .models import Question, ScoreQuestion
-from .models import QuestionOption, ScoreQuestionOption
-from .models import Voting, ScoreVoting
+from .models import Question
+from .models import QuestionOption
+from .models import Voting
 from base.serializers import KeySerializer, AuthSerializer
 
 

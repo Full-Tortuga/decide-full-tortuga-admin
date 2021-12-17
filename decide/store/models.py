@@ -12,7 +12,7 @@ class Vote(models.Model):
     voted = models.DateTimeField(auto_now=True)
     
     votingTypes = (('V', 'Voting'), ('BV', 'BinaryVoting'), ('MV', 'MultipleVoting'), ('SV', 'ScoreVoting'))
-    type = models.CharField(max_length=2, choices=votingTypes)
+    type = models.CharField(max_length=2, choices=votingTypes, default='V')
 
     def __str__(self):
         return '{}: {}'.format(self.voting_id, self.voter_id)

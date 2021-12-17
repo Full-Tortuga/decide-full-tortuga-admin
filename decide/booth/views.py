@@ -17,13 +17,9 @@ class BoothView(TemplateView):
         vid = kwargs.get('voting_id', 0)
 
         try:
-            r = mods.get('voting', params={'id': vid})
-            # Casting numbers to string to manage in javascript with BigInt
-            # and avoid problems with js and big number conversion
-            for k, v in r[0]['pub_key'].items():
-                r[0]['pub_key'][k] = str(v)
-
-            context['voting'] = json.dumps(r[0])
+            voting = get_object_or_404(Voting,id=vid)
+            
+            context['voting'] = json.dumps(Voting.toJson(voting))
         except:
             raise Http404
 

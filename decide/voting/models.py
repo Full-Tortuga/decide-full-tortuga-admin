@@ -78,6 +78,7 @@ class ScoreVoting(models.Model):
         data = {
             "voting": self.id,
             "auths": [ {"name": a.name, "url": a.url} for a in self.auths.all() ],
+            "type": self.type
         }
         key = mods.post('mixnet', baseurl=auth.url, json=data)
         pk = Key(p=key["p"], g=key["g"], y=key["y"])
@@ -86,9 +87,9 @@ class ScoreVoting(models.Model):
         self.save()
 
     def get_votes(self, token=''):
-        votes = mods.get('store', params={'scorevoting_id': self.id}, HTTP_AUTHORIZATION='Token ' + token)
+        votes = Vote.objects.filter(voting_id=self.pk,type=self.type).all()
 
-        return [[i['a'], i['b']] for i in votes]
+        return [[i.a, i.b] for i in votes]
 
     def tally_votes(self, token=''):
         '''
@@ -102,13 +103,15 @@ class ScoreVoting(models.Model):
         decrypt_url = "/decrypt/{}/".format(self.id)
         auths = [{"name": a.name, "url": a.url} for a in self.auths.all()]
 
-        data = { "msgs": votes }
+        data = { "msgs": votes,
+                "type": self.type }
         response = mods.post('mixnet', entry_point=shuffle_url, baseurl=auth.url, json=data,
                 response=True)
         if response.status_code != 200:
             pass
 
-        data = {"msgs": response.json()}
+        data = {"msgs": response.json(),
+                "type": self.type}
         response = mods.post('mixnet', entry_point=decrypt_url, baseurl=auth.url, json=data,
                 response=True)
 
@@ -315,19 +318,42 @@ class Voting(models.Model):
 
     start_date = models.DateTimeField(blank=True, null=True)
     end_date = models.DateTimeField(blank=True, null=True)
-    
-    #Create a new attribute called 'pub_key' that is a foreign key to the Key model and is not included in index 
-    #(so it is not searchable).
+        
     pub_key = models.ForeignKey(Key, related_name='voting', on_delete=models.CASCADE, null=True, blank=True, db_index=False)
     auths = models.ManyToManyField(Auth, related_name='votings')
-
-    #Create a new attribute called `tally` that is a list of integers.
 
     tally = models.Field(blank=True, null=True, default=[])
     postproc = models.Field(blank=True, null=True, default=[])
 
+    uniqueType = (('V', 'Voting'),)
+    type = models.CharField(max_length=2, choices= uniqueType,default='V')
+
+    def toJson(self):
+        json = {'id': self.id, 
+                'name': self.name, 
+                'desc': self.desc, 
+                'start_date': str(self.start_date),
+                'end_date': str(self.end_date),
+                'pub_key': {'p': str(self.pub_key.p), 
+                            'g': str(self.pub_key.g), 
+                            'y': str(self.pub_key.y)}, 
+                'auths': [{'name': self.auths.all()[0].name, 
+                            'url': self.auths.all()[0].url, 
+                            'me': self.auths.all()[0].me}], 
+                'tally': self.tally, 
+                'postproc': self.postproc,
+                'type':self.type}
+        question = {'desc': self.question.desc}
+        options = []
+        for o in self.question.options.all():
+            options.append({'number': o.number,'option':o.option})
+        question['options'] = options
+        json['question'] = question
+
+        return json
+
     def clean(self):
-        # Don't allow draft entries to have a pub_date.
+        
         if (self.pub_key is not None) and (Voting.objects.filter(pub_key=self.pub_key).exists()):
             raise ValidationError('There is already exists this public key', code='Error') 
 
@@ -337,6 +363,7 @@ class Voting(models.Model):
         data = {
             "voting": self.id,
             "auths": [ {"name": a.name, "url": a.url} for a in self.auths.all() ],
+            "type": self.type
         }
         key = mods.post('mixnet', baseurl=auth.url, json=data)
         pk = Key(p=key["p"], g=key["g"], y=key["y"])
@@ -346,10 +373,10 @@ class Voting(models.Model):
         self.save()
 
     def get_votes(self, token=''):
-        # gettings votes from store
-        votes = mods.get('store', params={'voting_id': self.id}, HTTP_AUTHORIZATION='Token ' + token)
-        # anon votes
-        return [[i['a'], i['b']] for i in votes]
+        
+        votes = Vote.objects.filter(voting_id=self.pk,type=self.type).all()
+       
+        return [[i.a, i.b] for i in votes]
 
     def tally_votes(self, token=''):
         '''
@@ -362,21 +389,23 @@ class Voting(models.Model):
         decrypt_url = "/decrypt/{}/".format(self.id)
         auths = [{"name": a.name, "url": a.url} for a in self.auths.all()]
         
-        # first, we do the shuffle
-        data = { "msgs": votes }
+      
+        data = { "msgs": votes,
+                "type": self.type }
         response = mods.post('mixnet', entry_point=shuffle_url, baseurl=auth.url, json=data,
                 response=True)
         if response.status_code != 200:
-            # TODO: manage error
+            
             pass
         
-        # then, we can decrypt that
-        data = {"msgs": response.json()}
+        
+        data = {"msgs": response.json(),
+                "type": self.type }
         response = mods.post('mixnet', entry_point=decrypt_url, baseurl=auth.url, json=data,
                 response=True)
 
         if response.status_code != 200:
-            # TODO: manage error
+            
             pass    
         
         self.tally = response.json()
