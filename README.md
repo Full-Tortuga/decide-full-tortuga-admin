@@ -108,36 +108,58 @@ Para cualquier información adicional visite la documentación oficial de los pa
 ## Prerequisitos
 Instale las siguientes dependencias
 ```sh
-apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev slapd ldap-utils tox lcov valgrind
+apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
 ```
-## Cambiar nombre de la máquina
-Primero cambie el nombre de su maquina a ldap.decide.org utilizando el siguiente comando:
-```sh
-sudo hostnamectl set-hostname ldap.decide.org
-```
-esto lo haremos para que el cliente LDAP cree una unueva organización con estas domain components(dc)
 
-## Instalación del cliente LDAP
-Segundo, instale el cliente LDAP en su equipo para ello utilice las siguientes instrucciones:
+## Iniciar servidor LDAP desde docker
+Abra un nuevo contenedor con el cliente mínimo de open ldap en su equipo, para ello utilice las siguientes instrucciones.
 ```sh
-sudo apt update
-sudo apt -y install slapd ldap-utils
+docker run  -p 389:389 \
+            -d carvilgar1us/decideldap
 ```
-Durante la instalacion se abrira una ventana para que introduzcas una contraseña para el administrador. 
-Una vaz finalizada la instalación, asegúrese de que la organización junto con el perfil de administrador se han creado correctamente, para ello utilize el comando 
+Para verificar que el contenedor está corriendo correctamente el servicio slapd, pruebe el siguiente
+comando en su máquina HOST.
 ```sh
-sudo slapcat
+ldapsearch -x -b "dc=decide, dc=org" -H ldap://:389 
 ```
-Si el comando anterior fallara y cree que ha seguido los anteriores correctamente es muy probable que el servicio de openLDAP no se esté ejecutando, para ello utilice el siguiente comando
-```sh
-systemctl enable slapd.service
-```
+La consola debe de devolver:
+\# extended LDIF
+\#
+\# LDAPv3
+\# base <dc=decide, dc=org> with scope subtree
+\# filter: (objectclass=*)
+\# requesting: ALL
+\#
+
+\# decide.org
+dn: dc=decide,dc=org
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o:: RGVjaWRlIHBsYXRhZm9ybWEgZGUgdm90byBlbGVjdHLDg8Kzbmljbw==
+dc: decide
+
+\# admin, decide.org
+dn: cn=admin,dc=decide,dc=org
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+
+Si es lo que usted ha obtenido entonces puede continuar.
+
 ## Añadir objetos a la organización
 ### Organitational Units
-A continuación añadiremos las _Organitational Units_(ou) a nuestra organización,para ello cree un fichero con extensión ldif y ejecútelo con privilegios root.
+A continuación añadiremos las _Organitational Units_(ou) a nuestra organización,para ello cree un fichero con extensión ldif y ejecútelo con privilegios root **En su maquina HOST**.
 ```sh
 sudo su -
+```
+Cree un fichero con extensión ldif.
+```sh
 vim basedn.ldif
+```
+En el fichero que ha creado previamente copie lo siguiente.
+```sh
 dn: ou=people,dc=decide,dc=org
 objectClass: organizationalUnit
 ou: people
@@ -163,6 +185,9 @@ slappasswd
 y cree un fichero con la siguiente información y recuerde copiar la contraseña que generó en el paso anterior en **userPassword**:
 ```sh
 vim ldapusers.ldif
+```
+Y a continuación, copie lo siguiente.
+```sh
 dn: uid=foobar,ou=people,dc=decide,dc=org
 objectClass: inetOrgPerson
 objectClass: posixAccount
@@ -201,10 +226,7 @@ Para ello, borre su local_settings.py y ejecute el comando pip para instalar las
 pip install -r requirements.txt 
 ```
 una vez finalizada la instalación copie el local settings que se le ofrece como plantilla y vuelva a configurar todo como se enseñó en clases de práticas y modifique el campo **AUTH_LDAP_SERVER_URI** de la configuración LDAP con la url de sus servidor y **AUTH_LDAP_BIND_PASSWORD** con la constraseña que puso en la instalación de openLDAP.
-Para ver la dirección utilice el siguiente comando
-```sh
-ldapurl
-```
+
 Puede probar que funcione haciendo una petición desde Postman
 ![alt text](https://i.imgur.com/3a4xwaZ.png)
 
