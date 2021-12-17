@@ -1,4 +1,5 @@
 ALLOWED_HOSTS = ["*"]
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Modules in use, commented modules that you won't use
 MODULES = [
@@ -14,9 +15,7 @@ MODULES = [
     'voting',
 ]
 
-
 BASEURL = 'http://localhost:8000'
-CORS_ORIGIN_ALLOW_ALL = True
 
 APIS = {
     'administration': BASEURL,
