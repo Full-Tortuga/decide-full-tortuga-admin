@@ -12,10 +12,10 @@ from threading import Thread
 
 
 #auth and front-end for '@VotitosBot'
-UPDATER = Updater(settings.TELEGRAM_TOKEN,
+UPDATER = Updater(os.environ.get('TELEGRAM_TOKEN'),
                 use_context=True)
 
-BOT=Bot(token=settings.TELEGRAM_TOKEN)
+BOT=Bot(token=os.environ.get('TELEGRAM_TOKEN'))
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
@@ -182,7 +182,7 @@ def results_graph(id, chat_identifier, context):
     url=settings.VISUALIZER_VIEW+ str(id)
     images=get_graphs(url)
     if images:
-        media_group=[InputMediaPhoto(media=i, caption="PUM en la boquita bb") for i in images]
+        media_group=[InputMediaPhoto(media=i) for i in images]
         context.bot.sendMediaGroup(chat_id=chat_identifier, media=media_group)
     else:
         context.bot.send_message(chat_id=chat_identifier,
