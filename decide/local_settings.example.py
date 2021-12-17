@@ -49,7 +49,7 @@ AUTH_LDAP_SERVER_URI = 'ldap://:389'
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
 AUTH_LDAP_BIND_PASSWORD = 'decide'
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
-    'ou=people,dc=decide,dc=world',
+    'ou=people,dc=decide,dc=org',
     ldap.SCOPE_SUBTREE,
     '(uid=%(user)s)',
 )
@@ -65,6 +65,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
 # superuser.
 
 AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
     'django_auth_ldap.backend.LDAPBackend',
 ]
 
