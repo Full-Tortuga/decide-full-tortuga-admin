@@ -1,6 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from base import mods
+from mixnet.models import Mixnet
+from store.models import Vote
 from djongo import models
 from django.core.exceptions import ValidationError
 
@@ -212,6 +214,7 @@ class BinaryVoting(models.Model):
         data = {
             "voting": self.id,
             "auths": [ {"name": a.name, "url": a.url} for a in self.auths.all() ],
+            "type": self.type
         }
         key = mods.post('mixnet', baseurl=auth.url, json=data)
         pk = Key(p=key["p"], g=key["g"], y=key["y"])
@@ -220,9 +223,9 @@ class BinaryVoting(models.Model):
         self.save()
 
     def get_votes(self, token=''):
-        votes = mods.get('store', params={'binaryvoting_id': self.id}, HTTP_AUTHORIZATION='Token ' + token)
+        votes = Vote.objects.filter(voting_id=self.pk,type=self.type).all()
 
-        return [[i['a'], i['b']] for i in votes]
+        return [[i.a, i.b] for i in votes]
 
     def tally_votes(self, token=''):
         '''
@@ -236,13 +239,17 @@ class BinaryVoting(models.Model):
         decrypt_url = "/decrypt/{}/".format(self.id)
         auths = [{"name": a.name, "url": a.url} for a in self.auths.all()]
 
-        data = { "msgs": votes }
+        data = { "msgs": votes,
+                "type": self.type }
+
         response = mods.post('mixnet', entry_point=shuffle_url, baseurl=auth.url, json=data,
                 response=True)
         if response.status_code != 200:
             pass
 
-        data = {"msgs": response.json()}
+        data = {"msgs": response.json(),
+                "type": self.type}
+
         response = mods.post('mixnet', entry_point=decrypt_url, baseurl=auth.url, json=data,
                 response=True)
 
@@ -471,6 +478,7 @@ class MultipleVoting(models.Model):
         data = {
             "voting": self.id,
             "auths": [ {"name": a.name, "url": a.url} for a in self.auths.all() ],
+            "type": self.type
         }
         key = mods.post('mixnet', baseurl=auth.url, json=data)
         pk = Key(p=key["p"], g=key["g"], y=key["y"])
@@ -479,9 +487,9 @@ class MultipleVoting(models.Model):
         self.save()
 
     def get_votes(self, token=''):
-        votes = mods.get('store', params={'multiplevoting_id': self.id}, HTTP_AUTHORIZATION='Token ' + token)
+        votes = Vote.objects.filter(voting_id=self.pk,type=self.type).all()
 
-        return [[i['a'], i['b']] for i in votes]
+        return [[i.a, i.b] for i in votes]
 
     def tally_votes(self, token=''):
         '''
@@ -495,13 +503,15 @@ class MultipleVoting(models.Model):
         decrypt_url = "/decrypt/{}/".format(self.id)
         auths = [{"name": a.name, "url": a.url} for a in self.auths.all()]
 
-        data = { "msgs": votes }
+        data = { "msgs": votes,
+                "type": self.type }
         response = mods.post('mixnet', entry_point=shuffle_url, baseurl=auth.url, json=data,
                 response=True)
         if response.status_code != 200:
             pass
 
-        data = {"msgs": response.json()}
+        data = {"msgs": response.json(),
+                "type": self.type }
         response = mods.post('mixnet', entry_point=decrypt_url, baseurl=auth.url, json=data,
                 response=True)
 
