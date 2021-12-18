@@ -1,5 +1,5 @@
 import React from "react";
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 
 import { userType } from "types";
 import { Table } from "components/02-molecules";

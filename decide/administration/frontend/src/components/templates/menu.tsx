@@ -4,8 +4,8 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Tooltip } from "@mui/material";
-import { Error, Home, Person } from "@mui/icons-material";
-import { Link, Outlet } from "react-router-dom";
+import { Home, Person } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const LinkTab = (props: {
   label?: string;

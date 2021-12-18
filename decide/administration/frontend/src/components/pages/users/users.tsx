@@ -3,8 +3,6 @@ import { UserTable } from "components/templates/users";
 
 import Page from "../page";
 import { userApi } from "api";
-import { useLocation } from "react-router";
-import { sessionUtils } from "utils";
 
 // todo: fetch users from api and set rows to the response
 const rows = [
@@ -25,6 +23,7 @@ const UsersPage = () => {
   React.useEffect(() => {
     userApi.getUsers().then((response) => {
       console.log(response);
+      setUsers(rows);
     });
   }, []);
 

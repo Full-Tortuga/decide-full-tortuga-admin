@@ -20,7 +20,7 @@ export const AppRoutes = () => {
         `rendered, auth: ${isAuthenticated}`,
         sessionUtils.getToken()
       ),
-    []
+    [isAuthenticated]
   );
 
   return (
