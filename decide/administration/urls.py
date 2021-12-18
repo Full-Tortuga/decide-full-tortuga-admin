@@ -13,6 +13,8 @@ urlpatterns = [
     path('api/base/auth/<int:auth_id>', views.AuthAPI.as_view()),
     path('api/base/key', views.KeysAPI.as_view()),
     path('api/base/key/<int:key_id>', views.KeyAPI.as_view()),
+    path('api/census', views.CensussAPI.as_view()),
+    path('api/census/<int:census_id>', views.CensusAPI.as_view()),
 
     # match react-app routed pages
     re_path(r'(^(?!(api)).*$)', views.index),
