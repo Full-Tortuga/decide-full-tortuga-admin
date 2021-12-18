@@ -1,5 +1,5 @@
 import React from "react";
-import { UserTable } from "components/templates/users";
+import { NewUserForm, UserTable } from "components/templates/users";
 
 import Page from "../page";
 import { userApi } from "api";
@@ -30,6 +30,7 @@ const UsersPage = () => {
   return (
     <Page title="Users">
       <UserTable users={users || rows} />
+      <NewUserForm />
     </Page>
   );
 };
