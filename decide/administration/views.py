@@ -185,6 +185,16 @@ class UserAPI(APIView):
         return Response({}, status=HTTP_200_OK)
 
 
+class MakeUserStaff(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def post(self, request):
+        ids = get_ids(request.data["idList"])
+        users = User.objects.filter(id__in=ids)
+        users.update(is_staff=True)
+        return Response({}, status=HTTP_200_OK)
+
+
 class LoginAuthAPI(APIView):
     parser_classes = (parsers.FormParser,
                       parsers.MultiPartParser, parsers.JSONParser,)
