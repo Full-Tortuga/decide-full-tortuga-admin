@@ -6,7 +6,7 @@ import "App.css";
 
 const App = () => {
   return (
-    <div className="App">
+    <div className="App flex justify-center">
       <AppRoutes />
     </div>
   );

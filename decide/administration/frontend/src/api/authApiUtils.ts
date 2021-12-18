@@ -1,4 +1,4 @@
-import { axios } from "api/config";
+import { axios } from "api/axios";
 
 const authApi = {
   login: (username: string, password: string) => {
@@ -6,6 +6,9 @@ const authApi = {
       username,
       password,
     });
+  },
+  logout: () => {
+    return axios.post("/auth/logout");
   },
 };
 

@@ -6,13 +6,22 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import { sessionUtils } from "utils";
+
 import { Loader } from "components/01-atoms";
 import { Menu } from "components/templates";
 import { NotFoundPage, UsersPage, HomePage, LoginPage } from "components/pages";
-import { localStore } from "store";
 
 export const AppRoutes = () => {
-  const isAuthenticated = localStore.getToken() !== null;
+  const isAuthenticated = sessionUtils?.getToken();
+  React.useEffect(
+    () =>
+      console.log(
+        `rendered, auth: ${isAuthenticated}`,
+        sessionUtils.getToken()
+      ),
+    [isAuthenticated]
+  );
 
   return (
     <Suspense
@@ -23,7 +32,7 @@ export const AppRoutes = () => {
       }
     >
       <Router basename="/administration">
-        <Menu />
+        <Menu hidden={!isAuthenticated} />
         <Routes>
           {isAuthenticated ? (
             <>

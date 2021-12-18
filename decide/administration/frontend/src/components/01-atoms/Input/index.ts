@@ -9,6 +9,7 @@ export type FieldProps = {
 
 export type InputProps = FieldProps & {
   type?: "text" | "password";
+  useFormLabel?: boolean;
 };
 
 export const FormItem = { TextInput, SecretInput };
