@@ -1,3 +1,4 @@
-import component from "./button";
+import Button from "./button";
+import IconButton from "./iconButton";
 
-export { component as Button };
+export { Button, IconButton };
