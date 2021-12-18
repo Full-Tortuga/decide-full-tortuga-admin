@@ -1,7 +1,8 @@
 import Axios, { AxiosRequestConfig } from "axios";
-import { localStore } from "store";
 
-const API_URL = "http://localhost:8000/administration/api/";
+import { sessionUtils } from "utils";
+
+const API_URL = "http://localhost:8000/administration/api";
 
 export const axios = Axios.create({
   baseURL: API_URL,
@@ -9,17 +10,29 @@ export const axios = Axios.create({
 
 // Headers interceptor
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
-  const token = localStore.getToken();
   if (config.headers) {
-    // auth
-    if (token) config.headers.token = `${token}`;
     // content-type
     config.headers.Accept = "application/json";
     config.headers.ContentType = "application/json";
+    config.headers["Access-Control-Allow-Origin"] = "*";
   }
 
   return config;
 });
+
+// Auth interceptor (logout)
+axios.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    if (error.response?.status === 403) {
+      sessionUtils.removeToken();
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Error handling interceptor
 axios.interceptors.response.use(

@@ -18,9 +18,12 @@ from base.perms import IsAdminAPI
 
 import json
 
+from utils.database import bulk_delete
+
 
 def index(request):
     return render(request, "build/index.html")
+
 
 class AuthsAPI(APIView):
     permission_classes = (IsAdminAPI,)
@@ -28,19 +31,23 @@ class AuthsAPI(APIView):
     def get(self, request):
         query = Auth.objects.all().values()
         return Response(query, status=HTTP_200_OK)
-    
+
     def post(self, request):
         auth = AuthSerializer(data=request.data)
         if not auth.is_valid():
-            return Response({"result","Auth object is not valid"}, status=HTTP_400_BAD_REQUEST)
+            return Response({"result", "Auth object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
             auth.save()
             return Response({}, status=HTTP_200_OK)
-    
+
     def delete(self, request):
-        Auth.objects.all().delete()
-        return Response({},status=HTTP_200_OK)
-    
+        if request.data["idList"] is None:
+            Auth.objects.all().delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            return bulk_delete(request.data["idList"], 'base_auth')
+
+
 class AuthAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
@@ -68,24 +75,29 @@ class AuthAPI(APIView):
         Auth.objects.all().filter(id=auth_id).delete()
         return Response({}, status=HTTP_200_OK)
 
+
 class KeysAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
         query = Key.objects.all().values()
         return Response(query, status=HTTP_200_OK)
-    
+
     def post(self, request):
         key = KeySerializer(data=request.data)
         if not key.is_valid():
-            return Response({"result","Key object is not valid"}, status=HTTP_400_BAD_REQUEST)
+            return Response({"result", "Key object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
             key.save()
             return Response({}, status=HTTP_200_OK)
-    
+
     def delete(self, request):
-        Key.objects.all().delete()
-        return Response({},status=HTTP_200_OK)
+        if request.data["idList"] is None:
+            Key.objects.all().delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            return bulk_delete(request.data["idList"], 'base_auth')
+
 
 class KeyAPI(APIView):
     permission_classes = (IsAdminAPI,)
@@ -114,6 +126,7 @@ class KeyAPI(APIView):
         Key.objects.all().filter(id=key_id).delete()
         return Response({}, status=HTTP_200_OK)
 
+
 class UsersAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
@@ -123,16 +136,23 @@ class UsersAPI(APIView):
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
-        user = UserSerializer(data=request.data)
-        if not user.is_valid():
+        serializer = UserSerializer(data=request.data)
+        if not serializer.is_valid():
             return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
+            fields = request.data
+            user = User(username=fields['username'], first_name=fields['first_name'],
+                        last_name=fields['last_name'], email=fields['email'], is_staff=fields['is_staff'])
+            user.set_password(request.data['password'])
             user.save()
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        User.objects.all().filter(is_superuser=False).delete()
-        return Response({}, status=HTTP_200_OK)
+        if request.data["idList"] is None:
+            User.objects.all().filter(is_superuser=False).delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            return bulk_delete(request.data["idList"], 'auth_user')
 
 
 class UserAPI(APIView):
@@ -165,9 +185,8 @@ class UserAPI(APIView):
 
 
 class LoginAuthAPI(APIView):
-    throttle_classes = ()
-    permission_classes = ()
-    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
+    parser_classes = (parsers.FormParser,
+                      parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = AuthTokenSerializer
 

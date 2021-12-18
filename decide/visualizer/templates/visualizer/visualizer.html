@@ -17,10 +17,13 @@
         </b-navbar>
 
         <div class="voting container">
-            <h1>[[ voting.id ]] - [[ voting.name ]]</h1>
+            <h1>{{voting.0.id}} - {{voting.0.name}}</h1>
 
-            <h2 v-if="!voting.start_date">Votación no comenzada</h2>
-            <h2 v-else-if="!voting.end_date">Votación en curso</h2>
+            {%if voting.0.start_date == null %}
+                <h2>Votación no comenzada</h2>
+            {%elif voting.0.end_date == null %}
+                <h2>Votación en curso</h2>
+            {% else %}
             <div v-else>
                 <h2 class="heading">Resultados:</h2>
 
@@ -33,15 +36,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="opt in voting.postproc" :key="opt.number">
-                            <th>[[opt.option]]</th>
-                            <td>[[opt.postproc]]</td>
-                            <td class="text-muted">[[opt.votes]]</td>
+                        {%for opt in voting.1%}
+                        <tr>
+                            <th>{{opt.option}}</th>
+                            <td>{{opt.postproc}}</td>
+                            <td class="text-muted">{{opt.votes}}</td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-
+            {% endif %}
         </div>
     </div>
 {% endblock %}

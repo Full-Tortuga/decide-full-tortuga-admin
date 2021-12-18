@@ -1,4 +1,4 @@
-import { axios } from "api/config";
+import { axios } from "api/axios";
 
 
 const baseApi = {

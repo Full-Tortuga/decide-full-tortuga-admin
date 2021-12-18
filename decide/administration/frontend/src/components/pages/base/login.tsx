@@ -1,13 +1,13 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
-import { localStore } from "store";
 import { authApi } from "api";
 
 import Page from "../page";
 import { FormItem } from "components/01-atoms/Input";
 import { Button } from "components/01-atoms";
 import { Box } from "@mui/material";
+import { sessionUtils } from "utils";
 
 type LoginInputs = {
   username: string;
@@ -18,22 +18,44 @@ const LoginPage = () => {
   const {
     control,
     getValues,
+    setError,
     formState: { errors },
   } = useForm<LoginInputs>();
 
+  const onSubmitFailed = (e: any) => {
+    if (!e.response) {
+      setError("password", { type: "manual", message: "Server Error" });
+      setError("username", { type: "manual", message: "" });
+    }
+    if (e?.response?.status === 400) {
+      setError("password", {
+        type: "manual",
+        message: e.response.data.non_field_errors[0],
+      });
+      setError("username", {
+        type: "manual",
+      });
+    }
+  };
+
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
     console.log("Login:", data.username);
-    authApi.login(data.username, data.password).then((r) => {
-      localStore.setToken(r.data);
-      window.location.reload();
-    });
+    authApi
+      .login(data.username, data.password)
+      .then((r) => {
+        sessionUtils.setToken(r?.headers["set-cookie"]?.[0]);
+        window.location.reload();
+      })
+      .catch((e) => {
+        onSubmitFailed(e);
+      });
   };
 
   return (
     <Page title="Log In">
       <Box className="flex flex-col w-60 mx-auto my-4">
         <form
-          className="space-y-10"
+          className="space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit(getValues());

@@ -101,3 +101,6 @@ ENV/
 .mypy_cache/
 
 .vagrant
+
+# new db migrations
+decide/*/migrations/0001_initial.py
