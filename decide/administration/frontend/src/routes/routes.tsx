@@ -13,12 +13,12 @@ import { Menu } from "components/templates";
 import { NotFoundPage, UsersPage, HomePage, LoginPage } from "components/pages";
 
 export const AppRoutes = () => {
-  const isAuthenticated = sessionUtils?.getCsrfToken();
+  const isAuthenticated = sessionUtils?.getToken();
   React.useEffect(
     () =>
       console.log(
         `rendered, auth: ${isAuthenticated}`,
-        sessionUtils.getCsrfToken()
+        sessionUtils.getToken()
       ),
     []
   );

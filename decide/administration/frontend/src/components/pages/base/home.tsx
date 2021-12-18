@@ -12,7 +12,7 @@ const HomePage = () => {
         title="Logout"
         onClick={() =>
           authApi.logout().finally(() => {
-            sessionUtils.removeCsrfToken();
+            sessionUtils.removeToken();
             window.location.reload();
           })
         }

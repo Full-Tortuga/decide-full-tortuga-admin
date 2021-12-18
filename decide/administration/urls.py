@@ -4,10 +4,6 @@ from django.urls.conf import re_path
 from . import views
 
 urlpatterns = [
-    # base
-    path("", views.index),
-    # match react routed pages
-    re_path(r'^(?:.*)/?$', views.index),
     # API
     path('api/users', views.UsersAPI.as_view()),
     path('api/users/<int:user_id>', views.UserAPI.as_view()),
@@ -16,5 +12,9 @@ urlpatterns = [
     path('api/base/auth', views.AuthsAPI.as_view()),
     path('api/base/auth/<int:auth_id>', views.AuthAPI.as_view()),
     path('api/base/key', views.KeysAPI.as_view()),
-    path('api/base/key/<int:key_id>', views.KeyAPI.as_view())
+    path('api/base/key/<int:key_id>', views.KeyAPI.as_view()),
+    # base
+    path("/app", views.index),
+    # match react routed pages
+    re_path(r'^(?:.*)/?$', views.index),
 ]

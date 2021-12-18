@@ -27,7 +27,7 @@ axios.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 403) {
-      sessionUtils.removeCsrfToken();
+      sessionUtils.removeToken();
       window.location.reload();
     }
     return Promise.reject(error);

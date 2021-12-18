@@ -21,6 +21,7 @@ const ControlledInput = (props: InputProps) => {
             value={value}
             onChange={onChange}
             error={props.error !== undefined}
+            helperText={props.error}
           />
         </div>
       )}
