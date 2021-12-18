@@ -7,6 +7,7 @@ import Page from "../page";
 import { FormItem } from "components/01-atoms/Input";
 import { Button } from "components/01-atoms";
 import { Box } from "@mui/material";
+import { sessionUtils } from "utils";
 
 type LoginInputs = {
   username: string;
@@ -42,6 +43,7 @@ const LoginPage = () => {
     authApi
       .login(data.username, data.password)
       .then((r) => {
+        sessionUtils.setToken(r?.headers["set-cookie"]?.[0]);
         window.location.reload();
       })
       .catch((e) => {

@@ -2,7 +2,7 @@ import Axios, { AxiosRequestConfig } from "axios";
 
 import { sessionUtils } from "utils";
 
-const API_URL = "http://localhost:8000/administration/api/";
+const API_URL = "http://localhost:8000/administration/api";
 
 export const axios = Axios.create({
   baseURL: API_URL,
