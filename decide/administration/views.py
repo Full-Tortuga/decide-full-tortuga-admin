@@ -1,5 +1,8 @@
 from django.shortcuts import render
+from base import serializers
+from base.mods import query
 from rest_framework.status import *
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
@@ -9,6 +12,7 @@ from rest_framework.views import APIView
 from base.models import Auth, Key
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
+from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
 from utils.utils import is_valid
 
@@ -16,6 +20,57 @@ from utils.utils import is_valid
 def index(request):
     return render(request, "build/index.html")
 
+class CensussAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request):
+        query = Census.objects.all().values()
+        return Response(query, status=HTTP_200_OK)
+
+    def post(self, request):
+        census = CensusSerializer(data=request.data)
+        if not census.is_valid():
+            return Response({"result", "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            census.save()
+            return Response({}, status=HTTP_200_OK)
+
+    def delete(self, request):
+        if request.data["idList"] is None:
+            Census.objects.all().delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            ids = get_ids(request.data["idList"])
+            Census.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
+
+
+class CensusAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request, census_id):
+        try:
+            query = Census.objects.all().values().filter(id=census_id).get()
+        except ObjectDoesNotExist:
+            return Response({}, status=HTTP_404_NOT_FOUND)
+        return Response(query, status=HTTP_200_OK)
+
+    def put(self, request, census_id):
+        if not CensusSerializer(data=request.data).is_valid():
+            return Response({"result": "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                census= Census.objects.all().filter(id=census_id).get()
+            except ObjectDoesNotExist:
+                return Response({}, status=HTTP_404_NOT_FOUND)
+            for key, value in request.data.items():
+                setattr(census, key, value)
+            census.save()
+            return Response({}, status=HTTP_200_OK)
+
+    def delete(self, request, census_id):
+        Census.objects.all().filter(id=census_id).delete()
+        return Response({}, status=HTTP_200_OK)
 
 class AuthsAPI(APIView):
     permission_classes = (IsAdminAPI,)
