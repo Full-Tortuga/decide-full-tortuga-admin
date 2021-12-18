@@ -6,10 +6,9 @@ const Component = (props: { rows: any[]; columns: GridColDef[] }) => {
   return (
     <div className="w-full">
       <DataGrid
+        autoHeight
         rows={props.rows}
         columns={props.columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
         checkboxSelection
       />
     </div>

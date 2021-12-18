@@ -1,16 +1,20 @@
 from django.urls import path
+from django.urls.conf import re_path
 
 from . import views
-from .views import *
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path('api/users/', UsersAPI.as_view()),
-    path('api/users/<int:user_id>/', UserAPI.as_view()),
-    path('api/auth/login', LoginAuthAPI.as_view()),
-    path('api/auth/logout', LogoutAuthAPI.as_view()),
-    path('api/base/auth', AuthsAPI.as_view()),
-    path('api/base/auth/<int:auth_id>/', AuthAPI.as_view()),
-    path('api/base/key', KeysAPI.as_view()),
-    path('api/base/key/<int:key_id>/', KeyAPI.as_view())
+    # base
+    path("", views.index),
+    # match react routed pages
+    re_path(r'^(?:.*)/?$', views.index),
+    # API
+    path('api/users', views.UsersAPI.as_view()),
+    path('api/users/<int:user_id>', views.UserAPI.as_view()),
+    path('api/auth/login', views.LoginAuthAPI.as_view()),
+    path('api/auth/logout', views.LogoutAuthAPI.as_view()),
+    path('api/base/auth', views.AuthsAPI.as_view()),
+    path('api/base/auth/<int:auth_id>', views.AuthAPI.as_view()),
+    path('api/base/key', views.KeysAPI.as_view()),
+    path('api/base/key/<int:key_id>', views.KeyAPI.as_view())
 ]

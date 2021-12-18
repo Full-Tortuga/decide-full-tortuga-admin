@@ -33,7 +33,7 @@ const LoginPage = () => {
     <Page title="Log In">
       <Box className="flex flex-col w-60 mx-auto my-4">
         <form
-          className="space-y-10"
+          className="space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit(getValues());

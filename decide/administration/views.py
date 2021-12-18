@@ -47,6 +47,7 @@ class AuthsAPI(APIView):
         else:
             return bulk_delete(request.data["idList"], 'base_auth')
 
+
 class AuthAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
@@ -184,9 +185,8 @@ class UserAPI(APIView):
 
 
 class LoginAuthAPI(APIView):
-    throttle_classes = ()
-    permission_classes = ()
-    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
+    parser_classes = (parsers.FormParser,
+                      parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = AuthTokenSerializer
 

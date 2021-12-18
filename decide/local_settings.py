@@ -1,5 +1,10 @@
-ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = ['*']
+
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
 
 # Modules in use, commented modules that you won't use
 MODULES = [

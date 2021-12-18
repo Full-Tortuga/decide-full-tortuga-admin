@@ -21,7 +21,7 @@ const LinkTab = (props: {
   );
 };
 
-const Menu = () => {
+const Menu = (props: { hidden: boolean }) => {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -29,20 +29,21 @@ const Menu = () => {
   };
 
   return (
-    <Box>
-      <nav>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="nav tabs"
-          centered
-        >
-          <LinkTab label="Home" icon={<Home />} href="/home" />
-          <LinkTab label="Users" icon={<Person />} href="/users" />
-          <LinkTab label="NotFound" icon={<Error />} href="/404" />
-        </Tabs>
-      </nav>
-      <Outlet />
+    <Box className="inline-flex flex-col w-1/12 h-screen justify-center">
+      {!props.hidden && (
+        <nav>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="nav tabs"
+            orientation="vertical"
+            centered
+          >
+            <LinkTab label="Home" icon={<Home />} href="/home" />
+            <LinkTab label="Users" icon={<Person />} href="/users" />
+          </Tabs>
+        </nav>
+      )}
     </Box>
   );
 };

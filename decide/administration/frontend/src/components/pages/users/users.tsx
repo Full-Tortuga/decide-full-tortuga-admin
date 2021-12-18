@@ -2,6 +2,9 @@ import React from "react";
 import { UserTable } from "components/templates/users";
 
 import Page from "../page";
+import { userApi } from "api";
+import { useLocation } from "react-router";
+import { sessionUtils } from "utils";
 
 // todo: fetch users from api and set rows to the response
 const rows = [
@@ -17,9 +20,17 @@ const rows = [
 ];
 
 const UsersPage = () => {
+  const [users, setUsers] = React.useState(rows);
+
+  React.useEffect(() => {
+    userApi.getUsers().then((response) => {
+      console.log(response);
+    });
+  }, []);
+
   return (
     <Page title="Users">
-      <UserTable users={rows} />
+      <UserTable users={users || rows} />
     </Page>
   );
 };

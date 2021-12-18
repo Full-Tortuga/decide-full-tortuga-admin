@@ -1,6 +1,6 @@
 import React from "react";
 
-import { FormLabel, Input } from "@mui/material";
+import { FormLabel, TextField } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { InputProps } from ".";
 
@@ -11,10 +11,13 @@ const ControlledInput = (props: InputProps) => {
       control={props.control}
       render={({ field: { onChange, value } }) => (
         <div>
-          <FormLabel>{props.name.toUpperCase()}</FormLabel>
-          <Input
+          {props.useFormLabel && (
+            <FormLabel>{props.name.toUpperCase()}</FormLabel>
+          )}
+          <TextField
             type={props.type}
             name={props.name}
+            label={props.name}
             value={value}
             onChange={onChange}
             error={props.error !== undefined}
