@@ -1,3 +1,4 @@
+from django.conf.urls import url
 from django.urls import path
 from django.urls.conf import re_path
 
@@ -14,6 +15,6 @@ urlpatterns = [
     path('api/base/key', views.KeysAPI.as_view()),
     path('api/base/key/<int:key_id>', views.KeyAPI.as_view()),
 
-    # match react-app routed pages
-    re_path(r'(^(?!(api)).*$)', views.index),
+    # react-app
+    url('', views.index)
 ]
