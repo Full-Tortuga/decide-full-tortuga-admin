@@ -3,6 +3,8 @@ import { axios } from "api/axios";
 const userApi = {
   // bulk operations
   getUsers: () => axios.get("/users"),
+  //createUsers: (user: any) => axios.post("/users/", user),
+  deleteUsers: () => axios.delete("/users"),
 
   // individual operations
   getUser: (id: string) => axios.get(`/users/${id}`),
@@ -10,5 +12,6 @@ const userApi = {
   updateUser: (user: any) => axios.put(`/users/${user.id}`, user),
   deleteUser: (id: string) => axios.delete(`/users/${id}`),
 };
+
 
 export default userApi;
