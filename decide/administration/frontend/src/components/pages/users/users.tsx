@@ -37,7 +37,7 @@ const UsersPage = () => {
   }, [refetch]);
 
   const idList = React.useMemo(
-    () => selected.map((user: userType.User) => user.id),
+    () => selected.map((user: userType.User) => user.id || -1),
     [selected]
   );
 
@@ -95,6 +95,7 @@ const UsersPage = () => {
         actions={[
           <NewUserForm
             initialUser={selected.length === 1 ? selected[0] : undefined}
+            refetch = {refetchUsers}
           />,
         ]}
         bulkActions={[

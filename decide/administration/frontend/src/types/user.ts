@@ -1,10 +1,11 @@
 export type User = {
-  id: number;
+  id?: number;
   email: string;
+  password?: string;
   first_name: string;
   last_name: string;
   username: string;
-  is_active: boolean;
-  is_staff: boolean;
-  is_superuser: boolean;
+  is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
 };
