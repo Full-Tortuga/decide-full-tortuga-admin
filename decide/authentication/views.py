@@ -13,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
+from django.contrib import messages
 
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render
@@ -124,3 +125,8 @@ class SignInView(LoginView):
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
+
+def cerrarsesion(request):
+    logout(request)
+    messages.success(request, F"Su sesión se ha cerrado correctamente")
+    return render(request, "bienvenida.html")
