@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework import viewsets
 from rest_framework.status import (
         HTTP_201_CREATED,
         HTTP_400_BAD_REQUEST,
@@ -107,3 +108,7 @@ class SignInView(LoginView):
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all().order_by('id')
+    serializer_class = UserSerializer
