@@ -10,6 +10,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
+from census.models import Census
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
 from .serializers import CensusSerializer
