@@ -1,4 +1,5 @@
 import React from 'react';
+import { checkPasswordEqual } from './Utils';
 
 //Register Box 
 class RegisterBox extends React.Component {
@@ -12,12 +13,29 @@ class RegisterBox extends React.Component {
   
     render() {
       return (
+        <form method='POST' action='/authentication/register_user/' onSubmit={checkPasswordEqual}>
+        
         <div className="inner-container">
           <div className="header">
             Register
           </div>
           <div className="box">
-  
+            <div className="input-group">
+              <label htmlFor="firstname">First Name</label>
+              <input
+                type="text"
+                name="firstname"
+                className="login-input"
+                placeholder="First name"/>
+            </div>
+            <div className="input-group">
+              <label htmlFor="lastname">Last Name</label>
+              <input
+                type="text"
+                name="lastname"
+                className="login-input"
+                placeholder="Last name"/>
+            </div>
             <div className="input-group">
               <label htmlFor="username">Username</label>
               <input
@@ -43,19 +61,18 @@ class RegisterBox extends React.Component {
             <div className="input-group">
               <label htmlFor="password2">Repeat Password</label>
               <input
-                type="password2"
+                type="password"
                 name="password2"
                 className="login-input"
                 placeholder="Repeat Password"/>
             </div>
             <button
-              type="button"
+              type="submit"
               className="login-btn"
-              onClick={this
-              .submitRegister
-              .bind(this)}>Register</button>
+              >Register</button>
           </div>
         </div>
+        </form>
       );
     }
   }

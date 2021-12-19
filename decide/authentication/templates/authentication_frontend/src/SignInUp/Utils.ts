@@ -12,3 +12,13 @@ export function getCookie(name:string) {
     }
     return cookieValue;
 }
+
+export function checkPasswordEqual(event:any){
+    var pwd = event.target.password.value;
+    var pwd2 = event.target.password2.value;
+    var equal = pwd == pwd2;
+    if(!equal){
+        event.preventDefault();
+    }
+
+}

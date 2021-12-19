@@ -1,8 +1,10 @@
+from django.db.models.fields import EmailField
 from rest_framework.response import Response
 from rest_framework.status import (
         HTTP_201_CREATED,
         HTTP_400_BAD_REQUEST,
-        HTTP_401_UNAUTHORIZED
+        HTTP_401_UNAUTHORIZED,
+        HTTP_302_FOUND
 )
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
@@ -39,7 +41,6 @@ class RegisterView(APIView):
         tk = get_object_or_404(Token, key=key)
         if not tk.user.is_superuser:
             return Response({}, status=HTTP_401_UNAUTHORIZED)
-
         username = request.data.get('username', '')
         pwd = request.data.get('password', '')
         if not username or not pwd:
@@ -61,7 +62,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView
-
+from django.urls import reverse
 from django.views.generic import TemplateView
 
 
@@ -104,6 +105,29 @@ class LDAPLogout(APIView):
 
 class SignInView(LoginView):
     template_name = 'form.html'
+
+class RegisterUserView(APIView):
+    def post(self, request):
+        username = request.data.get('username', '')
+        email= request.data.get('email','')
+        firstname = request.data.get('firstname','')
+        lastname = request.data.get('lastname','')
+        pwd = request.data.get('password', '')
+        if not username or not pwd:
+            return Response({}, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User(username=username,email=email,first_name=firstname,last_name=lastname)
+            user.set_password(pwd)
+            user.save()
+            token, _ = Token.objects.get_or_create(user=user)
+        except IntegrityError:
+            return Response({}, status=HTTP_400_BAD_REQUEST)
+        response = Response({'user_pk': user.pk, 'token': token.key}, HTTP_302_FOUND)
+        response['Location'] = reverse('sign_in')
+        
+        return response
+
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
