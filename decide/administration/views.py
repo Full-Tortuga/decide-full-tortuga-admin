@@ -142,7 +142,7 @@ class UsersAPI(APIView):
         else:
             fields = request.data
             user = User(username=fields['username'], first_name=fields['first_name'],
-                        last_name=fields['last_name'], email=fields['email'], is_staff=fields['is_staff'])
+                        last_name=fields['last_name'], email=fields['email'], is_staff=False)
             user.set_password(request.data['password'])
             user.save()
             return Response({}, status=HTTP_200_OK)

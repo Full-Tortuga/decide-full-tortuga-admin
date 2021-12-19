@@ -70,7 +70,7 @@ const Component = (props: {
               </div>
             )}
 
-            <Button onClick={props.onSubmit} title="Submit" type="submit" />
+            <Button title="Submit" type="submit" />
           </DialogActions>
         </form>
       </Dialog>
