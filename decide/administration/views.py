@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from base import serializers
-from base.mods import query
 from rest_framework.status import *
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,15 +8,11 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
-from rest_framework.renderers import JSONRenderer
 
 from authentication.serializers import UserSerializer
 from base.serializers import AuthSerializer, KeySerializer
 from base.perms import IsAdminAPI
-
-import json
-
-from utils.database import bulk_delete
+from utils.utils import get_ids
 
 
 def index(request):
@@ -45,7 +39,12 @@ class AuthsAPI(APIView):
             Auth.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            return bulk_delete(request.data["idList"], 'base_auth')
+            ids = get_ids(request.data["idList"])
+            if len(ids) > 0:
+                Auth.objects.filter(id__in=ids).delete()
+                return Response({}, status=HTTP_200_OK)
+            else:
+                return Response({'Error': 'El formato de la lista de ids no es correcto'}, status=HTTP_400_BAD_REQUEST)
 
 
 class AuthAPI(APIView):
@@ -96,7 +95,12 @@ class KeysAPI(APIView):
             Key.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            return bulk_delete(request.data["idList"], 'base_auth')
+            ids = get_ids(request.data["idList"])
+            if len(ids) > 0:
+                Key.objects.filter(id__in=ids).delete()
+                return Response({}, status=HTTP_200_OK)
+            else:
+                return Response({'Error': 'El formato de la lista de ids no es correcto'}, status=HTTP_400_BAD_REQUEST)
 
 
 class KeyAPI(APIView):
@@ -152,7 +156,12 @@ class UsersAPI(APIView):
             User.objects.all().filter(is_superuser=False).delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            return bulk_delete(request.data["idList"], 'auth_user')
+            ids = get_ids(request.data["idList"])
+            if len(ids) > 0:
+                User.objects.filter(id__in=ids).delete()
+                return Response({}, status=HTTP_200_OK)
+            else:
+                return Response({'Error': 'El formato de la lista de ids no es correcto'}, status=HTTP_400_BAD_REQUEST)
 
 
 class UserAPI(APIView):
