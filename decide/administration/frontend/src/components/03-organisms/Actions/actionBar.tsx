@@ -7,6 +7,7 @@ import { IconButton } from "components/01-atoms";
 type Action = {
   title: string;
   icon: ReactElement;
+  disabled?: boolean;
   onClick?: () => void;
 };
 
@@ -39,7 +40,7 @@ const Component = (props: {
             title={action.title}
             icon={action.icon}
             onClick={action.onClick}
-            disabled={!individualEnabled}
+            disabled={action.disabled || !individualEnabled}
           />
         ))}
         <Divider />
@@ -49,7 +50,7 @@ const Component = (props: {
             title={action.title}
             icon={action.icon}
             onClick={action.onClick}
-            disabled={!bulkEnabled}
+            disabled={action.disabled || !bulkEnabled}
           />
         ))}
       </Box>

@@ -1,14 +1,20 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "decide/administration"
-		},
-		{
-			"path": "decide/administration/frontend"
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "name": "decide-full-tortuga-admin",
+            "path": "."
+        },
+        {
+            "name": "decide",
+            "path": "decide"
+        },
+        {
+            "name": "administration",
+            "path": "decide/administration"
+        },
+        {
+            "name": "src",
+            "path": "decide/administration/frontend/src"
+        }
+    ]
 }

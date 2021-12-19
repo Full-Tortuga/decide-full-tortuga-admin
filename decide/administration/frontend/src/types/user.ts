@@ -1,7 +1,10 @@
-//todo replace with user correct data
 export type User = {
   id: number;
-  lastName: string;
-  firstName?: string | null;
-  age?: number | null;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
 };

@@ -23,7 +23,7 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
 // Auth interceptor (logout)
 axios.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response;
   },
   (error) => {
     if (error.response?.status === 403) {
@@ -37,7 +37,7 @@ axios.interceptors.response.use(
 // Error handling interceptor
 axios.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response;
   },
   (error) => {
     // todo: handle errors

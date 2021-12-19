@@ -1,17 +1,35 @@
 import { axios } from "api/axios";
+import { userType } from "types";
 
 const userApi = {
-  // bulk operations
+  // bulk simple operations
   getUsers: () => axios.get("/users"),
-  //createUsers: (user: any) => axios.post("/users/", user),
-  deleteUsers: () => axios.delete("/users"),
+  deleteUsers: (idList: number[]) =>
+    axios.delete("/users", { data: { idList: idList.join(",") } }),
 
-  // individual operations
+  // bulk role/status operations
+  updateUsersActive: (idList: number[], value: boolean) =>
+    axios.post("/users/state", {
+      idList: idList.join(","),
+      state: "Active",
+      value: value ? "True" : "False",
+    }),
+  updateUsersRole: (
+    idList: number[],
+    value: boolean,
+    role: "Staff" | "Superuser"
+  ) =>
+    axios.post("/users/state", {
+      idList: idList.join(","),
+      state: role,
+      value: value ? "True" : "False",
+    }),
+
+  // individual simple operations
   getUser: (id: string) => axios.get(`/users/${id}`),
-  createUser: (user: any) => axios.post("/users", user),
-  updateUser: (user: any) => axios.put(`/users/${user.id}`, user),
+  createUser: (user: userType.User) => axios.post("/users", user),
+  updateUser: (user: userType.User) => axios.put(`/users/${user.id}`, user),
   deleteUser: (id: string) => axios.delete(`/users/${id}`),
 };
-
 
 export default userApi;

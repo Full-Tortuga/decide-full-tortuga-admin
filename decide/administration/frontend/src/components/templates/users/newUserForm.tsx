@@ -12,7 +12,7 @@ const Component = (props: { initialUser?: userType.User }) => {
     setError,
     formState: { errors },
   } = useForm<{ username: string; username2: string }>({
-    defaultValues: { username: props.initialUser?.firstName || "" },
+    defaultValues: { username: props.initialUser?.first_name || "" },
   });
 
   const [sent, setSent] = React.useState(false);
