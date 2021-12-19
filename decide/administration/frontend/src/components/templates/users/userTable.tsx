@@ -7,7 +7,6 @@ import { Table } from "components/02-molecules";
 // todo: set correct columns
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID" },
   {
     field: "firstName",
     headerName: "First name",
@@ -26,8 +25,14 @@ const columns: GridColDef[] = [
   },
 ];
 
-const Component = (props: { users: userType.User[] }) => {
-  return <Table rows={props.users} columns={columns} />;
+const Component = (props: { users: userType.User[]; setSelected: any }) => {
+  return (
+    <Table
+      rows={props.users}
+      columns={columns}
+      setSelected={props.setSelected}
+    />
+  );
 };
 
 export default Component;

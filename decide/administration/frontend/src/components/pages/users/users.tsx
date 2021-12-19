@@ -1,8 +1,13 @@
 import React from "react";
+import { Delete } from "@mui/icons-material";
+
+import { userApi } from "api";
+import { userType } from "types";
+
+import { ActionBar } from "components/03-organisms";
 import { NewUserForm, UserTable } from "components/templates/users";
 
 import Page from "../page";
-import { userApi } from "api";
 
 // todo: fetch users from api and set rows to the response
 const rows = [
@@ -19,6 +24,7 @@ const rows = [
 
 const UsersPage = () => {
   const [users, setUsers] = React.useState(rows);
+  const [selected, setSelected] = React.useState([]);
 
   React.useEffect(() => {
     userApi.getUsers().then((response) => {
@@ -27,11 +33,39 @@ const UsersPage = () => {
     });
   }, []);
 
+  const idList = React.useMemo(
+    () => selected.map((user: userType.User) => user.id),
+    [selected]
+  );
+
+  const handleDelete = () => {
+    console.log(idList);
+  };
+
   return (
-    <Page title="Users">
-      <UserTable users={users || rows} />
-      <NewUserForm />
-    </Page>
+    <>
+      <Page title="Users">
+        <UserTable users={users || rows} setSelected={setSelected} />
+      </Page>
+      <ActionBar
+        selection={selected}
+        actions={[
+          <NewUserForm
+            initialUser={selected.length === 1 ? selected[0] : undefined}
+          />,
+        ]}
+        bulkActions={[
+          {
+            icon: <Delete />,
+            title: "Delete",
+            onClick: () => {
+              console.log("delete");
+              handleDelete();
+            },
+          },
+        ]}
+      />
+    </>
   );
 };
 
