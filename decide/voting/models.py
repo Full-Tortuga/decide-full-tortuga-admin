@@ -20,7 +20,7 @@ class QuestionOption(models.Model):
     number = models.PositiveIntegerField(blank=True, null=True)
     option = models.TextField()
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if not self.number:
             self.number = self.question.options.count() + 2
         return super().save()
