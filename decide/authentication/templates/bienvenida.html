@@ -6,11 +6,15 @@
 
     <ul>
         {% if user.is_authenticated %}
-            <h1>Hola {{ user.username }}</h1>
+            <h1>Hola {{ user.first_name }}</h1>
+
             <a href="{% url 'logout' %}">Cerrar sesión</a>        
         {% else %}
-            <a href="{% url 'sign_up' %}">Registrate</a>
-            <a href="{% url 'sign_in' %}">Iniciar sesión</a>
+            <a href="{% url 'sign_in' %}">Registrate</a>
+            <a href="{% url 'sign_in' %}">Iniciar sesión con usuario/contraseña</a>
+            <a href="{% url 'loginldap' %}">Iniciar sesión con LDAP</a>
+            <a href="">Iniciar sesión con huella dactilar</a>{% comment %}Meter url huelladactilar {% endcomment %}
+            <a href="">Iniciar sesión con redes sociales</a>{% comment %}Meter url para rrss {% endcomment %}
         {% endif %}
     </ul>
     
