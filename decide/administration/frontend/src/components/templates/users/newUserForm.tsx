@@ -2,16 +2,18 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { userType } from "types";
 import { ModalPage, Modal } from "components/02-molecules";
-import { Add } from "@mui/icons-material";
+import { Add, Edit } from "@mui/icons-material";
 import { FormItem } from "components/01-atoms/Input";
 
-const Component = (props: { initialUser?: userType.User[] }) => {
+const Component = (props: { initialUser?: userType.User }) => {
   const {
     control,
     getValues,
     setError,
     formState: { errors },
-  } = useForm<{ username: string; username2: string }>();
+  } = useForm<{ username: string; username2: string }>({
+    defaultValues: { username: props.initialUser?.firstName || "" },
+  });
 
   const [sent, setSent] = React.useState(false);
 
@@ -23,6 +25,8 @@ const Component = (props: { initialUser?: userType.User[] }) => {
   const onSubmit: SubmitHandler<{ username: string; username2: string }> = (
     data
   ) => {
+    //todo: if initialUser empty then call create new user
+    //todo: if initialUser is not empty, then call update
     console.log("submit:", data);
     //Todo: call api and create user,
     //Todo: if created then close modal if not, call onSubmitFailed
@@ -35,7 +39,7 @@ const Component = (props: { initialUser?: userType.User[] }) => {
     <Modal
       onSubmit={() => onSubmit(getValues())}
       title="New User"
-      openerIcon={<Add />}
+      openerIcon={props.initialUser ? <Edit /> : <Add />}
       externalClose={sent}
       pages={[
         <ModalPage description="Indique la información del Usuario">
@@ -43,7 +47,7 @@ const Component = (props: { initialUser?: userType.User[] }) => {
             control={control}
             name="username"
             error={errors.username?.message}
-          ></FormItem.TextInput>
+          />
         </ModalPage>,
       ]}
     />
