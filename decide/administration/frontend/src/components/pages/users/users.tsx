@@ -41,15 +41,13 @@ const UsersPage = () => {
     [selected]
   );
 
-  const checkOptions = (active: number) => {
-    return active === selected.length
-      ? "true"
-      : active === 0
-      ? "false"
-      : "mixed";
-  };
-
   const selectionState = React.useMemo(() => {
+    const checkOptions = (active: number) => {
+      if (active === selected.length) return "true";
+      else if (active === 0) return "false";
+      else return "mixed";
+    };
+
     const activeNumber = selected.filter(
       (user: userType.User) => user.is_active
     ).length;
@@ -59,12 +57,13 @@ const UsersPage = () => {
     const suNumber = selected.filter(
       (user: userType.User) => user.is_superuser
     ).length;
+
     return {
       active: checkOptions(activeNumber),
       staff: checkOptions(staffNumber),
       su: checkOptions(suNumber),
     };
-  }, [selected, checkOptions]);
+  }, [selected]);
 
   const handleDelete = () => {
     userApi.deleteUsers(idList).then((response) => {
