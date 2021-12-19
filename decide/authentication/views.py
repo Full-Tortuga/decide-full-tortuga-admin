@@ -103,7 +103,7 @@ class LDAPLogout(APIView):
 
 
 class SignInView(LoginView):
-    template_name = 'index.html'
+    template_name = 'form.html'
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
