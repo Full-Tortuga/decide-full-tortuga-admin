@@ -1,3 +1,4 @@
 import { Table } from "./Table";
+import { Modal, ModalPage } from "./Modal";
 
-export { Table };
+export { Table, Modal, ModalPage };

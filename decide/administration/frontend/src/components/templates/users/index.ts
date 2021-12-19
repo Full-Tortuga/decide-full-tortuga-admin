@@ -1,3 +1,4 @@
-import Component from "./userTable";
+import UserTable from "./userTable";
+import NewUserForm from "./newUserForm";
 
-export { Component as UserTable };
+export { NewUserForm, UserTable };
