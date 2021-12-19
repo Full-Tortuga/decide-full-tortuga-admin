@@ -15,9 +15,8 @@ from administration.serializers import UserAdminSerializer, UserSerializer
 from base.serializers import AuthSerializer, KeySerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
-from utils.database import get_ids
+from utils.utils import get_ids
 import json
-from utils.database import bulk_delete
 from utils.utils import get_ids, is_valid
 
 
