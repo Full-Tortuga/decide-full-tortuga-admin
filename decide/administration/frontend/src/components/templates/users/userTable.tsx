@@ -8,19 +8,38 @@ import { Table } from "components/02-molecules";
 
 const columns: GridColDef[] = [
   {
-    field: "firstName",
+    field: "username",
+    headerName: "Username",
+    width: 110,
+  },
+  {
+    field: "first_name",
     headerName: "First name",
     width: 200,
   },
   {
-    field: "lastName",
+    field: "last_name",
     headerName: "Last name",
     width: 200,
   },
   {
-    field: "age",
-    headerName: "Age",
-    type: "number",
+    field: "email",
+    headerName: "Email",
+    width: 110,
+  },
+  {
+    field: "is_active",
+    headerName: "Active",
+    width: 110,
+  },
+  {
+    field: "is_staff",
+    headerName: "Staff",
+    width: 110,
+  },
+  {
+    field: "is_superuser",
+    headerName: "Superuser",
     width: 110,
   },
 ];
