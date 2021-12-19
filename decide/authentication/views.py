@@ -15,14 +15,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 
 from django.db import IntegrityError
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import TemplateView
 
 from .serializers import UserSerializer
 
 import ldap
-from local_settings import AUTH_LDAP_SERVER_URI
+from local_settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD 
 
 
 class GetUserView(APIView):
@@ -78,13 +78,15 @@ class LDAPLogin(APIView):
         :param request:
         :return:
         """
-        #Probamos la conexion con el servidor
+        
         try:
+            #Probamos la conexion con el servidor con las siguientes instrucciones
             con = ldap.initialize(AUTH_LDAP_SERVER_URI)
-            con.simple_bind_s()
-            user_obj = authenticate(username=request.data['username'],
-                                password=request.data['password'])
+            con.simple_bind_s(AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD) 
             try:
+                #Probamos a logear con los datos enviados por el usuario
+                user_obj = authenticate(username=request.data['username'],
+                                password=request.data['password'])
                 login(request, user_obj, backend='django_auth_ldap.backend.LDAPBackend')
                 data={'detail': 'User logged in successfully'}
                 status = HTTP_200_OK
@@ -94,7 +96,7 @@ class LDAPLogin(APIView):
         except ldap.SERVER_DOWN:
             data={'detail': 'Problema con el servicio LDAP'}
             status = HTTP_500_INTERNAL_SERVER_ERROR
-        return Response(data, status=status)
+        return render(request, 'bienvenida.html', status=status)
             
 
 class LDAPLogout(APIView):
@@ -114,6 +116,8 @@ class LDAPLogout(APIView):
         return Response(data, status=200)
 
 
+class LDAPSignInView(LoginView):
+    template_name = 'login_ldap_view.html'
 
 class SignInView(LoginView):
     template_name = 'index.html'
