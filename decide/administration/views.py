@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from base import serializers
-from base.mods import query
 from rest_framework.status import *
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,15 +8,11 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
-from rest_framework.renderers import JSONRenderer
 
-from authentication.serializers import UserSerializer
+from administration.serializers import UserAdminSerializer, UserSerializer
 from base.serializers import AuthSerializer, KeySerializer
 from base.perms import IsAdminAPI
-
-import json
-
-from utils.database import bulk_delete
+from utils.utils import get_ids, is_valid
 
 
 def index(request):
@@ -45,7 +39,10 @@ class AuthsAPI(APIView):
             Auth.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            return bulk_delete(request.data["idList"], 'base_auth')
+            ids = get_ids(request.data["idList"])
+            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            Auth.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
 
 
 class AuthAPI(APIView):
@@ -96,7 +93,10 @@ class KeysAPI(APIView):
             Key.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            return bulk_delete(request.data["idList"], 'base_auth')
+            ids = get_ids(request.data["idList"])
+            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            Key.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
 
 
 class KeyAPI(APIView):
@@ -132,7 +132,7 @@ class UsersAPI(APIView):
 
     def get(self, request):
         query = User.objects.all()
-        rest = UserSerializer(query, many=True).data
+        rest = UserAdminSerializer(query, many=True).data
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
@@ -152,7 +152,10 @@ class UsersAPI(APIView):
             User.objects.all().filter(is_superuser=False).delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            return bulk_delete(request.data["idList"], 'auth_user')
+            ids = get_ids(request.data["idList"])
+            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            User.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
 
 
 class UserAPI(APIView):
@@ -163,7 +166,7 @@ class UserAPI(APIView):
             query = User.objects.filter(id=user_id).get()
         except ObjectDoesNotExist:
             return Response({}, status=HTTP_404_NOT_FOUND)
-        rest = UserSerializer(query).data
+        rest = UserAdminSerializer(query).data
         return Response(rest, status=HTTP_200_OK)
 
     def put(self, request, user_id):
@@ -207,3 +210,27 @@ class LogoutAuthAPI(APIView):
         response = Response({}, status=HTTP_200_OK)
         response.delete_cookie('token')
         return response
+
+
+class UpdateUserStateAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def post(self, request):
+        ids = get_ids(request.data["idList"])
+        state = request.data['state']
+        value = request.data['value']
+        is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+        is_valid(value == 'True' or value == 'False', 'The field value must be True or False')
+        res = Response({}, status=HTTP_200_OK)
+        if state == 'Active':
+            users = User.objects.filter(id__in=ids)
+            users.update(is_active=value)
+        elif state == 'Staff':
+            users = User.objects.filter(id__in=ids)
+            users.update(is_staff=value)
+        elif state == 'Superuser':
+            users = User.objects.filter(id__in=ids)
+            users.update(is_superuser=value)
+        else:
+            res = Response({"result": "The field state must be Active, Staff or Superuser"}, status=HTTP_400_BAD_REQUEST)
+        return res
