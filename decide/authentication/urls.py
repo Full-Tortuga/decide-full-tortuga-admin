@@ -2,7 +2,7 @@ from django.contrib.auth import views
 from django.urls import include, path
 from rest_framework.authtoken.views import obtain_auth_token
 
-from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion, inicio
+from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion
 
 
 urlpatterns = [
