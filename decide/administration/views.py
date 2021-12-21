@@ -170,17 +170,14 @@ class UserAPI(APIView):
         return Response(rest, status=HTTP_200_OK)
 
     def put(self, request, user_id):
-        if not UserSerializer(data=request.data).is_valid():
-            return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            try:
-                user = User.objects.filter(id=user_id).get()
-            except ObjectDoesNotExist:
-                return Response({}, status=HTTP_404_NOT_FOUND)
-            for key, value in request.data.items():
-                setattr(user, key, value)
-            user.save()
-            return Response({}, status=HTTP_200_OK)
+        try:
+            user = User.objects.filter(id=user_id).get()
+        except ObjectDoesNotExist:
+            return Response({}, status=HTTP_404_NOT_FOUND)
+        for key, value in request.data.items():
+            setattr(user, key, value)
+        user.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, user_id):
         User.objects.all().filter(is_superuser=False, id=user_id).delete()
