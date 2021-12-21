@@ -9,7 +9,7 @@ const ControlledInput = (props: InputProps) => {
     <Controller
       name={props.name}
       control={props.control}
-      render={({ field: { onChange, value } }) => (
+      render={({ field: { onChange, value, ref } }) => (
         <div>
           {props.useFormLabel && (
             <FormLabel>{props.name.toUpperCase()}</FormLabel>
@@ -22,6 +22,7 @@ const ControlledInput = (props: InputProps) => {
             onChange={onChange}
             error={props.error !== undefined}
             helperText={props.error}
+            ref={ref}
           />
         </div>
       )}

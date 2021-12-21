@@ -14,7 +14,7 @@ type Action = {
 const Component = (props: {
   selection?: any[];
   actions?: ReactElement[];
-  selectedActions?: Action[];
+  individualActions?: Action[];
   bulkActions?: Action[];
 }) => {
   const individualEnabled = React.useMemo(
@@ -29,18 +29,17 @@ const Component = (props: {
   return (
     <Box
       id="actions"
-      className="inline-block w-1/12 h-screen py-1 md:py-5 xl:py-48 px-2"
+      className="inline-block w-1/12 h-screen py-1 md:py-5 xl:py-32 px-2"
     >
       <Box className="h-full w-12 flex flex-col border rounded p-2 gap-3">
         {props.actions}
         <Divider />
-        {props.selectedActions?.map((action, index) => (
+        {props.individualActions?.map((action, index) => (
           <IconButton
             key={index}
             title={action.title}
             icon={action.icon}
             onClick={action.onClick}
-            disabled={action.disabled || !individualEnabled}
           />
         ))}
         <Divider />

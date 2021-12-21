@@ -9,3 +9,11 @@ export type User = {
   is_staff?: boolean;
   is_superuser?: boolean;
 };
+
+export type UserFormFields = {
+  username: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+};

@@ -26,10 +26,10 @@ const userApi = {
     }),
 
   // individual simple operations
-  getUser: (id: string) => axios.get(`/users/${id}`),
+  getUser: (id: number) => axios.get(`/users/${id}`),
   createUser: (user: userType.User) => axios.post("/users", user),
   updateUser: (user: userType.User) => axios.put(`/users/${user.id}`, user),
-  deleteUser: (id: string) => axios.delete(`/users/${id}`),
+  deleteUser: (id: number) => axios.delete(`/users/${id}`),
 };
 
 export default userApi;
