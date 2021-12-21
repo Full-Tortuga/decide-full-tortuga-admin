@@ -4,7 +4,6 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion, LDAPSignInView
 
-
 urlpatterns = [
     path('login/', obtain_auth_token),
     # path('logout/', LogoutView.as_view(), name='logout'),

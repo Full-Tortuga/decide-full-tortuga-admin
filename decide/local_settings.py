@@ -1,9 +1,9 @@
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 ALLOWED_HOSTS = ["*"]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
 # Modules in use, commented modules that you won't use
-'''MODULES = [
+MODULES = [
     'authentication',
     'base',
     'booth',
@@ -13,30 +13,30 @@ CORS_ORIGIN_ALLOW_ALL = True
     'store',
     'visualizer',
     'voting',
-]'''
+]
 
 APIS = {
-    'authentication': 'http://localhost:8011',
-    'base': 'http://localhost:8011',
-    'booth': 'http://localhost:8011',
-    'census': 'http://localhost:8011',
-    'mixnet': 'http://localhost:8011',
-    'postproc': 'http://localhost:8011',
-    'store': 'http://localhost:8011',
-    'visualizer': 'http://localhost:8011',
-    'voting': 'http://localhost:8011',
+    'authentication': 'http://localhost:8000',
+    'base': 'http://localhost:8000',
+    'booth': 'http://localhost:8000',
+    'census': 'http://localhost:8000',
+    'mixnet': 'http://localhost:8000',
+    'postproc': 'http://localhost:8000',
+    'store': 'http://localhost:8000',
+    'visualizer': 'http://localhost:8000',
+    'voting': 'http://localhost:8000',
 }
 
-BASEURL = 'http://localhost:8011'
+BASEURL = 'http://localhost:8000'
 
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'decide',
         'CLIENT': {
-           'host': '172.31.0.2',
-           'username': 'mongo',
-           'password': 'mongo'
+           'host': 'mongodb://127.0.0.1:27017/decide?compressors=disabled&gssapiServiceName=mongodb',
+           'username': 'decide',
+           'password': 'decide'
         }
 
     }
@@ -44,3 +44,29 @@ DATABASES = {
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
+
+AUTH_LDAP_SERVER_URI = 'ldap://:388'
+
+AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
+AUTH_LDAP_BIND_PASSWORD = 'decide'
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    'ou=people,dc=decide,dc=org',
+    ldap.SCOPE_SUBTREE,
+    '(uid=%(user)s)',
+)
+
+# Populate the Django user from the LDAP directory.
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'cn',
+    'last_name': 'sn',
+    'email': 'mail',
+}
+
+# Keep ModelBackend around for per-user permissions and maybe a local
+# superuser.
+
+AUTHENTICATION_BACKENDS = [
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
