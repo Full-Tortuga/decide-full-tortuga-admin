@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import login, logout
 
 from .serializers import UserSerializer
 
@@ -61,6 +62,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView
+from django.contrib import messages
 
 from django.views.generic import TemplateView
 
@@ -107,3 +109,8 @@ class SignInView(LoginView):
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
+
+def cerrarsesion(request):
+    logout(request)
+    messages.success(request, F"Su sesión se ha cerrado correctamente")
+    return render(request, "bienvenida.html")
