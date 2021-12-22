@@ -127,6 +127,8 @@ class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'
 
 def cerrarsesion(request):
+    print("==========================LOGOUT========================")
+
     logout(request)
     messages.success(request, F"Su sesión se ha cerrado correctamente")
     return render(request, "bienvenida.html")
