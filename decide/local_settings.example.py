@@ -32,11 +32,13 @@ BASEURL = 'http://10.5.0.1:8000'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': 'djongo',
+        'NAME': 'decide',
+        'CLIENT': {
+           'host': 'mongodb://127.0.0.1:27017/decide?compressors=disabled&gssapiServiceName=mongodb',
+        
+        }
+
     }
 }
 
