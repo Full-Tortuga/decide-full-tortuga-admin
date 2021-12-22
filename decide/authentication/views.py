@@ -132,6 +132,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 def cerrarsesion(request):
+    print("==========================LOGOUT========================")
+
     logout(request)
     messages.success(request, F"Su sesión se ha cerrado correctamente")
     return render(request, "bienvenida.html")
