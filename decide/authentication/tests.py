@@ -7,6 +7,8 @@ from rest_framework.authtoken.models import Token
 
 from base import mods
 
+from local_settings import AUTH_LDAP_SERVER_URI
+
 
 class AuthTestCase(APITestCase):
 
@@ -149,3 +151,19 @@ class AuthTestCase(APITestCase):
         response = self.client.post(
             '/authentication/register/', token, format='json')
         self.assertEqual(response.status_code, 400)
+
+    def test_login_ldap_positive(self):
+        body_form = {'username': 'foobar', 'password': 'test'}
+        response = self.client.post(
+            '/authentication/loginLDAP/', body_form, format='json')
+        self.assertEqual(response.status_code, 200)
+        
+
+    def test_login_ldap_negative(self):
+        body_form = {'username': 'foobar', 'password': 'contrasenyaMal'}
+        response = self.client.post(
+            '/authentication/loginLDAP/', body_form, format='json')
+        self.assertEqual(response.status_code, 400)
+        
+        
+        
