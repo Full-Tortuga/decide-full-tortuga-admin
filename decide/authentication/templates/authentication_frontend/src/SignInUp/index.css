@@ -173,3 +173,14 @@ body,
 .show {
     visibility: visible;
 }
+
+.error-box{
+    display: none;
+}
+
+.error-box.active{
+    display: flex;
+    border: 1px solid #e74c3c;
+    border-radius: 10px;
+    padding: 20px;
+}

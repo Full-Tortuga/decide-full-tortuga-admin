@@ -215,6 +215,41 @@ class AuthTestCase(APITestCase):
             '/authentication/users/', data, format='json')
         self.assertEqual(response.status_code, 400)       
 
+
+    def test_differentpasswords_register(self):
+        data = {'username':'testingUser', 'password': '123', 'password2':'456'}
+        response = self.client.post(
+            '/authentication/register_user/', data, format='json')
+        msg = response.json()['error']
+        self.assertEqual(msg, 'Contraseñas no coinciden')
+        self.assertEqual(response.status_code, 400) 
+
+    def test_registeruser_form(self):
+        data = {'username':'testingUser', 'password': '123', 'password2':'123'}
+        response = self.client.post(
+            '/authentication/register_user/', data, format='json')
+        self.assertEqual(response.status_code, 302)
+
+    def test_loginuser_form(self):
+        data_login = {'username':'testingUser', 'password': '123'}
+        response = self.client.post(
+            '/authentication/login_form/', data_login, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    # def test_loginuser_negative_form(self):
+    #     data_login = {'username':'noUser', 'password': 'nopwd'}
+    #     response = self.client.post(
+    #         '/authentication/login_form/', data_login, format='json')
+    #     self.assertEqual(response.status_code, 400)
+
+    def test_registeruser_existingusername(self):
+        data_login = {'username':'voter1', 'password': '123456', 'password2':'123456'}
+        response = self.client.post(
+            '/authentication/register_user/', data_login, format='json')
+        msg = response.json()['error']
+        self.assertEqual(msg, 'Ya existe este nombre de usuario')
+        self.assertEqual(response.status_code, 400)
+
     #
     #   TODO: Arreglar tests, estos tests asumen que el sistema ya tiene registrado un usuario 'foobar' en ldap,
     #   lo cual es erroneo, tiene que registrarse dicho usuario en el setup de los tests

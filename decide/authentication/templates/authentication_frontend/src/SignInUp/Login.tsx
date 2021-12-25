@@ -19,9 +19,7 @@ class LoginBox extends React.Component {
     const csrfToken = getCookie('csrftoken') || ''
     console.log(csrfToken)
     return (
-      <form method='POST' action='/authentication/login_form/'/*onSubmit={this
-        .submitLogin
-        .bind(this)}*/ >
+      <form method='POST' action='/authentication/login_form/'>
         <input type="hidden" name="csrfmiddlewaretoken" value={csrfToken}/> 
         <div className="inner-container">
           <div className="header">

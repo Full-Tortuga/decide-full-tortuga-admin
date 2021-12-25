@@ -13,11 +13,15 @@ export function getCookie(name:string) {
     return cookieValue;
 }
 
-export function checkPasswordEqual(event:any){
+export function checkErrors(event:any){
     var pwd = event.target.password.value;
     var pwd2 = event.target.password2.value;
+    console.log('easd')
+    console.log(pwd + pwd2)
     var equal = pwd == pwd2;
     if(!equal){
+        document.getElementById('error-msg')!.innerHTML='Las contraseñas no coinciden';
+        document.getElementById('error-box')!.classList.add('active');
         event.preventDefault();
     }
 

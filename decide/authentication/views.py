@@ -6,7 +6,8 @@ from rest_framework.status import (
         HTTP_201_CREATED,
         HTTP_400_BAD_REQUEST,
         HTTP_401_UNAUTHORIZED,
-        HTTP_500_INTERNAL_SERVER_ERROR
+        HTTP_500_INTERNAL_SERVER_ERROR,
+        HTTP_302_FOUND
 )
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
@@ -23,6 +24,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import TemplateView
 
 from .serializers import UserSerializer
+from django.urls import reverse
+from django.db import models
 
 import ldap
 from local_settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD 
@@ -131,8 +134,15 @@ class RegisterUserView(APIView):
         firstname = request.data.get('firstname','')
         lastname = request.data.get('lastname','')
         pwd = request.data.get('password', '')
-        if not username or not pwd:
-            return Response({}, status=HTTP_400_BAD_REQUEST)
+        pwd2 = request.data.get('password2','')
+        if not pwd==pwd2:
+            response = Response({'error': 'Contraseñas no coinciden'}, HTTP_400_BAD_REQUEST)
+            response['Location'] = reverse('sign_in')
+            return response
+        if User.objects.filter(username=username).count() > 0:
+            response = Response({'error': 'Ya existe este nombre de usuario', 'username': username}, HTTP_400_BAD_REQUEST)
+            response['Location'] = reverse('sign_in')
+            return response
 
         try:
             user = User(username=username,email=email,first_name=firstname,last_name=lastname)
@@ -145,7 +155,6 @@ class RegisterUserView(APIView):
         response['Location'] = reverse('sign_in')
         
         return response
-
 
 class BienvenidaView(TemplateView):
    template_name = 'bienvenida.html'

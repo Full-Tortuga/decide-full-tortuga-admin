@@ -25,6 +25,10 @@ class SignInUp extends React.Component<any,State>{
     console.log(this.state)
     return (
       <div className="root-container">
+        <div className="error-box active">
+          <span id="error-msg"> </span>
+        </div>
+
         <div className="box-container">
           {this.state.isLoginOpen && <LoginBox/>}
           {this.state.isRegisterOpen && <RegisterBox/>}
