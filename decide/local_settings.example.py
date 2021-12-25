@@ -17,39 +17,39 @@ MODULES = [
 ]
 
 APIS = {
-    'authentication': 'http://10.5.0.1:8000',
-    'base': 'http://10.5.0.1:8000',
-    'booth': 'http://10.5.0.1:8000',
-    'census': 'http://10.5.0.1:8000',
-    'mixnet': 'http://10.5.0.1:8000',
-    'postproc': 'http://10.5.0.1:8000',
-    'store': 'http://10.5.0.1:8000',
-    'visualizer': 'http://10.5.0.1:8000',
-    'voting': 'http://10.5.0.1:8000',
+    'authentication': 'http://localhost:8000',
+    'base': 'http://localhost:8000',
+    'booth': 'http://localhost:8000',
+    'census': 'http://localhost:8000',
+    'mixnet': 'http://localhost:8000',
+    'postproc': 'http://localhost:8000',
+    'store': 'http://localhost:8000',
+    'visualizer': 'http://localhost:8000',
+    'voting': 'http://localhost:8000',
 }
 
-BASEURL = 'http://10.5.0.1:8000'
+BASEURL = 'http://localhost:8000'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': 'djongo',
+        'NAME': 'decide',
+        'CLIENT': {
+           'host': '127.0.0.1'
+        }
+
     }
 }
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
 
-# Baseline configuration.
 AUTH_LDAP_SERVER_URI = 'ldap://:389'
 
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
 AUTH_LDAP_BIND_PASSWORD = 'decide'
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
-    'ou=people,dc=decide,dc=world',
+    'ou=people,dc=decide,dc=org',
     ldap.SCOPE_SUBTREE,
     '(uid=%(user)s)',
 )
@@ -66,5 +66,6 @@ AUTH_LDAP_USER_ATTR_MAP = {
 
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 

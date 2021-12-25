@@ -54,7 +54,7 @@ coverage.xml
 
 # Django stuff:
 *.log
-local_settings.py
+decide/local_settings.py
 
 migrations/
 
@@ -105,6 +105,3 @@ ENV/
 .mypy_cache/
 
 .vagrant
-
-#Node
-node_modules/

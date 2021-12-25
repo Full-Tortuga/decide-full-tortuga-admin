@@ -1,0 +1,50 @@
+name: Decide CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.9]
+    
+    services:
+      mongo-decide:
+        image: 'mongo'
+        ports:
+          - 27017:27017
+      ldap-decide:
+        image: 'carvilgar1us/decideldap'
+        ports:
+          - 389:389
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
+    - name: Install Python requirements
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Copy local_settings
+      run: |
+        cp ./decide/local_settings.example.py ./decide/local_settings.py    
+    - name: Run migrations
+      run: |
+        cd decide
+        python manage.py makemigrations
+        python manage.py migrate
+    - name: Run tests     
+      run: |
+        cd decide
+        python manage.py test authentication
