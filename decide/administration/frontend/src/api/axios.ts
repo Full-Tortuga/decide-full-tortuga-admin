@@ -6,18 +6,11 @@ const API_URL = "http://localhost:8000/administration/api";
 
 export const axios = Axios.create({
   baseURL: API_URL,
-});
-
-// Headers interceptor
-axios.interceptors.request.use((config: AxiosRequestConfig) => {
-  if (config.headers) {
-    // content-type
-    config.headers.Accept = "application/json";
-    config.headers.ContentType = "application/json";
-    config.headers["Access-Control-Allow-Origin"] = "*";
-  }
-
-  return config;
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 // Auth interceptor (logout)
