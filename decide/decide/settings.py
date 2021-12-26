@@ -24,15 +24,6 @@ SECRET_KEY = '^##ydkswfu0+=ofw0l#$kv^8n)0$i(qd&d&ol#p9!b$8*5%j1+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-ALLOW_CREDENTIALS = True
-
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000/#',
-    'http://localhost:8000/#',
-)
-CORS_ALLOW_HEADERS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
@@ -62,6 +53,7 @@ REST_FRAMEWORK = {
 AUTHENTICATION_BACKENDS = [
     'base.backends.AuthBackend',
 ]
+
 
 MODULES = [
     'administration',
@@ -194,4 +186,3 @@ if os.path.exists("config.jsonnet"):
         vars()[k] = v
 
 INSTALLED_APPS = INSTALLED_APPS + MODULES
-# added to solve CORS
