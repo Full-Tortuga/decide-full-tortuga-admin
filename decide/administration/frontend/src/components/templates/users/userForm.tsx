@@ -26,6 +26,7 @@ const Component = (props: {
   const [sent, setSent] = React.useState(false);
 
   React.useEffect(() => {
+    reset({});
     control._defaultValues = {
       username: props.initialUser?.username,
       password: props.initialUser?.password,
@@ -33,7 +34,7 @@ const Component = (props: {
       last_name: props.initialUser?.last_name,
       email: props.initialUser?.email,
     };
-  }, [props.initialUser, control]);
+  }, [props.initialUser, control, reset]);
 
   const onSubmitFailed = (e: any) => {
     console.log("error", e);
