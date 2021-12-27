@@ -20,7 +20,8 @@ const Component = (props: {
 
   React.useEffect(() => {
     props.setSelected(filterRows(selectionModel));
-  }, [selectionModel, filterRows]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectionModel, filterRows, props.setSelected]);
 
   return (
     <div className="w-full">

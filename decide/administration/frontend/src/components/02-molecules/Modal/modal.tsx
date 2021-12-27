@@ -72,7 +72,7 @@ const Component = (props: {
                 </div>
               )}
 
-              <Button title="Submit" type="submit" />
+              <Button variant="contained" title="Submit" type="submit" />
             </DialogActions>
           </form>
         </Dialog>
