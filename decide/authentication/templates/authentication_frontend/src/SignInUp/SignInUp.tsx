@@ -25,7 +25,7 @@ class SignInUp extends React.Component<any,State>{
     console.log(this.state)
     return (
       <div className="root-container">
-        <div className="error-box active">
+        <div id="error-box">
           <span id="error-msg"> </span>
         </div>
 
