@@ -175,7 +175,7 @@ class UserAPI(APIView):
         for key, value in request.data.items():
             if value:
                 setattr(user, key, value)
-        if request.data['password']:
+        if request.data.get('password'):
             user.set_password(request.data['password'])
         user.save()
         return Response({}, status=HTTP_200_OK)
