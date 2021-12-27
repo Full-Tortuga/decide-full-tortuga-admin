@@ -4,43 +4,47 @@ import { GridColDef } from "@mui/x-data-grid";
 import { userType } from "types";
 import { Table } from "components/02-molecules";
 
-// todo: set correct columns
-
 const columns: GridColDef[] = [
   {
     field: "username",
     headerName: "Username",
-    width: 110,
+    minWidth: 140,
   },
   {
     field: "first_name",
     headerName: "First name",
-    width: 200,
+    minWidth: 170,
   },
   {
     field: "last_name",
     headerName: "Last name",
-    width: 200,
+    minWidth: 170,
   },
   {
     field: "email",
     headerName: "Email",
-    width: 110,
+    minWidth: 230,
   },
   {
     field: "is_active",
     headerName: "Active",
-    width: 110,
+    minWidth: 80,
+    align: "center",
+    valueFormatter: (params) => (params.value ? "✔" : "✘"),
   },
   {
     field: "is_staff",
     headerName: "Staff",
-    width: 110,
+    minWidth: 80,
+    align: "center",
+    valueFormatter: (params) => (params.value ? "✔" : "✘"),
   },
   {
     field: "is_superuser",
     headerName: "Superuser",
-    width: 110,
+    minWidth: 120,
+    align: "center",
+    valueFormatter: (params) => (params.value ? "✔" : "✘"),
   },
 ];
 

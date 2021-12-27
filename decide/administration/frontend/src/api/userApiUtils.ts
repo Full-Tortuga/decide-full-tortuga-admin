@@ -5,12 +5,14 @@ const userApi = {
   // bulk simple operations
   getUsers: () => axios.get("/users"),
   deleteUsers: (idList: number[]) =>
-    axios.delete("/users", { data: { idList: idList.join(",") } }),
+    axios.delete("/users", {
+      data: { idList: idList },
+    }),
 
   // bulk role/status operations
   updateUsersActive: (idList: number[], value: boolean) =>
     axios.post("/users/state", {
-      idList: idList.join(","),
+      idList: idList,
       state: "Active",
       value: value ? "True" : "False",
     }),
@@ -20,16 +22,17 @@ const userApi = {
     role: "Staff" | "Superuser"
   ) =>
     axios.post("/users/state", {
-      idList: idList.join(","),
+      idList: idList,
       state: role,
       value: value ? "True" : "False",
     }),
 
   // individual simple operations
-  getUser: (id: string) => axios.get(`/users/${id}`),
+  getUser: (id: number) => axios.get(`/users/${id}`),
   createUser: (user: userType.User) => axios.post("/users", user),
-  updateUser: (user: userType.User) => axios.put(`/users/${user.id}`, user),
-  deleteUser: (id: string) => axios.delete(`/users/${id}`),
+  updateUser: (id: number, user: userType.User) =>
+    axios.put(`/users/${id}`, user),
+  deleteUser: (id: number) => axios.delete(`/users/${id}`),
 };
 
 export default userApi;
