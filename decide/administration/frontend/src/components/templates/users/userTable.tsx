@@ -3,7 +3,6 @@ import { GridColDef } from "@mui/x-data-grid";
 
 import { userType } from "types";
 import { Table } from "components/02-molecules";
-import { AdminPanelSettings } from "@mui/icons-material";
 
 const columns: GridColDef[] = [
   {
