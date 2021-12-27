@@ -28,3 +28,10 @@ class AdminQuestionSerializer(serializers.ModelSerializer):
         fields = ('id','desc', 'options')
         depht=1
 
+    def create(self, validated_data):
+        options_data = validated_data.pop("options")
+        question = Question.objects.create(**validated_data)
+        for options_data in options_data:
+            QuestionOption.objects.create(question=question, **options_data)
+        return question
+
