@@ -53,18 +53,13 @@ class QuestionAPI(APIView):
         rest = AdminQuestionSerializer(query).data
         return Response(rest, status=HTTP_200_OK)
 
-    def put(self, request, question_id):
-         if not AdminQuestionSerializer(data=request.data).is_valid():
-             return Response({"result": "Question object is not valid"}, status=HTTP_400_BAD_REQUEST)
-         else:
-             try:
-                 question = Question.objects.all().filter(id=question_id).get()
-             except ObjectDoesNotExist:
-                 return Response({}, status=HTTP_404_NOT_FOUND)
-             for key, value in request.data.items():
-                 setattr(question, key, value)
-             question.save()
-             return Response({}, status=HTTP_200_OK)
+    def put(self,request,question_id):
+       obj = Question.objects.get(id=question_id)
+       serializer = AdminQuestionSerializer(obj,data=request.data)
+       if serializer.is_valid():
+           serializer.save()
+           return Response(serializer.data, status=HTTP_200_OK)
+       return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     def delete(self, request, question_id):
         Question.objects.all().filter(id=question_id).delete()
