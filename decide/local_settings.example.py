@@ -1,4 +1,18 @@
-ALLOWED_HOSTS = ["*"]
+# dev env CORS SETTINGS
+BASEURL = 'http://localhost:8000'
+FE_BASEURL = 'http://localhost:3000'
+
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    BASEURL, FE_BASEURL
+)
+CSRF_TRUSTED_ORIGINS = [
+    BASEURL, FE_BASEURL
+]
+
 
 # Modules in use, commented modules that you won't use
 MODULES = [
@@ -14,9 +28,6 @@ MODULES = [
     'voting',
 ]
 
-
-BASEURL = 'http://localhost:8000'
-CORS_ORIGIN_ALLOW_ALL = True
 
 APIS = {
     'administration': BASEURL,
@@ -38,14 +49,6 @@ DATABASES = {
         'CLIENT': {
             'host': '127.0.0.1',
         }
-    },
-    'postgres': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'decide',
-        'PASSWORD': 'decide',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
     }
 }
 

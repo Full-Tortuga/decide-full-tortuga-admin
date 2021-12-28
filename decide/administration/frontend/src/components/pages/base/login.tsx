@@ -1,13 +1,12 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { Box } from "@mui/material";
 
 import { authApi } from "api";
-
-import Page from "../page";
-import { FormItem } from "components/01-atoms/Input";
-import { Button } from "components/01-atoms";
-import { Box } from "@mui/material";
 import { sessionUtils } from "utils";
+
+import { Input, Button } from "components/01-atoms";
+import Page from "../page";
 
 type LoginInputs = {
   username: string;
@@ -61,12 +60,12 @@ const LoginPage = () => {
             onSubmit(getValues());
           }}
         >
-          <FormItem.TextInput
+          <Input.Text
             name="username"
             control={control}
             error={errors.username?.message}
           />
-          <FormItem.SecretInput
+          <Input.Secret
             name="password"
             control={control}
             error={errors.password?.message}

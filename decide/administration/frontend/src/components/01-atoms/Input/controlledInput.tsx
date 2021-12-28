@@ -6,26 +6,26 @@ import { InputProps } from ".";
 
 const ControlledInput = (props: InputProps) => {
   return (
-    <Controller
-      name={props.name}
-      control={props.control}
-      render={({ field: { onChange, value } }) => (
-        <div>
-          {props.useFormLabel && (
-            <FormLabel>{props.name.toUpperCase()}</FormLabel>
-          )}
+    <>
+      {props.useFormLabel && <FormLabel>{props.name.toUpperCase()}</FormLabel>}
+      <Controller
+        name={props.name}
+        control={props.control}
+        rules={props.rules}
+        render={({ field, fieldState }) => (
           <TextField
+            inputRef={field.ref}
+            autoComplete="off"
+            {...field}
             type={props.type}
-            name={props.name}
             label={props.name}
-            value={value}
-            onChange={onChange}
-            error={props.error !== undefined}
-            helperText={props.error}
+            required={props.rules?.required}
+            error={fieldState.invalid}
+            helperText={fieldState.error?.message}
           />
-        </div>
-      )}
-    />
+        )}
+      />
+    </>
   );
 };
 

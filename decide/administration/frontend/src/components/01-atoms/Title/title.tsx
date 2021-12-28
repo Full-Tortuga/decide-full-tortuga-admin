@@ -16,7 +16,11 @@ type Variant =
   | "overline";
 
 const Component = (props: { title: string; variant: Variant }) => {
-  return <Typography variant={props.variant}>{props.title}</Typography>;
+  return (
+    <Typography align="left" variant={props.variant}>
+      {props.title}
+    </Typography>
+  );
 };
 
 export default Component;
