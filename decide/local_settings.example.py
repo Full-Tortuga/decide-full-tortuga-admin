@@ -1,7 +1,22 @@
-ALLOWED_HOSTS = ["*"]
+# dev env CORS SETTINGS
+BASEURL = 'http://localhost:8000'
+FE_BASEURL = 'http://localhost:3000'
+
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    BASEURL, FE_BASEURL
+)
+CSRF_TRUSTED_ORIGINS = [
+    BASEURL, FE_BASEURL
+]
+
 
 # Modules in use, commented modules that you won't use
 MODULES = [
+    'administration',
     'authentication',
     'base',
     'booth',
@@ -13,27 +28,27 @@ MODULES = [
     'voting',
 ]
 
-APIS = {
-    'authentication': 'http://10.5.0.1:8000',
-    'base': 'http://10.5.0.1:8000',
-    'booth': 'http://10.5.0.1:8000',
-    'census': 'http://10.5.0.1:8000',
-    'mixnet': 'http://10.5.0.1:8000',
-    'postproc': 'http://10.5.0.1:8000',
-    'store': 'http://10.5.0.1:8000',
-    'visualizer': 'http://10.5.0.1:8000',
-    'voting': 'http://10.5.0.1:8000',
-}
 
-BASEURL = 'http://10.5.0.1:8000'
+APIS = {
+    'administration': BASEURL,
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
+}
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': 'djongo',
+        'NAME': 'decide',
+        'CLIENT': {
+            'host': '127.0.0.1',
+        }
     }
 }
 
