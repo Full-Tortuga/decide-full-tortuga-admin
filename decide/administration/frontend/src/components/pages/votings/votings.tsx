@@ -74,8 +74,7 @@ const rows = [
 ];
 
 const VotingsPage = () => {
-  //const [users, setVotings] = React.useState<votingType.Voting[]>([]);
-  const [votings, setVotings] = React.useState(rows);
+  const [votings, setVotings] = React.useState<votingType.Voting[]>(rows);
 
   const [selected, setSelected] = React.useState([]);
   const [refetch, setRefetch] = React.useState(false);
@@ -103,6 +102,9 @@ const VotingsPage = () => {
   );
 
   const handleDelete = () => {
+    // todo: remove this 2 lines and uncomment the lines after
+    console.log(idList);
+    refetchVotings();
     // votingApi.deleteVotings(idList).then((response) => {
     //   console.log(response);
     //   refetchVotings();
