@@ -9,14 +9,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
 
-from administration.serializers import UserAdminSerializer, UserSerializer
+from administration.serializers import UserAdminSerializer, UserSerializer, AdminQuestionSerializer
 from base.serializers import AuthSerializer, KeySerializer
 from base.perms import IsAdminAPI
 from utils.utils import get_ids, is_valid
+from voting.models import Question
 
-from voting.models import Question, QuestionOption
-from administration.serializers import AdminQuestionSerializer, AdminQuestionOptionSerializer
-from voting.serializers import QuestionSerializer, QuestionOptionSerializer
 
 
 def index(request):
@@ -39,8 +37,14 @@ class QuestionsAPI(APIView):
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        Question.objects.all().delete()
-        return Response({},status=HTTP_200_OK)
+        if request.data["idList"] is None:
+            Question.objects.all().delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            ids = get_ids(request.data["idList"])
+            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            Question.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
 
 class QuestionAPI(APIView):
     permission_classes = (IsAdminAPI,)
