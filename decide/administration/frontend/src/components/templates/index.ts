@@ -1,4 +1,4 @@
 import Menu from "./menu";
-import { UserTable } from "./users";
+import { UserTable, UserForm } from "./users";
 
-export { Menu, UserTable };
+export { Menu, UserTable, UserForm };
