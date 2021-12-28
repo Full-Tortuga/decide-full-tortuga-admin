@@ -1,11 +1,13 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { userType } from "types";
-import { ModalPage, Modal } from "components/02-molecules";
 import { Add, Edit } from "@mui/icons-material";
-import { FormItem } from "components/01-atoms/Input";
+
 import { userApi } from "api";
 import { utils } from "utils";
+import { userType } from "types";
+
+import { Input } from "components/01-atoms";
+import { ModalPage, Modal } from "components/02-molecules";
 
 const Component = (props: {
   initialUser?: userType.User;
@@ -77,7 +79,7 @@ const Component = (props: {
       externalClose={sent}
       pages={[
         <ModalPage description="Indique la información del Usuario">
-          <FormItem.TextInput
+          <Input.Text
             control={control}
             name="username"
             rules={{
@@ -88,14 +90,14 @@ const Component = (props: {
               },
             }}
           />
-          <FormItem.SecretInput
+          <Input.Secret
             control={control}
             name="password"
             rules={editMode ? {} : { required: "This field is required" }}
           />
-          <FormItem.TextInput control={control} name="first_name" />
-          <FormItem.TextInput control={control} name="last_name" />
-          <FormItem.TextInput
+          <Input.Text control={control} name="first_name" />
+          <Input.Text control={control} name="last_name" />
+          <Input.Text
             control={control}
             name="email"
             rules={{
