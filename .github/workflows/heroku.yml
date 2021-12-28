@@ -1,0 +1,16 @@
+name: Heroku CI
+
+on:
+  push:
+    branches: [master, main, develop]
+
+jobs:
+  deploy:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v1
+      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+            heroku_api_key: ${{secrets.HEROKU_API_KEY_ADMINISTRATION}}
+            heroku_app_name: "decide-full-tortuga-admin"
+            heroku_email: "pedropontiga@gmail.com"
