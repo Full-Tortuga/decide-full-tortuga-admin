@@ -3,5 +3,6 @@ import NotFoundPage from "./base/404";
 import LoginPage from "./base/login";
 
 import UsersPage from "./users/users";
+import VotationsPage from "./votations/votations";
 
-export { LoginPage, HomePage, UsersPage, NotFoundPage };
+export { LoginPage, HomePage, UsersPage, VotationsPage, NotFoundPage };
