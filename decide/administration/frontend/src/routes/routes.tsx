@@ -10,7 +10,7 @@ import { sessionUtils } from "utils";
 
 import { Loader } from "components/01-atoms";
 import { Menu } from "components/templates";
-import { NotFoundPage, UsersPage, HomePage, LoginPage } from "components/pages";
+import { NotFoundPage, UsersPage, HomePage, LoginPage, VotationsPage } from "components/pages";
 
 export const AppRoutes = () => {
   const isAuthenticated = sessionUtils?.getToken();
@@ -37,6 +37,7 @@ export const AppRoutes = () => {
           {isAuthenticated ? (
             <>
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/votations" element={<VotationsPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/404" element={<NotFoundPage />} />
               <Route path="*" element={<Navigate to="/404" />} />
