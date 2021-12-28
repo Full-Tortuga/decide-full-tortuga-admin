@@ -5,6 +5,7 @@ export type FieldProps = {
   name: string;
   control: any;
   error?: string;
+  rules?: any;
 };
 
 export type InputProps = FieldProps & {

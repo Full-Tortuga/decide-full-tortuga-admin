@@ -2,4 +2,8 @@ const util = () => {
   return null;
 };
 
-export { util };
+const parseErrors = (error: any) => {
+  return error.response.data?.join(", ");
+};
+
+export { util, parseErrors };

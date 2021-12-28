@@ -14,12 +14,20 @@ class UserAdminSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
+
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password')
 
 class AdminQuestionOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionOption
         fields = ('id','number', 'option')
+        
+class UserUpdateSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, min_length=1)
+    first_name = serializers.CharField(max_length=30, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, allow_blank=True)
+    email = serializers.EmailField()
+
 
 class AdminQuestionSerializer(serializers.ModelSerializer):
     options = AdminQuestionOptionSerializer(many=True)
@@ -47,3 +55,5 @@ class AdminQuestionSerializer(serializers.ModelSerializer):
             option.option = option_data.get("option",option.option)
             option.save()
         return instance
+
+
