@@ -40,4 +40,6 @@ jobs:
     - name: Copy local_settings
       run: |
         cp ./decide/local_settings.example.py ./decide/local_settings.py
-
+    - name: Test administration module
+      run: |
+        python ./decide/manage.py test administration
