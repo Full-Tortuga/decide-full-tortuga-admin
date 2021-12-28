@@ -12,7 +12,7 @@ import { userApi } from "api";
 import { userType } from "types";
 
 import { ActionBar } from "components/03-organisms";
-import { UserForm, UserTable } from "components/templates/users";
+import { UserForm, UserTable } from "components/templates";
 
 import Page from "../page";
 
