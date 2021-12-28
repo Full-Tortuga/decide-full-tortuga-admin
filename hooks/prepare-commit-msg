@@ -2,6 +2,10 @@
 
 exec < /dev/tty
 
+COMMIT_SOURCE=$2
+if [ "${COMMIT_SOURCE}" = "message" ] || [ "${COMMIT_SOURCE}" = "template" ] || [ "${COMMIT_SOURCE}" = "merge" ] || [ "${COMMIT_SOURCE}" = "squash" ] || [ "${COMMIT_SOURCE}" = "commit" ];then
+    exit 0
+fi
 echo Task id:
 read id
 
