@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   push:
-    branches: [master, main, develop, feature/#41-Automatizar-despliegue-heroku]
+    branches: [master, main, develop]
   pull_request:
     branches: [master, main, develop]
 
