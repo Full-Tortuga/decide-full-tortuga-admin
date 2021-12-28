@@ -19,3 +19,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password')
 
+class UserUpdateSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, min_length=1)
+    first_name = serializers.CharField(max_length=30, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, allow_blank=True)
+    email = serializers.EmailField()
+

@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from rest_framework.status import *
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
@@ -12,12 +11,12 @@ from census.models import Census
 from rest_framework.renderers import JSONRenderer
 from authentication.serializers import UserSerializer
 from administration.serializers import UserAdminSerializer, UserSerializer
+from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
-from utils.utils import get_ids
-import json
 from utils.utils import get_ids, is_valid
+
 
 
 def index(request):
@@ -95,8 +94,8 @@ class AuthsAPI(APIView):
             Auth.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = get_ids(request.data["idList"])
-            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            ids = request.data["idList"]
+            is_valid(len(ids) > 0, 'The ids list can not be empty')
             Auth.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
@@ -149,8 +148,8 @@ class KeysAPI(APIView):
             Key.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = get_ids(request.data["idList"])
-            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            ids = request.data["idList"]
+            is_valid(len(ids) > 0, 'The ids list can not be empty')
             Key.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
@@ -193,23 +192,21 @@ class UsersAPI(APIView):
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            fields = request.data
-            user = User(username=fields['username'], first_name=fields['first_name'],
-                        last_name=fields['last_name'], email=fields['email'], is_staff=fields['is_staff'])
-            user.set_password(request.data['password'])
-            user.save()
-            return Response({}, status=HTTP_200_OK)
+        is_valid(serializer.is_valid(), "User object is not valid")
+        fields = request.data
+        user = User(username=fields['username'], first_name=fields['first_name'],
+                    last_name=fields['last_name'], email=fields['email'], is_staff=False)
+        user.set_password(request.data['password'])
+        user.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
         if request.data["idList"] is None:
             User.objects.all().filter(is_superuser=False).delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = get_ids(request.data["idList"])
-            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            ids = request.data["idList"]
+            is_valid(len(ids) > 0, 'The ids list can not be empty')
             User.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
@@ -226,17 +223,19 @@ class UserAPI(APIView):
         return Response(rest, status=HTTP_200_OK)
 
     def put(self, request, user_id):
-        if not UserSerializer(data=request.data).is_valid():
-            return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            try:
-                user = User.objects.filter(id=user_id).get()
-            except ObjectDoesNotExist:
-                return Response({}, status=HTTP_404_NOT_FOUND)
-            for key, value in request.data.items():
+        user_update = UserUpdateSerializer(data=request.data)
+        is_valid(user_update.is_valid(), "User object is not valid")
+        try:
+            user = User.objects.filter(id=user_id).get()
+        except ObjectDoesNotExist:
+            return Response({}, status=HTTP_404_NOT_FOUND)
+        for key, value in request.data.items():
+            if value:
                 setattr(user, key, value)
-            user.save()
-            return Response({}, status=HTTP_200_OK)
+        if request.data.get('password'):
+            user.set_password(request.data['password'])
+        user.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, user_id):
         User.objects.all().filter(is_superuser=False, id=user_id).delete()
@@ -272,10 +271,10 @@ class UpdateUserStateAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def post(self, request):
-        ids = get_ids(request.data["idList"])
+        ids = request.data["idList"]
         state = request.data['state']
         value = request.data['value']
-        is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+        is_valid(len(ids) > 0, 'The ids list can not be empty')
         is_valid(value == 'True' or value == 'False', 'The field value must be True or False')
         res = Response({}, status=HTTP_200_OK)
         if state == 'Active':
@@ -288,5 +287,6 @@ class UpdateUserStateAPI(APIView):
             users = User.objects.filter(id__in=ids)
             users.update(is_superuser=value)
         else:
-            res = Response({"result": "The field state must be Active, Staff or Superuser"}, status=HTTP_400_BAD_REQUEST)
+            res = Response({"result": "The field state must be Active, Staff or Superuser"},
+                           status=HTTP_400_BAD_REQUEST)
         return res

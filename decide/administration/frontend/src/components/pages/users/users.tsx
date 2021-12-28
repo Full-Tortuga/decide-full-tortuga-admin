@@ -1,58 +1,114 @@
 import React from "react";
-import { Delete } from "@mui/icons-material";
+import {
+  AdminPanelSettings,
+  Delete,
+  Pause,
+  PlayArrow,
+  Refresh,
+  Verified,
+} from "@mui/icons-material";
 
 import { userApi } from "api";
 import { userType } from "types";
 
 import { ActionBar } from "components/03-organisms";
-import { NewUserForm, UserTable } from "components/templates/users";
+import { UserForm, UserTable } from "components/templates";
 
 import Page from "../page";
 
-// todo: fetch users from api and set rows to the response
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
-
 const UsersPage = () => {
-  const [users, setUsers] = React.useState(rows);
+  const [users, setUsers] = React.useState<userType.User[]>([]);
   const [selected, setSelected] = React.useState([]);
+  const [refetch, setRefetch] = React.useState(false);
 
   React.useEffect(() => {
-    userApi.getUsers().then((response) => {
-      console.log(response);
-      setUsers(rows);
-    });
-  }, []);
+    console.log(selected);
+  }, [selected]);
+
+  const refetchUsers = () => {
+    setRefetch(!refetch);
+  };
+
+  React.useEffect(() => {
+    userApi
+      .getUsers()
+      .then((response) => {
+        console.log(response);
+        setUsers(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [refetch]);
 
   const idList = React.useMemo(
-    () => selected.map((user: userType.User) => user.id),
+    () => selected.map((user: userType.User) => user.id || -1),
     [selected]
   );
 
+  const selectionState = React.useMemo(() => {
+    const checkOptions = (active: number) => {
+      if (active === selected.length && selected.length > 0) return "true";
+      else if (active === 0) return "false";
+      else return "mixed";
+    };
+
+    const activeNumber = selected.filter(
+      (user: userType.User) => user.is_active
+    ).length;
+    const staffNumber = selected.filter(
+      (user: userType.User) => user.is_staff
+    ).length;
+    const suNumber = selected.filter(
+      (user: userType.User) => user.is_superuser
+    ).length;
+
+    return {
+      active: checkOptions(activeNumber),
+      staff: checkOptions(staffNumber),
+      su: checkOptions(suNumber),
+    };
+  }, [selected]);
+
   const handleDelete = () => {
-    console.log(idList);
+    userApi.deleteUsers(idList).then((response) => {
+      console.log(response);
+      refetchUsers();
+    });
+  };
+
+  const handleChangeActive = (value: boolean) => {
+    userApi.updateUsersActive(idList, value).then((response) => {
+      console.log(response);
+      refetchUsers();
+    });
+  };
+  const handleChangeRole = (value: boolean, role: "Staff" | "Superuser") => {
+    userApi.updateUsersRole(idList, value, role).then((response) => {
+      console.log(response);
+      refetchUsers();
+    });
   };
 
   return (
     <>
       <Page title="Users">
-        <UserTable users={users || rows} setSelected={setSelected} />
+        <UserTable users={users} setSelected={setSelected} />
       </Page>
       <ActionBar
         selection={selected}
         actions={[
-          <NewUserForm
+          <UserForm
             initialUser={selected.length === 1 ? selected[0] : undefined}
+            refetch={refetchUsers}
           />,
+        ]}
+        individualActions={[
+          {
+            icon: <Refresh />,
+            title: "Refresh",
+            onClick: () => refetchUsers(),
+          },
         ]}
         bulkActions={[
           {
@@ -61,6 +117,61 @@ const UsersPage = () => {
             onClick: () => {
               console.log("delete");
               handleDelete();
+            },
+          },
+          {
+            icon:
+              selectionState.active === "true" ? (
+                <Pause color="warning" />
+              ) : (
+                <PlayArrow />
+              ),
+            title:
+              selectionState.active === "true"
+                ? "Mark as Inactive"
+                : "Mark as Active",
+            disabled: selectionState.active === "mixed",
+            onClick: () => {
+              console.log("switch active");
+              selectionState.active === "true"
+                ? handleChangeActive(false)
+                : handleChangeActive(true);
+            },
+          },
+          {
+            icon:
+              selectionState.staff === "true" ? (
+                <Verified color="warning" />
+              ) : (
+                <Verified />
+              ),
+            title:
+              selectionState.staff === "true" ? "Remove Staff" : "Make Staff",
+            disabled: selectionState.staff === "mixed",
+            onClick: () => {
+              console.log("switch staff");
+              selectionState.staff === "true"
+                ? handleChangeRole(false, "Staff")
+                : handleChangeRole(true, "Staff");
+            },
+          },
+          {
+            icon:
+              selectionState.su === "true" ? (
+                <AdminPanelSettings color="warning" />
+              ) : (
+                <AdminPanelSettings />
+              ),
+            title:
+              selectionState.su === "true"
+                ? "Remove SuperUser"
+                : "Make SuperUser",
+            disabled: selectionState.su === "mixed",
+            onClick: () => {
+              console.log("switch staff");
+              selectionState.su === "true"
+                ? handleChangeRole(false, "Superuser")
+                : handleChangeRole(true, "Superuser");
             },
           },
         ]}
