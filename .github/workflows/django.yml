@@ -45,4 +45,4 @@ jobs:
             heroku_api_key: ${{secrets.HEROKU_API_KEY_ADMINISTRATION}}
             heroku_app_name: "decide-full-tortuga-admin"
             heroku_email: "pedropontiga@gmail.com"
-            remote_branch: "feature/#41-Automatizar-despliegue-heroku"
+            branch: "feature/#41-Automatizar-despliegue-heroku"
