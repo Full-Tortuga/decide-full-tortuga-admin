@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Tooltip } from "@mui/material";
-import { Home, Person, HowToVote} from "@mui/icons-material";
+import { Home, Person, HowToVote } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const LinkTab = (props: {
@@ -41,8 +41,7 @@ const Menu = (props: { hidden: boolean }) => {
           >
             <LinkTab label="Home" icon={<Home />} href="/home" />
             <LinkTab label="Users" icon={<Person />} href="/users" />
-            <LinkTab label="Votations" icon={<HowToVote/>} href="/votations" />
-
+            <LinkTab label="Votings" icon={<HowToVote />} href="/votings" />
           </Tabs>
         </nav>
       )}

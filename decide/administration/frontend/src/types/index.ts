@@ -1,2 +1,2 @@
 export * as userType from "./user";
-export * as votationType from "./votation";
+export * as votingType from "./voting";
