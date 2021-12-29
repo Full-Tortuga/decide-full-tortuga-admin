@@ -9,3 +9,9 @@ class TelegramBot(models.Model):
     
     class Meta:
         verbose_name = 'Telegram user'
+        
+
+
+class Graphs(models.Model):
+    voting_id=models.BigIntegerField(unique=True)
+    graphs_url=models.TextField()

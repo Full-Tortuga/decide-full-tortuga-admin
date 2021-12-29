@@ -11,7 +11,7 @@
     color: #fff;
 }
 
-#start-tlg {
+#start_tlg {
     border: #79aec8;
     border-radius: 12px;
     font-size: 14px;
@@ -26,6 +26,6 @@
     -o-border-radius: 12px;
 }
 
-#start-tlg:hover{
+#start_tlg:hover{
     background-color: #417690;
 }

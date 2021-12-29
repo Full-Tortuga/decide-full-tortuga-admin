@@ -4,8 +4,9 @@ from django.utils import timezone
 from .models import QuestionOption
 from .models import Question
 from .models import Voting
-from visualizer.telegramBot import auto_notifications
 from .filters import StartedFilter
+from visualizer.telegramBot import auto_notifications
+from visualizer.views import TELEGRAM_BOT_STATUS
 
 
 def start(modeladmin, request, queryset):
@@ -13,14 +14,14 @@ def start(modeladmin, request, queryset):
         v.create_pubkey()
         v.start_date = timezone.now()
         v.save()
-        #for users who have auto notifications enabled
-        auto_notifications(v)
+        send_notifications(v)
 
 
 def stop(ModelAdmin, request, queryset):
     for v in queryset.all():
         v.end_date = timezone.now()
         v.save()
+        send_notifications(v)
 
 
 def tally(ModelAdmin, request, queryset):
@@ -28,6 +29,11 @@ def tally(ModelAdmin, request, queryset):
         token = request.session.get('auth-token', '')
         v.tally_votes(token)
 
+#for users who have auto notifications enabled
+def send_notifications(v):
+    global TELEGRAM_BOT_STATUS
+    if TELEGRAM_BOT_STATUS:
+        auto_notifications(v)
 
 class QuestionOptionInline(admin.TabularInline):
     model = QuestionOption

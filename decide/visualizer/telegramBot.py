@@ -5,24 +5,21 @@ from telegram import InputMediaPhoto, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-import logging, os, sys
-from .website_scrapping import get_graphs
-from .models import TelegramBot
+import os, sys, base64
+from .models import TelegramBot, Graphs
 from threading import Thread
+from selenium import webdriver
 
 
 #auth and front-end for '@VotitosBot'
-UPDATER = Updater(os.environ.get('TELEGRAM_TOKEN'),
+UPDATER = Updater(settings.TELEGRAM_TOKEN,
                 use_context=True)
 
-BOT=Bot(token=os.environ.get('TELEGRAM_TOKEN'))
+BOT=Bot(token=settings.TELEGRAM_TOKEN)
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
-
-    #logging
-    logging.basicConfig(level=logging.ERROR,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
     setup_commands(UPDATER) 
     updates_setting()
     #starts the bot
@@ -149,16 +146,20 @@ def auto_query_handler(update, context):
         context.bot.delete_message(chat_id=u_id, message_id=id)
     TelegramBot.objects.filter(user_id=u_id).update(auto_msg=query.data) 
     query.answer("¡Listo! He actualizado tus preferencias")
+
         
-# ===================
-#  AUXILIARY METHODS
-# ===================
+# =====================
+#   AUXILIARY METHODS
+# =====================
 
 #auxiliary message to print details from votings
 def aux_message_builder(voting):
     
-    options=list(voting.question.options.values_list('option', flat=True)) 
-    tally=stmodels.Vote.objects.filter(voting_id=voting.id).values('voter_id').distinct().count() #gets unique votes for a voting
+    options=list(voting.question.options.values_list('option', flat=True))
+    if stmodels.Vote.objects.filter(voting_id=voting.id).exists():
+        tally=stmodels.Vote.objects.filter(voting_id=voting.id).values('voter_id').distinct().count() #gets unique votes for a voting
+    else:
+        tally=0
     start_d=voting.start_date.strftime('%d-%m-%Y %H:%M:%S')+"\n"
     end_d="Por decidir\n"
 
@@ -177,17 +178,42 @@ def aux_message_builder(voting):
     
     return msg
 
+
 #extracts graph's images from website selected voting and sends them to the user
 def results_graph(id, chat_identifier, context):
-    url=settings.VISUALIZER_VIEW+ str(id)
-    images=get_graphs(url)
-    if images:
-        media_group=[InputMediaPhoto(media=i) for i in images]
-        context.bot.sendMediaGroup(chat_id=chat_identifier, media=media_group)
+    open_graphs_generator_view(id)
+    if Graphs.objects.filter(voting_id=id).exists():
+        graphs_base64=Graphs.objects.filter(voting_id=id).values('graphs_url')
+        try:
+            base64_url_list=eval(graphs_base64[0]['graphs_url'])
+            b64_images=[]
+            media_group=[]
+            for i in range(0,len(base64_url_list)):
+                b64_images.append(base64_url_list[i].split(",")[1])
+                path="graph_"+str(id)+"_"+str(i)+".png"
+                with open(path,"wb") as f:
+                    f.write(base64.b64decode(b64_images[i]))
+                media_group.append(InputMediaPhoto(media=open(path, 'rb')))
+                os.remove(path)
+            context.bot.sendMediaGroup(chat_id=chat_identifier, media=media_group)
+        except:
+            context.bot.send_message(chat_id=chat_identifier,
+            text="Vaya...no hay gráficas disponibles para mostrar.\nInténtalo de nuevo más tarde.")
+        
     else:
         context.bot.send_message(chat_id=chat_identifier,
-        text="Upss! Parece que aún no hay ningún gráfico asociado a esta votación.\nInténtalo de nuevo en otro momento.")
-           
+        text="Upss! Parece que aún no hay ninguna gráfica asociada a esta votación.\nInténtalo de nuevo en otro momento.")
+
+
+#uses selenium to call view which generates voting graphs
+def open_graphs_generator_view(id):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    driver=webdriver.Chrome(options=options)
+    driver.get('http://127.0.0.1:8000/visualizer/' + str(id))  #VISUALIZER_VIEW will be taken from setting in production
+
+
+      
 #sends notifications when a new voting is created
 def auto_notifications(voting):
     users_id_enabled=list(TelegramBot.objects.values_list('user_id', flat=True).exclude(auto_msg=False))
