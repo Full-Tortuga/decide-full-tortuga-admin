@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from census.models import Census
+
 from django.contrib.auth.models import User
+
+from census.models import Census
 
 
 class UserAdminSerializer(serializers.HyperlinkedModelSerializer):
