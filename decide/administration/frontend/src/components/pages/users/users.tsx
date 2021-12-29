@@ -21,10 +21,6 @@ const UsersPage = () => {
   const [selected, setSelected] = React.useState([]);
   const [refetch, setRefetch] = React.useState(false);
 
-  React.useEffect(() => {
-    console.log(selected);
-  }, [selected]);
-
   const refetchUsers = () => {
     setRefetch(!refetch);
   };

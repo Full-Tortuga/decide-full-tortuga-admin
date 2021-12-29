@@ -1,5 +1,5 @@
 import React from "react";
-import { Delete } from "@mui/icons-material";
+import { Delete, Refresh } from "@mui/icons-material";
 
 import { votingType } from "types";
 
@@ -122,6 +122,13 @@ const VotingsPage = () => {
           <VotingForm
             initialVoting={selected.length === 1 ? selected[0] : undefined}
           />,
+        ]}
+        individualActions={[
+          {
+            icon: <Refresh />,
+            title: "Refresh",
+            onClick: () => refetchVotings(),
+          },
         ]}
         bulkActions={[
           {
