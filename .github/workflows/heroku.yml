@@ -46,8 +46,7 @@ jobs:
         python manage.py migrate
     - name: Run tests     
       run: |
-        cd decide
-        python manage.py test authentication
+        run: cd decide;coverage run --branch --source=. ./manage.py test authentication --keepdb; coverage xml;
     - name: Codacy Coverage Reporter
       uses: codacy/codacy-coverage-reporter-action@v1.1.0
       with:
