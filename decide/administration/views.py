@@ -7,20 +7,16 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
-from census.models import Census
-from rest_framework.renderers import JSONRenderer
 from authentication.serializers import UserSerializer
-from administration.serializers import UserAdminSerializer, UserSerializer
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
-from utils.utils import get_ids, is_valid
-
 
 
 def index(request):
     return render(request, "build/index.html")
+
 
 class CensussAPI(APIView):
     permission_classes = (IsAdminAPI,)
@@ -38,11 +34,11 @@ class CensussAPI(APIView):
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        if request.data["idList"] is None:
+        if request.get("idList") is None:
             Census.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = get_ids(request.data["idList"])
+            ids = request.get("idList")
             Census.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
@@ -62,7 +58,7 @@ class CensusAPI(APIView):
             return Response({"result": "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
             try:
-                census= Census.objects.all().filter(id=census_id).get()
+                census = Census.objects.all().filter(id=census_id).get()
             except ObjectDoesNotExist:
                 return Response({}, status=HTTP_404_NOT_FOUND)
             for key, value in request.data.items():
@@ -73,6 +69,7 @@ class CensusAPI(APIView):
     def delete(self, request, census_id):
         Census.objects.all().filter(id=census_id).delete()
         return Response({}, status=HTTP_200_OK)
+
 
 class CensussAPI(APIView):
     permission_classes = (IsAdminAPI,)
