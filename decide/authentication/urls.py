@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework import routers
 
-from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion, LDAPSignInView
+from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion, LDAPSignInView, landingpage
 from . import views
 
 router = routers.DefaultRouter()
@@ -19,6 +19,7 @@ urlpatterns = [
     path('login_form/', SignInView.as_view(), name='sign_in'),
     path('bienvenida/', BienvenidaView.as_view()),
     # path('logout/', cerrarsesion, name="logout"),
+    path('welcome/', landingpage, name='landing'),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # path('', inicio),

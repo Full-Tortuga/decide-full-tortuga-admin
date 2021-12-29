@@ -45,7 +45,6 @@ class LogoutView(APIView):
 
         return Response({})
 
-
 class RegisterView(APIView):
     def post(self, request):
         key = request.data.get('token', '')
@@ -137,3 +136,6 @@ def cerrarsesion(request):
     logout(request)
     messages.success(request, F"Su sesión se ha cerrado correctamente")
     return render(request, "bienvenida.html")
+
+def landingpage(request):
+    return render(request, "welcome.html")
