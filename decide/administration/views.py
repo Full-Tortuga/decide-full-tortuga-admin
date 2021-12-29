@@ -12,10 +12,63 @@ from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
+from voting.models import Question
+from utils.utils import is_valid
 
 
 def index(request):
     return render(request, "build/index.html")
+
+
+class QuestionsAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request):
+        query = Question.objects.all()
+        rest = AdminQuestionSerializer(query, many=True).data
+        return Response(rest, status=HTTP_200_OK)
+
+    def post(self, request):
+        question = AdminQuestionSerializer(data=request.data)
+        if not question.is_valid():
+            return Response({"result", "AdminQuestion object is not valid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            question.save()
+            return Response({}, status=HTTP_200_OK)
+
+    def delete(self, request):
+        if request.data.get("idList") is None:
+            Question.objects.all().delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            ids = request.data.get("idList")
+            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            Question.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
+
+
+class QuestionAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request, question_id):
+        try:
+            query = Question.objects.filter(id=question_id).get()
+        except ObjectDoesNotExist:
+            return Response({}, status=HTTP_404_NOT_FOUND)
+        rest = AdminQuestionSerializer(query).data
+        return Response(rest, status=HTTP_200_OK)
+
+    def put(self, request, question_id):
+        obj = Question.objects.get(id=question_id)
+        serializer = AdminQuestionSerializer(obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, question_id):
+        Question.objects.all().filter(id=question_id).delete()
+        return Response({}, status=HTTP_200_OK)
 
 
 class CensussAPI(APIView):
@@ -34,7 +87,7 @@ class CensussAPI(APIView):
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        if request.get("idList") is None:
+        if request.data.get("idList") is None:
             Census.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
