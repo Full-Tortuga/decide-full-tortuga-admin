@@ -11,11 +11,12 @@ from .models import TelegramBot
 from threading import Thread
 
 
+#This is token is temporary and won't be the same in final version, so security won't be compromised
 #auth and front-end for '@VotitosBot'
-UPDATER = Updater(os.environ.get('TELEGRAM_TOKEN'),
-                use_context=True)
+UPDATER = Updater('2111051748:AAH1R736I0_HsZEW6_22Tf0r-OqihtF5x88',                                                                   
+                use_context=True)                                               
 
-BOT=Bot(token=os.environ.get('TELEGRAM_TOKEN'))
+BOT=Bot(token='2111051748:AAH1R736I0_HsZEW6_22Tf0r-OqihtF5x88')
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
