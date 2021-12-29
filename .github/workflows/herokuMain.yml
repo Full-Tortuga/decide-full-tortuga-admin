@@ -1,0 +1,17 @@
+name: Heroku Main CI
+
+on:
+  push:
+    branches: [master, main]
+
+jobs:
+  deploy:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: sed -i "s%http://localhost:8000%https://decide-full-tortuga-admin.herokuapp.com/%g" "settings.py"
+      - uses: actions/checkout@v1
+      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+            heroku_api_key: ${{secrets.HEROKU_API_KEY_ADMINISTRATION}}
+            heroku_app_name: "decide-full-tortuga-admin"
+            heroku_email: "pedropontiga@gmail.com"
