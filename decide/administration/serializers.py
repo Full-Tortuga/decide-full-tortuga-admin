@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from django.contrib.auth.models import User
 
+from census.models import Census
+
 
 class UserAdminSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -20,3 +22,9 @@ class UserUpdateSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30, allow_blank=True)
     last_name = serializers.CharField(max_length=150, allow_blank=True)
     email = serializers.EmailField()
+
+
+class CensusSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Census
+        fields = ('id', 'voting_id', 'voter_id')
