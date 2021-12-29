@@ -1,8 +1,5 @@
 from django.shortcuts import render
-from base import serializers
-from base.mods import query
 from rest_framework.status import *
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
@@ -10,7 +7,6 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from base.models import Auth, Key
-from census.models import Census
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
 from .serializers import CensusSerializer
@@ -20,6 +16,7 @@ from utils.utils import is_valid
 
 def index(request):
     return render(request, "build/index.html")
+
 
 class CensussAPI(APIView):
     permission_classes = (IsAdminAPI,)
@@ -37,11 +34,11 @@ class CensussAPI(APIView):
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        if request.data["idList"] is None:
+        if request.data.get("idList") is None:
             Census.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = get_ids(request.data["idList"])
+            ids = request.data.get("idList")
             Census.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
@@ -61,7 +58,7 @@ class CensusAPI(APIView):
             return Response({"result": "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
             try:
-                census= Census.objects.all().filter(id=census_id).get()
+                census = Census.objects.all().filter(id=census_id).get()
             except ObjectDoesNotExist:
                 return Response({}, status=HTTP_404_NOT_FOUND)
             for key, value in request.data.items():
@@ -72,6 +69,7 @@ class CensusAPI(APIView):
     def delete(self, request, census_id):
         Census.objects.all().filter(id=census_id).delete()
         return Response({}, status=HTTP_200_OK)
+
 
 class AuthsAPI(APIView):
     permission_classes = (IsAdminAPI,)
@@ -89,11 +87,11 @@ class AuthsAPI(APIView):
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        if request.data["idList"] is None:
+        if request.data.get("idList") is None:
             Auth.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = request.data["idList"]
+            ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             Auth.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
@@ -143,11 +141,11 @@ class KeysAPI(APIView):
             return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        if request.data["idList"] is None:
+        if request.data.get("idList") is None:
             Key.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = request.data["idList"]
+            ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             Key.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
@@ -200,11 +198,11 @@ class UsersAPI(APIView):
         return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
-        if request.data["idList"] is None:
+        if request.data.get("idList") is None:
             User.objects.all().filter(is_superuser=False).delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = request.data["idList"]
+            ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             User.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
@@ -270,7 +268,7 @@ class UpdateUserStateAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def post(self, request):
-        ids = request.data["idList"]
+        ids = request.data.get("idList")
         state = request.data['state']
         value = request.data['value']
         is_valid(len(ids) > 0, 'The ids list can not be empty')
