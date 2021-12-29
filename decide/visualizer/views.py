@@ -30,7 +30,6 @@ class Votes_csv(View):
         res['Content-Disposition'] = 'attachment; filename=' + str(r[0]["id"]) + '.csv'
 
         csv_file = csv.writer(res)
-
         csv_file.writerow(["Opcion", "Puntuacion", "Votos"])
         for vote in voting:
             csv_file.writerow([vote["option"], vote["postproc"], vote["votes"]])
@@ -54,3 +53,5 @@ class VisualizerView(TemplateView):
             raise Http404
 
         return context
+
+
