@@ -10,6 +10,8 @@ from base.models import Auth, Key
 from authentication.serializers import UserSerializer
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
+from decide.settings import BASEURL
+from voting.serializers import SimpleVotingSerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
 from voting.models import Question
@@ -18,6 +20,37 @@ from utils.utils import is_valid
 
 def index(request):
     return render(request, "build/index.html")
+
+
+class VotingAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request):
+        query = Voting.objects.all()
+        rest = SimpleVotingSerializer(query, many=True).data
+        return Response(rest, status=HTTP_200_OK)
+
+    def post(self, request):
+        voting_seria = VotingSerializer(data=request.data)
+        if not voting_seria.is_valid():
+            return Response({"result", "Voting object is not valid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            auth_url = request.data.get("auth")
+            id_users = request.data.get("census")
+            try:
+                auth_object = Auth.objects.filter(url=auth_url).get()
+            except ObjectDoesNotExist:
+                auth_object = Auth.objects.save(Auth(name="Auth", url=auth_url, me=True))
+
+            voting = Voting(name=request.data.get("name"), desc=request.data.get("desc"),
+                            question=request.data.get("question"))
+            voting.auths.add(auth_object)
+            voting = voting.save()
+            voting_id = voting.get("id")
+            for voter_id in id_users:
+                census = Census(voting_id=voting_id, voter_id=voter_id)
+                census.save()
+            return Response({voting}, status=HTTP_200_OK)
 
 
 class QuestionsAPI(APIView):
