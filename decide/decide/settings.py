@@ -86,7 +86,6 @@ elif ENV_MAIN:
 else:
     BASEURL = 'http://localhost:8000'
 
-
 APIS = {
     'administration': BASEURL,
     'authentication': BASEURL,
