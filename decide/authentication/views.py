@@ -97,7 +97,7 @@ class LDAPLogin(APIView):
         except ldap.SERVER_DOWN:
             data={'detail': 'Problema con el servicio LDAP'}
             status = HTTP_500_INTERNAL_SERVER_ERROR
-        return render(request, 'bienvenida.html', status=status)
+        return render(request, 'welcome.html', status=status)
             
 
 class LDAPLogout(APIView):
@@ -124,7 +124,7 @@ class SignInView(LoginView):
     template_name = 'index.html'
 
 class BienvenidaView(TemplateView):
-   template_name = 'bienvenida.html'
+   template_name = 'welcome.html'
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('id')
