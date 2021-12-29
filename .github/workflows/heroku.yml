@@ -36,6 +36,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install codacy-coverage
     - name: Copy local_settings
       run: |
         cp ./decide/local_settings.example.py ./decide/local_settings.py    
