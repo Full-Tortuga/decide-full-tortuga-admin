@@ -1,0 +1,13 @@
+{% extends 'admin/change_list.html' %}
+{% load i18n static %}
+
+{% block extrahead %}
+    <link type="text/css" rel="stylesheet" href="{% static "/visualizer.css" %}" />
+{% endblock %}
+
+{% block content %}    
+    <br>
+    <a id="start-tlg" href="{% url 'start_telegram' %}">Start Telegram Bot</a>
+    <div><br></div>
+    {{ block.super }}
+{% endblock %}

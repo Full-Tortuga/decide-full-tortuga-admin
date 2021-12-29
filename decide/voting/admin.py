@@ -2,10 +2,11 @@ from django.contrib import admin
 from django.db.models.base import Model
 from django.utils import timezone
 
+
 from .models import MultipleQuestion, MultipleQuestionOption, MultipleVoting, QuestionOption, BinaryQuestionOption, ScoreQuestionOption
 from .models import Question, BinaryQuestion, ScoreQuestion
 from .models import Voting, BinaryVoting, ScoreVoting
-
+from visualizer.telegramBot import auto_notifications
 from .filters import StartedFilter
 
 
@@ -14,6 +15,8 @@ def start(modeladmin, request, queryset):
         v.create_pubkey()
         v.start_date = timezone.now()
         v.save()
+        #for users who have auto notifications enabled
+        auto_notifications(v)
 
 
 def stop(ModelAdmin, request, queryset):
