@@ -48,3 +48,8 @@ jobs:
       run: |
         cd decide
         python manage.py test authentication
+    - name: Codacy Coverage Reporter
+      uses: codacy/codacy-coverage-reporter-action@v1.1.0
+      with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: decide/authentication/coverage.xml
