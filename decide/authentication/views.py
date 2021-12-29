@@ -135,7 +135,7 @@ def cerrarsesion(request):
 
     logout(request)
     messages.success(request, F"Su sesión se ha cerrado correctamente")
-    return render(request, "bienvenida.html")
+    return render(request, "welcome.html")
 
 def landingpage(request):
     return render(request, "welcome.html")
