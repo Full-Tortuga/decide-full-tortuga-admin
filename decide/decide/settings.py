@@ -76,7 +76,16 @@ MODULES = [
     'visualizer',
     'voting','''
 
-BASEURL = 'https://decide-full-tortuga-admin.herokuapp.com'
+ENV_DEVELOP = os.environ.get('ENV_DEVELOP', False)
+ENV_MAIN = os.environ.get('ENV_MAIN', False)
+
+if ENV_DEVELOP:
+    BASEURL = 'https://decide-full-tortuga-admin-dev.herokuapp.com'
+elif ENV_MAIN:
+    BASEURL = 'https://decide-full-tortuga-admin.herokuapp.com'
+else:
+    BASEURL = 'http://localhost:8000'
+
 
 APIS = {
     'administration': BASEURL,
