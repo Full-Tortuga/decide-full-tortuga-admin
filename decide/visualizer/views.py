@@ -1,5 +1,9 @@
 import json
+<<<<<<< HEAD
 from django.http import response
+=======
+from django.http.response import HttpResponse, HttpResponseRedirect
+>>>>>>> f2ac03dae091252e300b9391543f807a3599f798
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.http import Http404
@@ -7,7 +11,7 @@ from django.views.generic.base import View
 
 from base import mods
 from collections import OrderedDict
-
+from .telegramBot import init_bot
 import json
 import csv
 
@@ -29,6 +33,7 @@ class Votes_csv(View):
         res = response.HttpResponse(content_type="text/csv")
         res['Content-Disposition'] = 'attachment; filename=' + str(r[0]["id"]) + '.csv'
 
+
         csv_file = csv.writer(res)
         csv_file.writerow(["Opcion", "Puntuacion", "Votos"])
         for vote in voting:
@@ -36,8 +41,8 @@ class Votes_csv(View):
         return res
 
 class VisualizerView(TemplateView):
-    template_name = 'visualizer/visualizer.html'
-
+    template_name = 'visualizer/visualizer'
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         vid = kwargs.get('voting_id', 0)
@@ -53,5 +58,10 @@ class VisualizerView(TemplateView):
             raise Http404
 
         return context
-
+    
+def initialize(request):
+    #call to initalize telegram bot
+    init_bot()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
 

@@ -53,6 +53,7 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+decide/*/migrations
 
 # Flask stuff:
 instance/
@@ -102,5 +103,10 @@ ENV/
 
 .vagrant
 
+<<<<<<< HEAD
 #node
 nodesource_setup.sh
+=======
+# Visual Studio Code settings
+.vscode
+>>>>>>> f2ac03dae091252e300b9391543f807a3599f798

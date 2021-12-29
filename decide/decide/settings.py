@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -79,8 +80,20 @@ MODULES = [
     'visualizer',
     'voting','''
 
-BASEURL = 'http://localhost:8000'
+BASEURL = 'https://decide-full-tortuga-2.herokuapp.com'
 
+APIS = {
+    'authentication': 'https://decide-full-tortuga-2.herokuapp.com',
+    'base': 'https://decide-full-tortuga-2.herokuapp.com',
+    'booth': 'https://decide-full-tortuga-2.herokuapp.com',
+    'census': 'https://decide-full-tortuga-2.herokuapp.com',
+    'mixnet': 'https://decide-full-tortuga-2.herokuapp.com',
+    'postproc': 'https://decide-full-tortuga-2.herokuapp.com',
+    'store': 'https://decide-full-tortuga-2.herokuapp.com',
+    'visualizer': 'https://decide-full-tortuga-2.herokuapp.com',
+    'voting': 'https://decide-full-tortuga-2.herokuapp.com',
+}
+django_heroku.settings(locals())
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -166,6 +179,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#temporary link to visualizer page for bots (until hosted)
+VISUALIZER_VIEW="https://decide-full-tortuga-2.herokuapp.com/visualizer/"
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
