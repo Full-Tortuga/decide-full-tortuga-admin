@@ -79,19 +79,8 @@ MODULES = [
     'visualizer',
     'voting','''
 
-BASEURL = 'https://decide-full-tortuga-2.herokuapp.com'
+BASEURL = 'http://localhost:8000'
 
-APIS = {
-    'authentication': 'https://decide-full-tortuga-2.herokuapp.com',
-    'base': 'https://decide-full-tortuga-2.herokuapp.com',
-    'booth': 'https://decide-full-tortuga-2.herokuapp.com',
-    'census': 'https://decide-full-tortuga-2.herokuapp.com',
-    'mixnet': 'https://decide-full-tortuga-2.herokuapp.com',
-    'postproc': 'https://decide-full-tortuga-2.herokuapp.com',
-    'store': 'https://decide-full-tortuga-2.herokuapp.com',
-    'visualizer': 'https://decide-full-tortuga-2.herokuapp.com',
-    'voting': 'https://decide-full-tortuga-2.herokuapp.com',
-}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

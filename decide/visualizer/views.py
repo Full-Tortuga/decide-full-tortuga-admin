@@ -41,7 +41,7 @@ class Votes_csv(View):
         return res
 
 class VisualizerView(TemplateView):
-    template_name = 'visualizer/visualizer'
+    template_name = 'visualizer/visualizer.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
