@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-import djando_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,7 +92,6 @@ APIS = {
     'visualizer': 'https://decide-full-tortuga-2.herokuapp.com',
     'voting': 'https://decide-full-tortuga-2.herokuapp.com',
 }
-django_heroku.settings(locals())
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
