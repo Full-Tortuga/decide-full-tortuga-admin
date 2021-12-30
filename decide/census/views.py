@@ -18,23 +18,23 @@ from .models import Census
 class CensusCreate(generics.ListCreateAPIView):
     permission_classes = (UserIsStaff,)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request,type, *args, **kwargs):
         voting_id = request.data.get('voting_id')
         voters = request.data.get('voters')
         try:
             for voter in voters:
-                census = Census(voting_id=voting_id, voter_id=voter)
-                if Census.objects.filter(voting_id=voting_id, voter_id=voter).exists():
+                census = Census(voting_id=voting_id, voter_id=voter, type=type)
+                if Census.objects.filter(voting_id=voting_id, voter_id=voter, type=type).exists():
                     return Response('Error try to create census', status=ST_409)
                 census.save()
         except ValidationError:
             return Response('Error try to create census', status=ST_409)
         return Response('Census created', status=ST_201)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, type, *args, **kwargs):
         voting_id = request.GET.get('voting_id')
         voters = Census.objects.filter(
-            voting_id=voting_id).values_list('voter_id', flat=True)
+            voting_id=voting_id, type=type).values_list('voter_id', flat=True)
         return Response({'voters': voters})
 
 
