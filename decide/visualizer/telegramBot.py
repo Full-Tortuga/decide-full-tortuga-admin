@@ -11,6 +11,7 @@ from threading import Thread
 from selenium import webdriver
 
 
+#This is token is temporary and won't be the same in final version, so security won't be compromised
 #auth and front-end for '@VotitosBot'
 UPDATER = Updater(settings.TELEGRAM_TOKEN,
                 use_context=True)
