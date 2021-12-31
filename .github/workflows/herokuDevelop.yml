@@ -13,4 +13,4 @@ jobs:
         with:
             heroku_api_key: ${{secrets.HEROKU_API_KEY_ADMINISTRATION}}
             heroku_app_name: "decide-full-tortuga-admin-dev"
-            heroku_email: "pedropontiga@gmail.com"
+            heroku_email: ${{secrets.HEROKU_APP_EMAIL_ADMINISTRATION}}
