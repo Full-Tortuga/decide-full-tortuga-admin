@@ -1,6 +1,7 @@
 //ajax function to send graphs to backend
 $(document).ready(function(){
-    if (document.body.contains(document.getElementsByTagName("canvas")[0])) {
+    var canvas_elements=document.getElementsByClassName("chartjs-render-monitor")
+    if (canvas_elements.length==2) {
         $('canvas:nth-of-type(2)').addClass(function(){
             const csrf_cookie=getCookie('csrftoken');
             $.ajax({

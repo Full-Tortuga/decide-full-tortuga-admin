@@ -37,7 +37,7 @@ def initialize(request):
     global TELEGRAM_BOT_STATUS
     if not TELEGRAM_BOT_STATUS:
         init_bot()
-        TELEGRAM_BOT_STATUS= True
+        TELEGRAM_BOT_STATUS=True
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def graphs_requests(request, voting_id):
