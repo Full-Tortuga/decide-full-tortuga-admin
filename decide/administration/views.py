@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.utils import timezone
+
+from django.shortcuts import render, get_object_or_404
 from rest_framework.status import *
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import parsers, renderers
+from rest_framework import parsers, renderers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
@@ -11,7 +13,7 @@ from authentication.serializers import UserSerializer
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
 from decide.settings import BASEURL
-from voting.serializers import SimpleVotingSerializer
+from voting.serializers import VotingSerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
 from voting.models import Question
@@ -27,11 +29,11 @@ class VotingAPI(APIView):
 
     def get(self, request):
         query = Voting.objects.all()
-        rest = SimpleVotingSerializer(query, many=True).data
+        rest = VotingSerializer(query, many=True).data
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
-        voting_seria = VotingSerializer(data=request.data)
+        voting_seria = AdminVotingSerializer(data=request.data)
         if not voting_seria.is_valid():
             return Response({"result", "Voting object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
@@ -57,6 +59,45 @@ class VotingAPI(APIView):
                 census = Census(voting_id=voting_id, voter_id=voter_id)
                 census.save()
             return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
+
+    def put(self, request):
+
+        votings_id = request.data.get("idList")
+        action = request.data.get('action')
+        if not action:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        msg = ''
+        st = status.HTTP_200_OK
+        if action == 'start':
+            votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=True)
+            if len(votings)> 0:
+                votings.update(start_date=timezone.now())
+                msg = 'Votings started'
+            else:
+                msg = 'All votings all already started'
+                st = status.HTTP_400_BAD_REQUEST
+
+        elif action == 'stop':
+            votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=False, end_date__isnull=True)
+            if len(votings) > 0:
+                votings.update(end_date=timezone.now())
+                msg = 'Votings stopped'
+            else:
+                msg = 'All votings all already stopped or not started'
+                st = status.HTTP_400_BAD_REQUEST
+        elif action == 'tally':
+            votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=False, end_date__isnull=False)
+            if len(votings) > 0:
+                for voting in votings:
+                    key = request.COOKIES.get('token', "")
+                    voting.tally_votes(key)
+            else:
+                msg = 'All votings all already tallied, not stopped or not started'
+                st = status.HTTP_400_BAD_REQUEST
+        else:
+            msg = 'Action not found, try with start, stop or tally'
+            st = status.HTTP_400_BAD_REQUEST
+        return Response(msg, status=st)
 
 
 class QuestionsAPI(APIView):
