@@ -67,7 +67,7 @@ class CensusSerializer(serializers.HyperlinkedModelSerializer):
 
 class VotingSerializer(serializers.Serializer):
     question = AdminQuestionSerializer(many=False)
-    auth = AuthSerializer(many=False)
+    auth = serializers.URLField()
     name = serializers.CharField(max_length=200)
     desc = serializers.CharField(max_length=1000, allow_blank=True, allow_null=True)
     census = serializers.ListField()

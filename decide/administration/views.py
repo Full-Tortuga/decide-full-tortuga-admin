@@ -40,17 +40,23 @@ class VotingAPI(APIView):
             try:
                 auth_object = Auth.objects.filter(url=auth_url).get()
             except ObjectDoesNotExist:
-                auth_object = Auth.objects.save(Auth(name="Auth", url=auth_url, me=True))
-
+                auth_object = Auth(name="Auth", url=auth_url, me=True)
+                auth_object.save()
+            question = Question(desc=request.data.get('question').get("desc"))
+            question.save()
+            options = request.data.get('question').get("options")
+            for opt in options:
+                option = QuestionOption(question=question, option=opt.get("option"), number=opt.get("number"))
+                option.save()
             voting = Voting(name=request.data.get("name"), desc=request.data.get("desc"),
-                            question=request.data.get("question"))
+                            question=question)
+            voting.save()
             voting.auths.add(auth_object)
-            voting = voting.save()
-            voting_id = voting.get("id")
+            voting_id = voting.id
             for voter_id in id_users:
                 census = Census(voting_id=voting_id, voter_id=voter_id)
                 census.save()
-            return Response({voting}, status=HTTP_200_OK)
+            return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
 
 
 class QuestionsAPI(APIView):

@@ -19,7 +19,7 @@ urlpatterns = [
     path('api/users/state', views.UpdateUserStateAPI.as_view()),
     path('api/votings/question', views.QuestionsAPI.as_view()),
     path('api/votings/question/<int:question_id>/', views.QuestionAPI.as_view()),
-    path('api/votings/voting', views.VotingAPI.as_view()),
+    path('api/votings', views.VotingAPI.as_view()),
     # react-app
     url('', views.index)
 ]
