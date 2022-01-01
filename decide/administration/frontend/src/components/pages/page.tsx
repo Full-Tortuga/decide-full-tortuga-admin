@@ -11,7 +11,7 @@ const Page = (props: {
     <>
       <Box className="inline-block w-10/12 h-screen p-1 md:p-5 xl:p-10">
         <Box id="content" className="my-2 ml-10 inline-block w-11/12">
-          <Title title={props.title} variant="h2" />
+          <Title title={props.title} variant="h3" />
           {props.children}
         </Box>
       </Box>

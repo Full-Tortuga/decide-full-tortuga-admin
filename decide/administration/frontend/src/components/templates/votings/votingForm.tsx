@@ -1,10 +1,12 @@
 import React from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Add, Edit } from "@mui/icons-material";
+
+import { votingType } from "types";
+
 import { Input } from "components/01-atoms";
 import { Modal, ModalPage } from "components/02-molecules";
-import { QuestionInput } from ".";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { votingType } from "types";
+import { CensusInput, QuestionInput } from ".";
 
 const Component = (props: { initialVoting?: votingType.Voting }) => {
   const editMode = React.useMemo(
@@ -15,15 +17,35 @@ const Component = (props: { initialVoting?: votingType.Voting }) => {
   const {
     control,
     getValues,
+    trigger,
     setError,
+    clearErrors,
     formState: { errors },
+    reset,
   } = useForm<votingType.VotingFormFields>({ mode: "onChange" });
 
   const [sent, setSent] = React.useState(false);
 
+  React.useEffect(() => {
+    reset({});
+    clearErrors();
+    trigger();
+    if (props.initialVoting) {
+      const census: number[] = [];
+      const question = {} as votingType.Question;
+
+      control._defaultValues = {
+        name: props.initialVoting?.name,
+        desc: props.initialVoting?.desc,
+        census: census,
+        question: question,
+      };
+    }
+  }, [props.initialVoting, control, reset, clearErrors, trigger]);
+
   const onSubmitFailed = (e: any) => {
     console.log("error", e);
-    setError("name", { type: "manual", message: "Fake Error" });
+    setError("name", { type: "manual", message: e });
   };
 
   const onSubmit: SubmitHandler<votingType.VotingFormFields> = (data) => {
@@ -45,6 +67,7 @@ const Component = (props: { initialVoting?: votingType.Voting }) => {
             control={control}
             name="name"
             error={errors.name?.message}
+            rules={{ required: true }}
           />
           <Input.Text
             control={control}
@@ -55,19 +78,14 @@ const Component = (props: { initialVoting?: votingType.Voting }) => {
         <ModalPage description="Indique la pregunta de la Votación">
           <QuestionInput control={control} />
         </ModalPage>,
-        <ModalPage
-          description="Indique el censo de la Votación
-         (si no selecciona ningún usuario, todos serán añadidos)"
-        >
-          <span>
-            {/* TODO: <CensusInput control={control} /> */}
-            Todo: Census Input
-          </span>
+        <ModalPage description="Indique el censo de la Votación">
+          <CensusInput control={control} />
         </ModalPage>,
         <ModalPage description="Indique la autorización requerida para la Votación">
           <Input.Radio
             control={control}
             name="auth"
+            rules={[{ required: true }]}
             options={[
               {
                 label: "Local (localhost:8000)",
