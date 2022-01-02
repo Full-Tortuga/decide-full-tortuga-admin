@@ -238,6 +238,25 @@ class AuthTestCase(APITestCase):
         self.assertEqual(user['id'], id)
         self.assertEqual(user['username'], username+'X')
 
+    def test_putuser_username_alreadyexists_API(self):
+        response = self.client.get(
+            '/authentication/users/', format='json')
+        self.assertEqual(response.status_code, 200)
+
+        users = response.json()
+
+        id1 = users[-1]['id']
+        id2 = users[-2]['id']
+        response = self.client.get(
+            f'/authentication/users/{id2}/', format='json')
+        user = response.json()
+
+        username = user['username']
+        data = {'username': username, 'password': '12345'}
+        response = self.client.put(
+            f'/authentication/users/{id1}/', format='json')
+        self.assertEqual(response.status_code, 400)
+
     def test_deleteuser_API(self):
         data = {'username': 'user5', 'password': '12345'}
         response = self.client.post(
