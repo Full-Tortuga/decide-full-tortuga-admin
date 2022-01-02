@@ -12,6 +12,7 @@ from base.models import Auth, Key
 from authentication.serializers import UserSerializer
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
+from decide import settings
 from decide.settings import BASEURL
 from voting.serializers import VotingSerializer
 from .serializers import CensusSerializer
@@ -39,11 +40,8 @@ class VotingAPI(APIView):
         else:
             auth_url = request.data.get("auth")
             id_users = request.data.get("census")
-            try:
-                auth_object = Auth.objects.filter(url=auth_url).get()
-            except ObjectDoesNotExist:
-                auth_object = Auth(name="Auth", url=auth_url, me=True)
-                auth_object.save()
+            auth, _ = Auth.objects.get_or_create(url=auth_url,
+                                                 defaults={'me': True, 'name': 'test auth'})
             question = Question(desc=request.data.get('question').get("desc"))
             question.save()
             options = request.data.get('question').get("options")
@@ -53,11 +51,15 @@ class VotingAPI(APIView):
             voting = Voting(name=request.data.get("name"), desc=request.data.get("desc"),
                             question=question)
             voting.save()
-            voting.auths.add(auth_object)
+            voting.auths.add(auth)
             voting_id = voting.id
-            for voter_id in id_users:
-                census = Census(voting_id=voting_id, voter_id=voter_id)
-                census.save()
+            if id_users is None:
+                users = User.objects.all()
+                id_users = [user.id for user in users]
+            if len(id_users) > 0:
+                for voter_id in id_users:
+                    census = Census(voting_id=voting_id, voter_id=voter_id)
+                    census.save()
             return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
 
     def put(self, request):
@@ -70,8 +72,11 @@ class VotingAPI(APIView):
         st = status.HTTP_200_OK
         if action == 'start':
             votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=True)
-            if len(votings)> 0:
-                votings.update(start_date=timezone.now())
+            if len(votings) > 0:
+                for voting in votings:
+                    voting.create_pubkey()
+                    voting.start_date = timezone.now()
+                    voting.save()
                 msg = 'Votings started'
             else:
                 msg = 'All votings all already started'
@@ -80,7 +85,9 @@ class VotingAPI(APIView):
         elif action == 'stop':
             votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=False, end_date__isnull=True)
             if len(votings) > 0:
-                votings.update(end_date=timezone.now())
+                for voting in votings:
+                    voting.end_date = timezone.now()
+                    voting.save()
                 msg = 'Votings stopped'
             else:
                 msg = 'All votings all already stopped or not started'
@@ -91,6 +98,7 @@ class VotingAPI(APIView):
                 for voting in votings:
                     key = request.COOKIES.get('token', "")
                     voting.tally_votes(key)
+                    msg = 'Votings tallied'
             else:
                 msg = 'All votings all already tallied, not stopped or not started'
                 st = status.HTTP_400_BAD_REQUEST

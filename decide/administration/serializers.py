@@ -70,4 +70,4 @@ class AdminVotingSerializer(serializers.Serializer):
     auth = serializers.URLField()
     name = serializers.CharField(max_length=200)
     desc = serializers.CharField(max_length=1000, allow_blank=True, allow_null=True)
-    census = serializers.ListField()
+    census = serializers.ListField(allow_null=True)
