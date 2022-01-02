@@ -103,5 +103,9 @@ ENV/
 
 .vagrant
 
+#node
+nodesource_setup.sh
+
 # Visual Studio Code settings
 .vscode
+

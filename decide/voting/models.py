@@ -52,9 +52,6 @@ class ScoreVoting(models.Model):
                 'desc': self.desc, 
                 'start_date': str(self.start_date),
                 'end_date': str(self.end_date),
-                'pub_key': {'p': str(self.pub_key.p), 
-                            'g': str(self.pub_key.g), 
-                            'y': str(self.pub_key.y)}, 
                 'auths': [{'name': self.auths.all()[0].name, 
                             'url': self.auths.all()[0].url, 
                             'me': self.auths.all()[0].me}], 
@@ -67,6 +64,13 @@ class ScoreVoting(models.Model):
             options.append({'number': o.number,'option':o.option})
         question['options'] = options
         json['question'] = question
+
+        if self.pub_key == None:
+            json['pub_key'] = 'None'
+        else:
+            json['pub_key'] = {'p': str(self.pub_key.p), 
+                            'g': str(self.pub_key.g), 
+                            'y': str(self.pub_key.y)}
 
         return json
 
@@ -191,9 +195,6 @@ class BinaryVoting(models.Model):
                 'desc': self.desc, 
                 'start_date': str(self.start_date),
                 'end_date': str(self.end_date),
-                'pub_key': {'p': str(self.pub_key.p), 
-                            'g': str(self.pub_key.g), 
-                            'y': str(self.pub_key.y)}, 
                 'auths': [{'name': self.auths.all()[0].name, 
                             'url': self.auths.all()[0].url, 
                             'me': self.auths.all()[0].me}], 
@@ -206,6 +207,13 @@ class BinaryVoting(models.Model):
             options.append({'number': o.number,'option':o.option})
         question['options'] = options
         json['question'] = question
+
+        if self.pub_key == None:
+            json['pub_key'] = 'None'
+        else:
+            json['pub_key'] = {'p': str(self.pub_key.p), 
+                            'g': str(self.pub_key.g), 
+                            'y': str(self.pub_key.y)}
 
         return json
 
@@ -334,9 +342,6 @@ class Voting(models.Model):
                 'desc': self.desc, 
                 'start_date': str(self.start_date),
                 'end_date': str(self.end_date),
-                'pub_key': {'p': str(self.pub_key.p), 
-                            'g': str(self.pub_key.g), 
-                            'y': str(self.pub_key.y)}, 
                 'auths': [{'name': self.auths.all()[0].name, 
                             'url': self.auths.all()[0].url, 
                             'me': self.auths.all()[0].me}], 
@@ -349,6 +354,13 @@ class Voting(models.Model):
             options.append({'number': o.number,'option':o.option})
         question['options'] = options
         json['question'] = question
+
+        if self.pub_key == None:
+            json['pub_key'] = 'None'
+        else:
+            json['pub_key'] = {'p': str(self.pub_key.p), 
+                            'g': str(self.pub_key.g), 
+                            'y': str(self.pub_key.y)}
 
         return json
 
@@ -481,9 +493,6 @@ class MultipleVoting(models.Model):
                 'desc': self.desc, 
                 'start_date': str(self.start_date),
                 'end_date': str(self.end_date),
-                'pub_key': {'p': str(self.pub_key.p), 
-                            'g': str(self.pub_key.g), 
-                            'y': str(self.pub_key.y)}, 
                 'auths': [{'name': self.auths.all()[0].name, 
                             'url': self.auths.all()[0].url, 
                             'me': self.auths.all()[0].me}], 
@@ -497,6 +506,13 @@ class MultipleVoting(models.Model):
         question['options'] = options
         json['question'] = question
 
+        if self.pub_key == None:
+            json['pub_key'] = 'None'
+        else:
+            json['pub_key'] = {'p': str(self.pub_key.p), 
+                            'g': str(self.pub_key.g), 
+                            'y': str(self.pub_key.y)}
+        
         return json
 
     def create_pubkey(self):
