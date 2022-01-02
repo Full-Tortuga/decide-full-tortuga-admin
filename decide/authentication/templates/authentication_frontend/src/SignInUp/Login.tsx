@@ -33,7 +33,7 @@ class LoginBox extends React.Component {
                 type="text"
                 name="username"
                 className="login-input"
-                placeholder="Username" />
+                placeholder="Username" required/>
             </div>
 
             <div className="input-group">
@@ -42,7 +42,7 @@ class LoginBox extends React.Component {
                 type="password"
                 name="password"
                 className="login-input"
-                placeholder="Password" />
+                placeholder="Password" required/>
             </div>
 
             <button
