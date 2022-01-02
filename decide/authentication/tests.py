@@ -254,7 +254,7 @@ class AuthTestCase(APITestCase):
         username = user['username']
         data = {'username': username, 'password': '12345'}
         response = self.client.put(
-            f'/authentication/users/{id1}/', format='json')
+            f'/authentication/users/{id1}/', data, format='json')
         self.assertEqual(response.status_code, 400)
 
     def test_deleteuser_API(self):
