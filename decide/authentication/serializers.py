@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             email=validated_data['email'],
-            password=make_password(validated_data['password'])  # here
+            password=make_password(validated_data['password'])
         )
         return user
 
@@ -22,8 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get(
             'last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
-        instance.password = validated_data.get(
-            'password', make_password(instance.password))
+        instance.password = make_password(validated_data['password'])
 
         instance.save()
         return instance
@@ -34,6 +33,5 @@ class UserSerializer(serializers.ModelSerializer):
                   'password', 'is_active', 'is_superuser', 'is_staff')
         read_only_fields = ('is_active', 'is_superuser', 'is_staff')
         extra_kwargs = {'password': {
-            # 'write_only': True,
+            'write_only': True,
             'min_length': 4, 'required': True}}
-    validate_password = make_password
