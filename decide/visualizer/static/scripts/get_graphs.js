@@ -1,14 +1,17 @@
 //ajax function to send graphs to backend
-$(document).ready(function(){
+$(document).ready(async function(){
+    await new Promise(r => setTimeout(r, 1500));
     var canvas_elements=document.getElementsByClassName("chartjs-render-monitor")
     if (canvas_elements.length==2) {
-        $('canvas:nth-of-type(2)').addClass(function(){
+        $('#bar-chart').addClass(function(){
             const csrf_cookie=getCookie('csrftoken');
             $.ajax({
                 url: "graphs/",
                 type: "POST",
+                dataType:"json",
                 data:{
-                    graphs:graphs_images()
+                    type:$('#vot_type').val(),
+                    graphs:graphs_images(),
                 },
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader("X-CSRFToken", csrf_cookie)

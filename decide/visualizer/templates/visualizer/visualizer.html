@@ -19,6 +19,7 @@
         </b-navbar>
 
         <div class="voting container">
+            <input id="vot_type" type="hidden" value="V">
             <h1>[[ voting[0]["id"] ]] - [[ voting[0]["name"] ]]</h1>
 
             <h2 v-if="!voting[0]['start_date']">Votación no comenzada</h2>

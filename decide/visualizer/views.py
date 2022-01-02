@@ -1,4 +1,4 @@
-from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.http import Http404
@@ -161,13 +161,15 @@ def initialize(request):
 
 def graphs_requests(request, voting_id):
     if request.method == 'POST':
-        data=request.POST.getlist('graphs[]')
-        if Graphs.objects.filter(voting_id=voting_id).exists():
-            Graphs.objects.filter(voting_id=voting_id).update(graphs_url=data)
+        vot_type=request.POST.get('type')
+        urls=request.POST.getlist('graphs[]')
+        if Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).exists():
+            Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).update(voting_type=vot_type, graphs_url=urls)
         else:
-            Graphs.objects.create(voting_id=voting_id, graphs_url=data)
+            Graphs.objects.create(voting_id=voting_id, voting_type=vot_type, graphs_url=urls)
         return HttpResponse()
     
-    if request.method == 'GET':       
-        data=list(Graphs.objects.filter(voting_id=voting_id).values('voting_id', 'graphs_url'))
+    if request.method == 'GET':  
+        vot_type=request.GET.get('type')       
+        data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))
         return HttpResponse(json.dumps(data), content_type="application/json")

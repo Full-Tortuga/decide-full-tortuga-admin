@@ -7,10 +7,12 @@
     <link type="text/css" rel="stylesheet"
          href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
     <link type="text/css" rel="stylesheet" href="{% static "booth/style.css" %}" />
+    <link type="text/css" rel="stylesheet" href="{% static "/visualizer.css" %}" />
 
 {% endblock %}
 
 {% block content %}
+    {% csrf_token %}
     <div id="app-visualizer">
         <!-- Navbar -->
         <b-navbar type="dark" variant="secondary">
@@ -18,6 +20,7 @@
         </b-navbar>
 
         <div class="voting container">
+            <input id="vot_type" type="hidden" :value="voting.type">
             <h1>[[ voting.id ]] - [[ voting.name ]]</h1>
 
             <h2 v-if="voting.start_date == 'None'">Votación no comenzada</h2>
@@ -47,12 +50,19 @@
         </div>
         
     </div>
-        
-
+    <footer class="bg-secondary" id="bots-footer">
+        <p class="navbar-brand">Echa un vistazo a nuestros bots si quieres estar al tanto de toda la información de las votaciones
+            <img src="https://img.icons8.com/color/48/000000/telegram-app--v1.png" 
+            onclick="window.location='https://t.me/votitos_bot'">
+        </p>
+    </footer>    
 {% endblock %}
 
 
 {% block extrabody %}
+
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- Vuejs -->
     <script src="https://unpkg.com/vue"></script>
@@ -146,7 +156,6 @@
 
     <script>   
         var voting = {{voting|safe}};
-        console.log(voting)
         var app = new Vue({
             delimiters: ['[[', ']]'],
             el: '#app-visualizer',
@@ -156,6 +165,6 @@
         })
     </script>
     
-    
+    <script src="{% static "scripts/get_graphs.js" %}"></script>     
 </body>
 {% endblock %}

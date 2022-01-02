@@ -13,5 +13,9 @@ class TelegramBot(models.Model):
 
 
 class Graphs(models.Model):
-    voting_id=models.BigIntegerField(unique=True)
-    graphs_url=models.TextField()
+    voting_id=models.BigIntegerField()
+    voting_type=models.CharField(max_length=30, default='V')
+    graphs_url=models.TextField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ('voting_id', 'voting_type',)
