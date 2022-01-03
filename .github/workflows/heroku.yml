@@ -57,6 +57,7 @@ jobs:
           coverage-reports: decide/coverage.xml
   deploy:
     needs: build
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: Heroku
     steps:
