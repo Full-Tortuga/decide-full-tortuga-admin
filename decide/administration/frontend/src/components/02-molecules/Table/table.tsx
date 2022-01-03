@@ -18,10 +18,13 @@ const Component = (props: {
   const [selectionModel, setSelectionModel] =
     React.useState<GridSelectionModel>([]);
 
-  React.useEffect(() => {
-    props.setSelected(filterRows(selectionModel));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectionModel, filterRows, props.setSelected]);
+  const updateSelectionModel = React.useCallback(
+    (newSelection: GridSelectionModel) => {
+      setSelectionModel(newSelection);
+      props.setSelected(filterRows(newSelection));
+    },
+    [props, filterRows]
+  );
 
   return (
     <div className="w-full">
@@ -29,9 +32,10 @@ const Component = (props: {
         autoHeight
         rows={props.rows}
         columns={props.columns}
+        pageSize={10}
         checkboxSelection
         selectionModel={selectionModel}
-        onSelectionModelChange={(e) => setSelectionModel(e)}
+        onSelectionModelChange={(e) => updateSelectionModel(e)}
       />
     </div>
   );

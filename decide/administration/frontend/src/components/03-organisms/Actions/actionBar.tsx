@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
-
 import { Box } from "@mui/system";
 import { Divider } from "@mui/material";
+
 import { IconButton } from "components/01-atoms";
 
 type Action = {
@@ -23,11 +23,8 @@ const Component = (props: {
   );
 
   return (
-    <Box
-      id="actions"
-      className="inline-block w-1/12 h-screen py-1 sm:py-5 md:py-20 my-10 px-2"
-    >
-      <Box className="h-full w-12 flex flex-col border rounded p-2 gap-3">
+    <Box id="actions" className="inline-flex items-center w-1/12 h-screen px-2">
+      <Box className="w-12 flex flex-col border rounded p-2 gap-3">
         {props.actions}
         <Divider />
         {props.individualActions?.map((action, index) => (
