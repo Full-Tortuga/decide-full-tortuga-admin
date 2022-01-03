@@ -150,26 +150,40 @@ class VotesMultiple_csv(View):
         for vote in voting.postproc:
             csv_file.writerow([vote["option"], vote["postproc"], vote["votes"]])
         return res
-
+    
 def initialize(request):
     #call to initalize telegram bot
     global TELEGRAM_BOT_STATUS
     if not TELEGRAM_BOT_STATUS:
         init_bot()
         TELEGRAM_BOT_STATUS=True
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))       
 
 def graphs_requests(request, voting_id):
     if request.method == 'POST':
         vot_type=request.POST.get('type')
         urls=request.POST.getlist('graphs[]')
         if Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).exists():
-            Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).update(voting_type=vot_type, graphs_url=urls)
+            to_update=Graphs.objects.get(voting_id=voting_id, voting_type=vot_type)
+            to_update.voting_type=vot_type
+            to_update.graphs_url=urls
+            to_update.save()
         else:
             Graphs.objects.create(voting_id=voting_id, voting_type=vot_type, graphs_url=urls)
         return HttpResponse()
     
     if request.method == 'GET':  
-        vot_type=request.GET.get('type')       
-        data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))
+        vot_type=translate_type(request.path_info)    
+        data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))        
         return HttpResponse(json.dumps(data), content_type="application/json")
+    
+#translate path to vot_type
+def translate_type(path_url):
+    vot_type='V'
+    if 'binaryVoting' in path_url:
+        vot_type='BV'
+    elif 'multiple' in path_url:
+        vot_type='MV'
+    elif 'score' in path_url:
+        vot_type='SV'
+    return vot_type   
