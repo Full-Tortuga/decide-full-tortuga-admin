@@ -20,7 +20,7 @@ jobs:
         ports:
           - 27017:27017
       ldap:
-        image: ldap/openldap:2.4.45
+        image: carvilgar1us/decideldap
         ports:
           - 389:389
 
