@@ -8,7 +8,7 @@
         {% if user.is_authenticated %}
             <h1>Hola {{ user.first_name }}</h1>
 
-            <a href="{% url 'logout' %}">Cerrar sesión</a>        
+            <a href="{% url 'userlogout' %}">Cerrar sesión</a>      
         {% else %}
             <a href="{% url 'sign_in' %}">Registrate</a>
             <a href="{% url 'sign_in' %}">Iniciar sesión con usuario/contraseña</a>
