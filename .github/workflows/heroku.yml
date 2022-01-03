@@ -55,3 +55,13 @@ jobs:
       with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: decide/coverage.xml
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Heroku
+    steps:
+    - uses: actions/checkout@v1
+    - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+      with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "full-tortuga-4"
+          heroku_email: "bogdan.lorenzo11@gmail.com"
