@@ -8,18 +8,19 @@ STATIC_ROOT = '/app/static/'
 MEDIA_ROOT = '/app/static/media/'
 ALLOWED_HOSTS = ['*']
 
-BASEURL = 'http://localhost'
+
+BASEURL = os.environ.get('APP_URL')
 
 APIS = {
-    'authentication': 'http://localhost',
-    'base': 'http://localhost',
-    'booth': 'http://localhost',
-    'census': 'http://localhost',
-    'mixnet': 'http://localhost',
-    'postproc': 'http://localhost',
-    'store': 'http://localhost',
-    'visualizer': 'http://localhost',
-    'voting': 'http://localhost',
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
 }
 
 
