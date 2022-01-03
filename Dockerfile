@@ -28,4 +28,4 @@ ADD docker-settings.py /app/decide/local_settings.py
 
 RUN ./manage.py collectstatic
 
-CMD ./manage.py runserver 0.0.0.0:$PORT $DATABASE_NAME $DATABASE_HOST $DATABASE_USERNAME $DATABASE_PASSWORD 
+CMD ./manage.py runserver 0.0.0.0:$PORT
