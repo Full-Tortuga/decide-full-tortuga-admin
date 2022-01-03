@@ -9,3 +9,13 @@ class TelegramBot(models.Model):
     
     class Meta:
         verbose_name = 'Telegram user'
+        
+
+
+class Graphs(models.Model):
+    voting_id=models.BigIntegerField()
+    voting_type=models.CharField(max_length=30, default='V')
+    graphs_url=models.TextField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ('voting_id', 'voting_type',)

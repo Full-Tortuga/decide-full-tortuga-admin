@@ -1,25 +1,26 @@
 from django.contrib import admin
 from django.db.models.base import Model
 from django.utils import timezone
-
-
 from .models import MultipleQuestion, MultipleQuestionOption, MultipleVoting, QuestionOption, BinaryQuestionOption, ScoreQuestionOption
 from .models import Question, BinaryQuestion, ScoreQuestion
 from .models import Voting, BinaryVoting, ScoreVoting
 from .filters import StartedFilter
-
+from visualizer.telegramBot import auto_notifications
+import visualizer.views
 
 def start(modeladmin, request, queryset):
     for v in queryset.all():
         v.create_pubkey()
         v.start_date = timezone.now()
         v.save()
+        send_notifications(v)
 
 
 def stop(ModelAdmin, request, queryset):
     for v in queryset.all():
         v.end_date = timezone.now()
         v.save()
+        send_notifications(v)
 
 
 def tally(ModelAdmin, request, queryset):
@@ -27,6 +28,10 @@ def tally(ModelAdmin, request, queryset):
         token = request.session.get('auth-token', '')
         v.tally_votes(token)
 
+#for users who have auto notifications enabled
+def send_notifications(v):
+    if visualizer.views.TELEGRAM_BOT_STATUS:
+        auto_notifications(v)
 
 class QuestionOptionInline(admin.TabularInline):
     model = QuestionOption

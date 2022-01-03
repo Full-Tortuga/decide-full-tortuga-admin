@@ -5,25 +5,23 @@ from telegram import InputMediaPhoto, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-import logging, os, sys
-from .website_scrapping import get_graphs
-from .models import TelegramBot
+import os, sys, base64
+from .models import TelegramBot, Graphs
 from threading import Thread
+from selenium import webdriver
+from functools import partial
 
 
 #This is token is temporary and won't be the same in final version, so security won't be compromised
 #auth and front-end for '@VotitosBot'
-UPDATER = Updater('2111051748:AAH1R736I0_HsZEW6_22Tf0r-OqihtF5x88',                                                                   
-                use_context=True)                                               
+UPDATER = Updater(settings.TELEGRAM_TOKEN,
+                use_context=True)
 
-BOT=Bot(token='2111051748:AAH1R736I0_HsZEW6_22Tf0r-OqihtF5x88')
+BOT=Bot(token=settings.TELEGRAM_TOKEN)
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
-
-    #logging
-    logging.basicConfig(level=logging.ERROR,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
     setup_commands(UPDATER) 
     updates_setting()
     #starts the bot
@@ -34,15 +32,16 @@ def setup_commands(votitos):
 
     dp=votitos.dispatcher
     dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('help', help))
     dp.add_handler(CommandHandler('relaunch', relaunch, Filters.user(user_id=1931864468)))
     dp.add_handler(CommandHandler('stop', stop, Filters.user(user_id=1931864468)))
-    dp.add_handler(CommandHandler('results', show_results))
-    dp.add_handler(CommandHandler('details', show_details))
+    dp.add_handler(CommandHandler('results', partial(voting_selection_menu, command_name='results')))
+    dp.add_handler(CommandHandler('details', partial(voting_selection_menu, command_name='details')))
     dp.add_handler(CommandHandler('auto', change_auto_status))
-    dp.add_handler(CommandHandler('help', help))
     dp.add_handler(MessageHandler(Filters.command, unknown_command))
+    dp.add_handler(CallbackQueryHandler(voting_selection_query_handler, pattern="^v_[a-zA-Z]+_[a-zA-Z]+$"))
     dp.add_handler(CallbackQueryHandler(results_query_handler, pattern="^[1-9][0-9]*$"))
-    dp.add_handler(CallbackQueryHandler(details_query_handler, pattern="^d[1-9][0-9]*$")) 
+    dp.add_handler(CallbackQueryHandler(details_query_handler, pattern="^d[1-9][0-9]*_[a-zA-Z]+$")) 
     dp.add_handler(CallbackQueryHandler(auto_query_handler, pattern="(^True$|^False$)"))
 
 #set bot configuration not to reply to old messages
@@ -58,7 +57,7 @@ def start(update, context):
     id=update.message.chat.id
     context.bot.send_message(chat_id=id, text="Hola {}, a las buenas tardes. ¿En qué puedo ayudarte?".format(name))
     TelegramBot.objects.get_or_create(user_id=id)
-    help(update)
+    help(update, context)
     
 # relaunch the bot and also the whole project (limited to admin)
 def relaunch(update, context):
@@ -74,7 +73,7 @@ def stop(update, context):
     UPDATER.stop()
     
 #list of available commands
-def help(update):
+def help(update, context):
 
     update.message.reply_text("""Esta es mi lista de comandos: 
     /start - Inicia la interacción conmigo
@@ -88,42 +87,49 @@ def unknown_command(update, context):
     update.message.reply_text("Lo siento, no sé qué es '%s'. Revisa que has escrito bien el comando o bien revisa mi lista de comandos, puedes hacerlo con\n/help" % update.message.text)
 
 #allows you to select a closed voting and show its results
-def show_results(update, context):
-    update.message.reply_text("Aquí tienes la lista de votaciones finalizadas.")
-    finished_votings=models.Voting.objects.exclude(start_date__isnull=True).exclude(end_date__isnull=True)
-    keyboard_buttons=[]
-    for v in finished_votings:
-        keyboard_buttons.append(InlineKeyboardButton(text=str(v.name), callback_data=str(v.id)))
-    keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
-    context.bot.send_message(chat_id=update.message.chat.id, text= "Elige por favor:", reply_markup=keyboard)
+def show_results(update, context, chat_identifier, vot_type):
+    votings=get_voting_objects(vot_type)
+    finished_votings=votings.exclude(start_date__isnull=True).exclude(end_date__isnull=True)
+    if finished_votings is not None:
+        keyboard_buttons=[]
+        for v in finished_votings:
+            keyboard_buttons.append(InlineKeyboardButton(text=str(v.name), callback_data=str(v.id)))
+        keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
+        context.bot.send_message(chat_id=chat_identifier, text= "Aquí tienes la lista de votaciones finalizadas. Elige por favor:", reply_markup=keyboard)
+    else:
+        context.bot.send_message(chat_id=chat_identifier, text= "Vaya...no hay ninguna votación de este tipo que haya finalizado.\nInténtalo de nuevo en otro momemnto")
     
 #handler for '/results' command  
 def results_query_handler(update, context):
     
     query=update.callback_query
     query.answer("¡A la orden!")
-    results_graph(query.data, update.callback_query.message.chat_id, context)
+    results_graph(query.data, query.message.chat_id, context)
 
 #allows you to select an active or closed voting and show its details    
-def show_details(update, context):
-    update.message.reply_text("Selecciona la votación de la que desea ver sus detalles") 
-    votings=models.Voting.objects.exclude(start_date__isnull=True)
-    keyboard_buttons=[InlineKeyboardButton(text=str(v.name), callback_data="d"+str(v.id)) for v in votings]
-    keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
-    context.bot.send_message(chat_id=update.message.chat.id, text="Seleccione una por favor:", reply_markup=keyboard)
-
-#constructs menu for inline buttons    
-def build_keyboard_menu(buttons, n_cols):
-    return [buttons[b:(b + n_cols)] for b in range(0, len(buttons), n_cols)]
-
+def show_details(update, context, chat_identifier,vot_type):
+    
+    votings=get_voting_objects(vot_type)
+    started_votings=votings.exclude(start_date__isnull=True)
+    type=vot_type.split("_")[1]
+    if started_votings is not None:
+        keyboard_buttons=[InlineKeyboardButton(text=str(v.name), callback_data="d"+str(v.id)+"_"+type) for v in started_votings]
+        keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
+        context.bot.send_message(chat_id=chat_identifier, text="Selecciona la votación de la que desea ver sus detalles", reply_markup=keyboard)
+    else:
+        context.bot.send_message(chat_id=chat_identifier, text= "Vaya...no hay ninguna votación de este tipo ahora mismo.\nInténtalo de nuevo en otro momemnto")
+        
 #handler for '/details' command
 def details_query_handler(update, context):
-
     query=update.callback_query
     query.answer("¡A la orden!")
-    vot_id=query.data[1]
-    voting=models.Voting.objects.exclude(start_date__isnull=True).get(id=vot_id)
-    msg=aux_message_builder(voting)
+    response_array=query.data.split("_")
+    vot_id=response_array[0][1]
+    vot_type=response_array[1]
+    
+    voting=get_voting_objects(vot_type).exclude(start_date__isnull=True).get(id=vot_id)
+    v_type=translate_type(vot_type)
+    msg=aux_message_builder(voting,v_type)
     context.bot.send_message(chat_id=query.message.chat_id,text=msg, parse_mode="HTML")
 
 #opt-in and opt-out for auto notifications
@@ -132,34 +138,88 @@ def change_auto_status(update, context):
     status_user=TelegramBot.objects.get(user_id=id)
     if status_user.auto_msg:
         choose_msg="Actualmente las notificaciones automáticas se encuentran activadas.\n¿Desea desactivarlas?"
-        keyboard_buttons=[[InlineKeyboardButton(text="Sí", callback_data="False")],
-                          [InlineKeyboardButton(text="No", callback_data="True")]]
+        keyboard_buttons=build_keyboard_menu([InlineKeyboardButton(text="Sí", callback_data="False"),
+                          InlineKeyboardButton(text="No", callback_data="True")], 2)
+
     else:
         choose_msg="Actualmente las notificaciones automáticas se encuentran desactivadas.\n¿Desea activarlas?"
-        keyboard_buttons=[[InlineKeyboardButton(text="Sí", callback_data="True")],
-                          [InlineKeyboardButton(text="No", callback_data="False")]]
+        keyboard_buttons=build_keyboard_menu([InlineKeyboardButton(text="Sí", callback_data="True"),
+                          InlineKeyboardButton(text="No", callback_data="False")], 2)
     keyboard=InlineKeyboardMarkup(keyboard_buttons)
     context.bot.send_message(chat_id=id, text=choose_msg, reply_markup=keyboard)
 
 #handler for '/auto' command
 def auto_query_handler(update, context):
     query=update.callback_query
-    u_id=update.callback_query.message.chat_id
-    msg_id=update.callback_query.message.message_id
-    for id in range(msg_id-2, msg_id+1):
+    u_id=query.message.chat_id
+    msg_id=query.message.message_id
+    for id in range(msg_id, msg_id+1):
         context.bot.delete_message(chat_id=u_id, message_id=id)
     TelegramBot.objects.filter(user_id=u_id).update(auto_msg=query.data) 
     query.answer("¡Listo! He actualizado tus preferencias")
-        
-# ===================
-#  AUXILIARY METHODS
-# ===================
 
-#auxiliary message to print details from votings
-def aux_message_builder(voting):
+        
+# =====================
+#   AUXILIARY METHODS
+# =====================
+
+#auxiliary keyboard to select voting type and get command name
+def voting_selection_menu(update, context, command_name):
+    keyboard_buttons = [InlineKeyboardButton('Votación simple', callback_data='v_simple_'+command_name),
+              InlineKeyboardButton('Votación binaria', callback_data='v_binary_'+command_name),
+              InlineKeyboardButton('Votación múltiple', callback_data='v_multiple_'+command_name),
+              InlineKeyboardButton('Votación por puntuación', callback_data='v_score_'+command_name)]
+    context.bot.send_message(chat_id=update.message.chat.id, text="Elige el tipo de votación:", reply_markup=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2)))
     
-    options=list(voting.question.options.values_list('option', flat=True)) 
-    tally=stmodels.Vote.objects.filter(voting_id=voting.id).values('voter_id').distinct().count() #gets unique votes for a voting
+    
+#handler for voting selection
+def voting_selection_query_handler(update, context):
+    query=update.callback_query
+    vot_type_command=query.data
+    if 'details' in vot_type_command:
+        show_details(update, context, query.message.chat_id, vot_type_command)
+    elif 'results' in vot_type_command:
+        show_results(update, context, query.message.chat_id, vot_type_command)
+    query.answer()
+
+#gets voting type objects
+def get_voting_objects(vot_type):
+    res=None
+    if 'simple' in vot_type:
+       res=models.Voting.objects
+    elif 'binary' in vot_type:
+        res=models.BinaryVoting.objects
+    elif 'multiple' in vot_type:
+        res=models.MultipleVoting.objects
+    elif 'score' in vot_type:
+        res=models.ScoreVoting.objects
+    return res
+
+#translate vot_type var to actual voting type name
+def translate_type(vot_type):
+    res=None
+    if 'simple' in vot_type:
+        res=('V', 'Voting')
+    elif 'binary' in vot_type:
+        res=('BV', 'BinaryVoting')
+    elif 'multiple' in vot_type:
+        res=('MV', 'MultipleVoting')
+    elif 'score' in vot_type:
+        res=('SV', 'ScoreVoting')
+    return res    
+           
+#constructs menu for inline buttons    
+def build_keyboard_menu(buttons, n_cols):
+    return [buttons[b:(b + n_cols)] for b in range(0, len(buttons), n_cols)]
+        
+#auxiliary message to print details from votings
+def aux_message_builder(voting, vot_type):
+    
+    options=list(voting.question.options.values_list('option', flat=True))
+    if stmodels.Vote.objects.filter(voting_id=voting.id, type=vot_type).exists():
+        tally=stmodels.Vote.objects.filter(voting_id=voting.id, type=vot_type).values('voter_id').distinct().count()
+    else:
+        tally=0
     start_d=voting.start_date.strftime('%d-%m-%Y %H:%M:%S')+"\n"
     end_d="Por decidir\n"
 
@@ -178,21 +238,46 @@ def aux_message_builder(voting):
     
     return msg
 
+
 #extracts graph's images from website selected voting and sends them to the user
 def results_graph(id, chat_identifier, context):
-    url=settings.VISUALIZER_VIEW+ str(id)
-    images=get_graphs(url)
-    if images:
-        media_group=[InputMediaPhoto(media=i) for i in images]
-        context.bot.sendMediaGroup(chat_id=chat_identifier, media=media_group)
+    open_graphs_generator_view(id)
+    if Graphs.objects.filter(voting_id=id).exists():
+        graphs_base64=Graphs.objects.filter(voting_id=id).values('graphs_url')
+        try:
+            base64_url_list=eval(graphs_base64[0]['graphs_url'])
+            b64_images=[]
+            media_group=[]
+            for i in range(0,len(base64_url_list)):
+                b64_images.append(base64_url_list[i].split(",")[1])
+                path="graph_"+str(id)+"_"+str(i)+".png"
+                with open(path,"wb") as f:
+                    f.write(base64.b64decode(b64_images[i]))
+                media_group.append(InputMediaPhoto(media=open(path, 'rb')))
+                os.remove(path)
+            context.bot.sendMediaGroup(chat_id=chat_identifier, media=media_group)
+        except:
+            context.bot.send_message(chat_id=chat_identifier,
+            text="Vaya...no hay gráficas disponibles para mostrar.\nInténtalo de nuevo más tarde.")
+        
     else:
         context.bot.send_message(chat_id=chat_identifier,
-        text="Upss! Parece que aún no hay ningún gráfico asociado a esta votación.\nInténtalo de nuevo en otro momento.")
-           
+        text="Upss! Parece que aún no hay ninguna gráfica asociada a esta votación.\nInténtalo de nuevo en otro momento.")
+
+
+#uses selenium to call view which generates voting graphs
+def open_graphs_generator_view(id):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    driver=webdriver.Chrome(options=options)
+    driver.get('http://127.0.0.1:8000/visualizer/' + str(id))  #VISUALIZER_VIEW will be taken from setting in production
+
+
+      
 #sends notifications when a new voting is created
 def auto_notifications(voting):
     users_id_enabled=list(TelegramBot.objects.values_list('user_id', flat=True).exclude(auto_msg=False))
-    msg=aux_message_builder(voting)
+    msg=aux_message_builder(voting, voting.type)
     for id in users_id_enabled:
         BOT.send_message(chat_id=id, text=msg, parse_mode="HTML")
 
