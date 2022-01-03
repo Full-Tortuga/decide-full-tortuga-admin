@@ -173,7 +173,7 @@ def graphs_requests(request, voting_id):
         return HttpResponse()
     
     if request.method == 'GET':  
-        vot_type=translate_type(request.path_info)    
+        vot_type=translate_type(request.path_info)   
         data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))        
         return HttpResponse(json.dumps(data), content_type="application/json")
     

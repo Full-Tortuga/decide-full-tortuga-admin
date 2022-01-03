@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^##ydkswfu0+=ofw0l#$kv^8n)0$i(qd&d&ol#p9!b$8*5%j1+'
 
 #will change on production
-TELEGRAM_TOKEN = '2111051748:AAH1R736I0_HsZEW6_22Tf0r-OqihtF5x88'
+TELEGRAM_TOKEN = '2111051748:AAHbizpbLso8NS7VyUPVrpO33-eKEcWiwcc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
