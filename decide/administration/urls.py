@@ -3,7 +3,6 @@ from django.urls import path
 from django.urls.conf import re_path
 
 from . import views
-from .views import QuestionsAPI, QuestionAPI
 
 urlpatterns = [
     # API
@@ -18,9 +17,10 @@ urlpatterns = [
     path('api/census', views.CensussAPI.as_view()),
     path('api/census/<int:census_id>', views.CensusAPI.as_view()),
     path('api/users/state', views.UpdateUserStateAPI.as_view()),
-    path('api/votings/question', QuestionsAPI.as_view()),
-    path('api/votings/question/<int:question_id>/', QuestionAPI.as_view()),
-
+    path('api/votings/question', views.QuestionsAPI.as_view()),
+    path('api/votings/question/<int:question_id>/', views.QuestionAPI.as_view()),
+    path('api/votings', views.VotingAPI.as_view()),
+    path('api/votings/<int:voting_id>/', views.VotingsAPI.as_view()),
     # react-app
     url('', views.index)
 ]
