@@ -107,6 +107,32 @@ class VotingAPI(APIView):
             st = status.HTTP_400_BAD_REQUEST
         return Response(msg, status=st)
 
+    def delete(self, request):
+        if request.data.get("idList") is None:
+            Voting.objects.all().delete()
+            return Response({}, status=HTTP_200_OK)
+        else:
+            ids = request.data.get("idList")
+            is_valid(len(ids) > 0, 'The format of the ids list is not correct')
+            Voting.objects.filter(id__in=ids).delete()
+            return Response({}, status=HTTP_200_OK)
+
+class VotingsAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request, voting_id):
+        try:
+            query = Voting.objects.filter(id=voting_id).get()
+        except ObjectDoesNotExist:
+            return Response({}, status=HTTP_404_NOT_FOUND)
+        rest = VotingSerializer(query).data
+        return Response(rest, status=HTTP_200_OK)
+
+
+    def delete(self, request, voting_id):
+        Voting.objects.all().filter(id=voting_id).delete()
+        return Response({}, status=HTTP_200_OK)
+
 
 class QuestionsAPI(APIView):
     permission_classes = (IsAdminAPI,)
