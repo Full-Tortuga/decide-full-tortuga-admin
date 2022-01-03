@@ -2,12 +2,9 @@
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
-ALLOWED_HOSTS = ["*"]
 # dev env CORS SETTINGS
 BASEURL = 'http://localhost:8000'
 FE_BASEURL = 'http://localhost:3000'
-
-ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
