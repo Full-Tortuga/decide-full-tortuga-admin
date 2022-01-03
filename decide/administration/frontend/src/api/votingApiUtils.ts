@@ -18,7 +18,42 @@ const votingApi = {
 
 
     //VOTING API
-    //TO DO
+    //Bulk Operations   
+    getVotings:() => axios.get(`/votings`),
+    deleteVotings: (idList: any) => axios.delete("/votings", idList),
+    deleteAllVotings: () => axios.delete(`/votings`), 
+    
+    startVotings:(
+        idList:number[],
+        actionV: "start",        
+    ) => 
+    axios.put("/votings", {
+        idList: idList,
+        action: actionV,        
+    }),
+
+    stopVotings:(
+        idList:number[],
+        actionV: "stop",        
+    ) => 
+    axios.put("/votings", {
+        idList: idList,
+        action: actionV,        
+    }),
+
+    tallyVotings:(
+        idList:number[],
+        actionV: "tally",        
+    ) => 
+    axios.put("/votings", {
+        idList: idList,
+        action: actionV,        
+    }),
+    
+    //Individual Operations
+    getVoting: (voting_id: number) => axios.get(`/votings/${voting_id}`),
+    createVoting: (voting: Voting) => axios.post("/votings", voting),
+    deleteVoting: (voting_id: number) => axios.delete(`/votings/${voting_id}`),  
 };
 
 export default votingApi;
