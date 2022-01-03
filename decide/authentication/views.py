@@ -28,7 +28,7 @@ from django.urls import reverse
 from django.db import models
 
 import ldap
-from local_settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD 
+from local_settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD
 
 
 class GetUserView(APIView):
@@ -70,6 +70,7 @@ class RegisterView(APIView):
             return Response({}, status=HTTP_400_BAD_REQUEST)
         return Response({'user_pk': user.pk, 'token': token.key}, HTTP_201_CREATED)
 
+
 class LDAPLogin(APIView):
     """
     Class to authenticate a user via LDAP and
@@ -83,26 +84,27 @@ class LDAPLogin(APIView):
         :param request:
         :return:
         """
-        
+
         try:
-            #Probamos la conexion con el servidor con las siguientes instrucciones
+            # Probamos la conexion con el servidor con las siguientes instrucciones
             con = ldap.initialize(AUTH_LDAP_SERVER_URI)
-            con.simple_bind_s(AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD) 
+            con.simple_bind_s(AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD)
             try:
-                #Probamos a logear con los datos enviados por el usuario
+                # Probamos a logear con los datos enviados por el usuario
                 user_obj = authenticate(username=request.data['username'],
-                                password=request.data['password'])
-                login(request, user_obj, backend='django_auth_ldap.backend.LDAPBackend')
-                data={'detail': 'User logged in successfully'}
+                                        password=request.data['password'])
+                login(request, user_obj,
+                      backend='django_auth_ldap.backend.LDAPBackend')
+                data = {'detail': 'User logged in successfully'}
                 status = HTTP_200_OK
             except AttributeError:
-                data={'detail': 'Credenciales mal'}
+                data = {'detail': 'Credenciales mal'}
                 status = HTTP_400_BAD_REQUEST
         except ldap.SERVER_DOWN:
-            data={'detail': 'Problema con el servicio LDAP'}
+            data = {'detail': 'Problema con el servicio LDAP'}
             status = HTTP_500_INTERNAL_SERVER_ERROR
         return render(request, 'bienvenida.html', status=status)
-            
+
 
 class LDAPLogout(APIView):
     """
@@ -117,12 +119,13 @@ class LDAPLogout(APIView):
         :return:
         """
         logout(request)
-        data={'detail': 'User logged out successfully'}
+        data = {'detail': 'User logged out successfully'}
         return Response(data, status=200)
 
 
 class LDAPSignInView(LoginView):
     template_name = 'login_ldap_view.html'
+
 
 class SignInView(LoginView):
     template_name = 'form.html'
@@ -157,11 +160,13 @@ class RegisterUserView(APIView):
         return response
 
 class BienvenidaView(TemplateView):
-   template_name = 'bienvenida.html'
+    template_name = 'bienvenida.html'
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
+
 
 def cerrarsesion(request):
     print("==========================LOGOUT========================")

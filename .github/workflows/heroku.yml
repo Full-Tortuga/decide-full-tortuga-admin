@@ -36,6 +36,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install codacy-coverage
     - name: Copy local_settings
       run: |
         cp ./decide/local_settings.example.py ./decide/local_settings.py    
@@ -47,4 +48,29 @@ jobs:
     - name: Run tests     
       run: |
         cd decide
-        python manage.py test authentication
+        coverage run --branch --source=. ./manage.py test authentication --keepdb
+        coverage xml
+    - name: Codacy Coverage Reporter
+      uses: codacy/codacy-coverage-reporter-action@v1.1.0
+      with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: decide/coverage.xml
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: Heroku
+    steps:
+    - uses: actions/checkout@v1
+    - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+      with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "full-tortuga-4"
+          heroku_email: "bogdan.lorenzo11@gmail.com"
+          usedocker: true
+      env:
+        HD_DATABASE_NAME: ${{secrets.DATABASE_NAME}}
+        HD_DATABASE_HOST: ${{secrets.DATABASE_HOST}}
+        HD_DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
+        HD_DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+        HD_APP_URL: "https://full-tortuga-4.herokuapp.com"
