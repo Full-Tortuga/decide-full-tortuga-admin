@@ -43,7 +43,7 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME'),
         'CLIENT': {
            'host': os.environ.get('DATABASE_HOST'),
-           'username':  os.environ.get('DATABASE_USER'),
+           'username':  os.environ.get('DATABASE_USERNAME'),
            'password': os.environ.get('DATABASE_PASSWORD'),
 	       'SSL': 'true'
         }
