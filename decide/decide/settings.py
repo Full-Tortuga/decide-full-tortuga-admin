@@ -82,7 +82,12 @@ MODULES = [
     'visualizer',
     'voting','''
 
-BASEURL = 'http://localhost:8000'
+BASEURL = 'http://decide-full-tortuga-2.herokuapp.com/visualizer/'
+
+APIS = {}
+
+import django_heroku
+django_heroku.settings(locals())
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
