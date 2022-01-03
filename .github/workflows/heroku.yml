@@ -66,3 +66,8 @@ jobs:
           heroku_app_name: "full-tortuga-4"
           heroku_email: "bogdan.lorenzo11@gmail.com"
           usedocker: true
+      env:
+        HD_DATABASE_NAME: ${{secrets.DATABASE_NAME}}
+        HD_DATABASE_HOST: ${{secrets.DATABASE_NAME}}
+        HD_DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
+        HD_DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
