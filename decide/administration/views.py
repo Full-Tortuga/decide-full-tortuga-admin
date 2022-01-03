@@ -1,8 +1,6 @@
 from django.utils import timezone
-
 from django.shortcuts import render, get_object_or_404
 from rest_framework.status import *
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import parsers, renderers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -12,8 +10,6 @@ from base.models import Auth, Key
 from authentication.serializers import UserSerializer
 from administration.serializers import *
 from base.serializers import AuthSerializer, KeySerializer
-from decide import settings
-from decide.settings import BASEURL
 from voting.serializers import VotingSerializer
 from .serializers import CensusSerializer
 from base.perms import IsAdminAPI
@@ -29,8 +25,8 @@ class VotingAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
-        query = Voting.objects.all()
-        rest = VotingSerializer(query, many=True).data
+        votings = Voting.objects.all()
+        rest = VotingSerializer(votings, many=True).data
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
@@ -117,17 +113,14 @@ class VotingAPI(APIView):
             Voting.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
+
 class VotingsAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, voting_id):
-        try:
-            query = Voting.objects.filter(id=voting_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        rest = VotingSerializer(query).data
+        votings = get_object_or_404(Voting.objects.filter(id=voting_id))
+        rest = VotingSerializer(votings).data
         return Response(rest, status=HTTP_200_OK)
-
 
     def delete(self, request, voting_id):
         Voting.objects.all().filter(id=voting_id).delete()
@@ -138,8 +131,8 @@ class QuestionsAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
-        query = Question.objects.all()
-        rest = AdminQuestionSerializer(query, many=True).data
+        questions = Question.objects.all()
+        rest = AdminQuestionSerializer(questions, many=True).data
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
@@ -165,20 +158,17 @@ class QuestionAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, question_id):
-        try:
-            query = Question.objects.filter(id=question_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        rest = AdminQuestionSerializer(query).data
+        question = get_object_or_404(Question.objects.filter(id=question_id))
+        rest = AdminQuestionSerializer(question).data
         return Response(rest, status=HTTP_200_OK)
 
     def put(self, request, question_id):
-        obj = Question.objects.get(id=question_id)
-        serializer = AdminQuestionSerializer(obj, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        question = Question.objects.get(id=question_id)
+        question_serializer = AdminQuestionSerializer(question, data=request.data)
+        if question_serializer.is_valid():
+            question_serializer.save()
+            return Response(question_serializer.data, status=HTTP_200_OK)
+        return Response(question_serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     def delete(self, request, question_id):
         Question.objects.all().filter(id=question_id).delete()
@@ -189,8 +179,8 @@ class CensussAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
-        query = Census.objects.all().values()
-        return Response(query, status=HTTP_200_OK)
+        censuss = Census.objects.all().values()
+        return Response(censuss, status=HTTP_200_OK)
 
     def post(self, request):
         census = CensusSerializer(data=request.data)
@@ -214,73 +204,14 @@ class CensusAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, census_id):
-        try:
-            query = Census.objects.all().values().filter(id=census_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        return Response(query, status=HTTP_200_OK)
+        census = get_object_or_404(Census.objects.all().values().filter(id=census_id))
+        return Response(census, status=HTTP_200_OK)
 
     def put(self, request, census_id):
         if not CensusSerializer(data=request.data).is_valid():
             return Response({"result": "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
-            try:
-                census = Census.objects.all().filter(id=census_id).get()
-            except ObjectDoesNotExist:
-                return Response({}, status=HTTP_404_NOT_FOUND)
-            for key, value in request.data.items():
-                setattr(census, key, value)
-            census.save()
-            return Response({}, status=HTTP_200_OK)
-
-    def delete(self, request, census_id):
-        Census.objects.all().filter(id=census_id).delete()
-        return Response({}, status=HTTP_200_OK)
-
-
-class CensussAPI(APIView):
-    permission_classes = (IsAdminAPI,)
-
-    def get(self, request):
-        query = Census.objects.all().values()
-        return Response(query, status=HTTP_200_OK)
-
-    def post(self, request):
-        census = CensusSerializer(data=request.data)
-        if not census.is_valid():
-            return Response({"result", "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            census.save()
-            return Response({}, status=HTTP_200_OK)
-
-    def delete(self, request):
-        if request.data.get("idList") is None:
-            Census.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
-        else:
-            ids = request.data.get("idList")
-            Census.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
-
-
-class CensusAPI(APIView):
-    permission_classes = (IsAdminAPI,)
-
-    def get(self, request, census_id):
-        try:
-            query = Census.objects.all().values().filter(id=census_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        return Response(query, status=HTTP_200_OK)
-
-    def put(self, request, census_id):
-        if not CensusSerializer(data=request.data).is_valid():
-            return Response({"result": "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            try:
-                census = Census.objects.all().filter(id=census_id).get()
-            except ObjectDoesNotExist:
-                return Response({}, status=HTTP_404_NOT_FOUND)
+            census = get_object_or_404(Census.objects.all().filter(id=census_id))
             for key, value in request.data.items():
                 setattr(census, key, value)
             census.save()
@@ -295,8 +226,8 @@ class AuthsAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
-        query = Auth.objects.all().values()
-        return Response(query, status=HTTP_200_OK)
+        auths = Auth.objects.all().values()
+        return Response(auths, status=HTTP_200_OK)
 
     def post(self, request):
         auth = AuthSerializer(data=request.data)
@@ -321,20 +252,14 @@ class AuthAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, auth_id):
-        try:
-            query = Auth.objects.all().values().filter(id=auth_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        return Response(query, status=HTTP_200_OK)
+        auth = get_object_or_404(Auth.objects.all().values().filter(id=auth_id))
+        return Response(auth, status=HTTP_200_OK)
 
     def put(self, request, auth_id):
         if not AuthSerializer(data=request.data).is_valid():
             return Response({"result": "Auth object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
-            try:
-                auth = Auth.objects.all().filter(id=auth_id).get()
-            except ObjectDoesNotExist:
-                return Response({}, status=HTTP_404_NOT_FOUND)
+            auth = get_object_or_404(Auth.objects.all().filter(id=auth_id))
             for key, value in request.data.items():
                 setattr(auth, key, value)
             auth.save()
@@ -349,8 +274,8 @@ class KeysAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
-        query = Key.objects.all().values()
-        return Response(query, status=HTTP_200_OK)
+        keys = Key.objects.all().values()
+        return Response(keys, status=HTTP_200_OK)
 
     def post(self, request):
         key = KeySerializer(data=request.data)
@@ -375,20 +300,14 @@ class KeyAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, key_id):
-        try:
-            query = Key.objects.all().values().filter(id=key_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        return Response(query, status=HTTP_200_OK)
+        key = get_object_or_404(Key.objects.all().values().filter(id=key_id))
+        return Response(key, status=HTTP_200_OK)
 
     def put(self, request, key_id):
         if not KeySerializer(data=request.data).is_valid():
             return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
         else:
-            try:
-                keym = Key.objects.all().filter(id=key_id).get()
-            except ObjectDoesNotExist:
-                return Response({}, status=HTTP_404_NOT_FOUND)
+            keym = get_object_or_404(Key.objects.all().filter(id=key_id))
             for key, value in request.data.items():
                 setattr(keym, key, value)
             keym.save()
@@ -403,8 +322,8 @@ class UsersAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request):
-        query = User.objects.all()
-        rest = UserAdminSerializer(query, many=True).data
+        users = User.objects.all()
+        rest = UserAdminSerializer(users, many=True).data
         return Response(rest, status=HTTP_200_OK)
 
     def post(self, request):
@@ -432,20 +351,14 @@ class UserAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, user_id):
-        try:
-            query = User.objects.filter(id=user_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
-        rest = UserAdminSerializer(query).data
+        user = get_object_or_404(User.objects.filter(id=user_id))
+        rest = UserAdminSerializer(user).data
         return Response(rest, status=HTTP_200_OK)
 
     def put(self, request, user_id):
         user_update = UserUpdateSerializer(data=request.data)
         is_valid(user_update.is_valid(), "User object is not valid")
-        try:
-            user = User.objects.filter(id=user_id).get()
-        except ObjectDoesNotExist:
-            return Response({}, status=HTTP_404_NOT_FOUND)
+        user = get_object_or_404(User.objects.filter(id=user_id))
         for key, value in request.data.items():
             if value:
                 setattr(user, key, value)
