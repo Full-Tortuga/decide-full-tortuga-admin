@@ -82,6 +82,8 @@ MODULES = [
     'visualizer',
     'voting','''
 
+BASEURL = 'http://decide-full-tortuga-2.herokuapp.com/'
+
 APIS = {
     'authentication': BASEURL,
     'base': BASEURL,
@@ -93,8 +95,6 @@ APIS = {
     'visualizer': BASEURL,
     'voting': BASEURL,
 }
-
-BASEURL = 'http://decide-full-tortuga-2.herokuapp.com/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
