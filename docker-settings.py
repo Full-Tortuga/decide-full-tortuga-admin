@@ -8,18 +8,19 @@ STATIC_ROOT = '/app/static/'
 MEDIA_ROOT = '/app/static/media/'
 ALLOWED_HOSTS = ['*']
 
-BASEURL = 'http://localhost'
+
+BASEURL = os.environ.get('APP_URL')
 
 APIS = {
-    'authentication': 'http://localhost',
-    'base': 'http://localhost',
-    'booth': 'http://localhost',
-    'census': 'http://localhost',
-    'mixnet': 'http://localhost',
-    'postproc': 'http://localhost',
-    'store': 'http://localhost',
-    'visualizer': 'http://localhost',
-    'voting': 'http://localhost',
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
 }
 
 
@@ -43,7 +44,7 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME'),
         'CLIENT': {
            'host': os.environ.get('DATABASE_HOST'),
-           'username':  os.environ.get('DATABASE_USER'),
+           'username':  os.environ.get('DATABASE_USERNAME'),
            'password': os.environ.get('DATABASE_PASSWORD'),
 	       'SSL': 'true'
         }
@@ -76,6 +77,6 @@ AUTH_LDAP_USER_ATTR_MAP = {
 
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'base.backends.AuthBackend',
 ]
 
