@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install linux dependencies
         run: |
-          apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
+          sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
