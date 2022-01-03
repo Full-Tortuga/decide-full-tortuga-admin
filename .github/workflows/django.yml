@@ -19,6 +19,10 @@ jobs:
         image: mongo:3.4.23
         ports:
           - 27017:27017
+      ldap:
+        image: ldap/openldap:2.4.45
+        ports:
+          - 389:389
 
     steps:
       - uses: actions/checkout@v2
