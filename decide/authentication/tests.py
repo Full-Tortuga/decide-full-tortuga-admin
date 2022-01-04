@@ -353,7 +353,6 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         self.driver.find_element_by_name('username').send_keys("noadmin")
         self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
         
-        print(self.driver.current_url)
         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
 
 
