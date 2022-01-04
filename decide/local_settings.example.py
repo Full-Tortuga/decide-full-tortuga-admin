@@ -66,6 +66,6 @@ AUTH_LDAP_USER_ATTR_MAP = {
 
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'base.backends.AuthBackend',
 ]
 
