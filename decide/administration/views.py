@@ -128,6 +128,39 @@ class VotingsAPI(APIView):
         rest = VotingSerializer(query).data
         return Response(rest, status=HTTP_200_OK)
 
+    def put(self, request, voting_id):
+        if not AdminVotingSerializer(data=request.data).is_valid():
+            return Response({"result": "Voting object is not valid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            voting = get_object_or_404(Voting.objects.all().filter(id=voting_id))
+            voting_seria = VotingSerializer(voting)
+            voting.name = request.data.get("name")
+            voting.desc = request.data.get("desc")
+            voting.auth = request.data.get("auth")
+            voting.census = request.data.get("census")
+            question_request = request.data.get("question")
+            voting.question.desc = question_request["desc"]
+            options = QuestionOption.objects.all().filter(question__pk=voting.question.id)
+            options_request = question_request.get("options")
+            tam = max(len(options),len(options_request))
+            for i in range(0, tam):
+                if i < len(options) and i < len(options_request):
+                    option = options[i]
+                    option.number = options_request[i].get("number", option.number)
+                    option.option = options_request[i].get("option", option.option)
+                    option.save()
+                else:
+                    if len(options) > len(options_request):
+                        option = options[i]
+                        option.delete()
+                    else:
+                        opt = QuestionOption(question=voting.question,
+                                             number=options_request[i].get("number"),
+                                             option=options_request[i].get("option"))
+                        opt.save()
+            voting.question.save()
+            voting.save()
+            return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, voting_id):
         Voting.objects.all().filter(id=voting_id).delete()
