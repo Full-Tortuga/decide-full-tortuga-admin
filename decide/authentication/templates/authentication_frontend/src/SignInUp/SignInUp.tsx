@@ -3,7 +3,7 @@ import './index.css';
 import LoginBox from './Login';
 import RegisterBox from './Register';
 
-class App extends React.Component<any,State>{
+class SignInUp extends React.Component<any,State>{
 
   constructor(props:any) {
     super(props);
@@ -25,6 +25,10 @@ class App extends React.Component<any,State>{
     console.log(this.state)
     return (
       <div className="root-container">
+        <div id="error-box">
+          <span id="error-msg"> </span>
+        </div>
+
         <div className="box-container">
           {this.state.isLoginOpen && <LoginBox/>}
           {this.state.isRegisterOpen && <RegisterBox/>}
@@ -61,4 +65,4 @@ interface State{
   isRegisterOpen: boolean,
   isLoginOpen: boolean
 }
-export default App;
+export default SignInUp;

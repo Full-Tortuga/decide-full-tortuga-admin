@@ -173,3 +173,23 @@ body,
 .show {
     visibility: visible;
 }
+
+#error-box{
+    display: none;
+}
+
+#error-box.active{
+    display: table;
+    background-color: #e07266;
+    border: 1px solid #e74c3c;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    width: 30vw;
+    text-align: center;
+}
+
+#error-box span{
+    display:table-cell;
+    vertical-align:middle;
+}

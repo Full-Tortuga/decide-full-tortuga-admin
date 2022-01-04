@@ -1,11 +1,13 @@
+from django.db.models.fields import EmailField
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-    HTTP_401_UNAUTHORIZED,
-    HTTP_500_INTERNAL_SERVER_ERROR
+        HTTP_200_OK,
+        HTTP_201_CREATED,
+        HTTP_400_BAD_REQUEST,
+        HTTP_401_UNAUTHORIZED,
+        HTTP_500_INTERNAL_SERVER_ERROR,
+        HTTP_302_FOUND
 )
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
@@ -22,6 +24,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import TemplateView
 
 from .serializers import UserSerializer
+from django.urls import reverse
+from django.db import models
 
 import ldap
 from local_settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD
@@ -51,7 +55,6 @@ class RegisterView(APIView):
         tk = get_object_or_404(Token, key=key)
         if not tk.user.is_superuser:
             return Response({}, status=HTTP_401_UNAUTHORIZED)
-
         username = request.data.get('username', '')
         pwd = request.data.get('password', '')
         if not username or not pwd:
@@ -124,8 +127,36 @@ class LDAPSignInView(LoginView):
 
 
 class SignInView(LoginView):
-    template_name = 'index.html'
+    template_name = 'form.html'
 
+class RegisterUserView(APIView):
+    def post(self, request):
+        username = request.data.get('username', '')
+        email= request.data.get('email','')
+        firstname = request.data.get('firstname','')
+        lastname = request.data.get('lastname','')
+        pwd = request.data.get('password', '')
+        pwd2 = request.data.get('password2','')
+        if not pwd==pwd2:
+            response = Response({'error': 'Contraseñas no coinciden'}, HTTP_400_BAD_REQUEST)
+            response['Location'] = reverse('sign_in')
+            return response
+        if User.objects.filter(username=username).count() > 0:
+            response = Response({'error': 'Ya existe este nombre de usuario', 'username': username}, HTTP_400_BAD_REQUEST)
+            response['Location'] = reverse('sign_in')
+            return response
+
+        try:
+            user = User(username=username,email=email,first_name=firstname,last_name=lastname)
+            user.set_password(pwd)
+            user.save()
+            token, _ = Token.objects.get_or_create(user=user)
+        except IntegrityError:
+            return Response({}, status=HTTP_400_BAD_REQUEST)
+        response = Response({'user_pk': user.pk, 'token': token.key}, HTTP_302_FOUND)
+        response['Location'] = reverse('sign_in')
+        
+        return response
 
 class BienvenidaView(TemplateView):
    template_name = 'welcome.html'
