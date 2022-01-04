@@ -1,5 +1,5 @@
 import { axios } from "api/axios";
-import { Question, Voting } from "types/voting";
+import { votingType } from "types";
 
 
 const votingApi = {
@@ -12,8 +12,8 @@ const votingApi = {
     
     //Individual Operations
     getQuestion: (question_id: number) => axios.get(`/voting/question/${question_id}`),
-    createQuestion: (question: Question) => axios.post("/voting/question/", question),
-    updateQuestion: (question: Question, question_id: number) => axios.put(`/voting/question/${question_id}`, question),
+    createQuestion: (question: votingType.Question) => axios.post("/voting/question/", question),
+    updateQuestion: (question: votingType.Question, question_id: number) => axios.put(`/voting/question/${question_id}`, question),
     deleteQuestion: (question_id: number) => axios.delete(`/voting/question/${question_id}`),  
 
 
@@ -49,7 +49,7 @@ const votingApi = {
     
     //Individual Operations
     getVoting: (voting_id: number) => axios.get(`/votings/${voting_id}`),
-    createVoting: (voting: Voting) => axios.post("/votings", voting),
+    createVoting: (voting: votingType.VotingFormFields) => axios.post("/votings", voting),
     deleteVoting: (voting_id: number) => axios.delete(`/votings/${voting_id}`),  
 };
 

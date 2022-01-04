@@ -1,81 +1,16 @@
 import React from "react";
-import { Delete, Refresh } from "@mui/icons-material";
+import { Delete, Refresh, PlayArrow, Pause } from "@mui/icons-material";
 
 import { votingType } from "types";
+import { votingApi } from "api"
 
 import { ActionBar } from "components/03-organisms";
 import { VotingTable, VotingForm } from "components/templates";
 import Page from "../page";
-
-const rows = [
-  {
-    id: 1,
-    name: "Votacion 1",
-    desc: "Jon",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 2,
-    name: "Votacion 2",
-    desc: "Cersei",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 3,
-    name: "Votacion 3",
-    desc: "Jaime",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 4,
-    name: "Votacion 4",
-    desc: "Arya",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 5,
-    name: "Votacion 5",
-    desc: "Daenerys",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 6,
-    name: "Votacion 6",
-    desc: "Saliba",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 7,
-    name: "Votacion 7",
-    desc: "Ferrara",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 8,
-    name: "Votacion 8",
-    desc: "Rossini",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 9,
-    name: "Votacion 9",
-    desc: "Harvey",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-];
+import { utils } from "utils";
 
 const VotingsPage = () => {
-  const [votings, setVotings] = React.useState<votingType.Voting[]>(rows);
-
+  const [votings, setVotings] = React.useState<votingType.Voting[]>([]);
   const [selected, setSelected] = React.useState([]);
   const [refetch, setRefetch] = React.useState(false);
 
@@ -84,22 +19,45 @@ const VotingsPage = () => {
   };
 
   React.useEffect(() => {
-    //votingApi
-    //.getVotings()
-    //.then((response) => {
-    // console.log(response);
-    //  setVotings(response.data);
-    //  })
-    //.catch((error) => {
-    //   console.log(error);
-    // });
-    setVotings(rows);
+    votingApi
+    .getVotings()
+    .then((response) => {
+     console.log(response);
+     //response.data.setAttribute("status", utils.getStatus(response.data));
+      setVotings(response.data);
+      })
+    .catch((error) => {
+       console.log(error);
+     });
   }, [refetch]);
 
   const idList = React.useMemo(
     () => selected.map((voting: votingType.Voting) => voting.id),
     [selected]
   );
+
+  //See if votings have the same status
+  // const selectionState = React.useMemo(() => {
+  //   const checkOptions = (active: number) => {
+  //     if (active === selected.length && selected.length > 0) return "true";
+  //     else if (active === 0) return "false";
+  //     else return "mixed";
+  //   };
+
+  //   const activeNumber = selected.filter(
+  //     (user: userType.User) => user.is_active
+  //   ).length;
+  //   const staffNumber = selected.filter(
+  //     (user: userType.User) => user.is_staff
+  //   ).length;
+  //   const suNumber = selected.filter(
+  //     (user: userType.User) => user.is_superuser
+  //   ).length;
+
+  //   return {
+  //     active: getStatus(votings),
+  //   };
+  // }, [selected]);
 
   const handleDelete = () => {
     // todo: remove this 2 lines and uncomment the lines after
@@ -114,13 +72,14 @@ const VotingsPage = () => {
   return (
     <>
       <Page title="Votings">
-        <VotingTable votings={votings || rows} setSelected={setSelected} />
+        <VotingTable votings={votings} setSelected={setSelected} />
       </Page>
       <ActionBar
         selection={selected}
         actions={[
           <VotingForm
             initialVoting={selected.length === 1 ? selected[0] : undefined}
+            refetch={refetchVotings}
           />,
         ]}
         individualActions={[
@@ -139,6 +98,25 @@ const VotingsPage = () => {
               handleDelete();
             },
           },
+          // {
+          //   icon:
+          //     selectionState.active === "true" ? (
+          //       <Pause color="warning" />
+          //     ) : (
+          //       <PlayArrow />
+          //     ),
+          //   title:
+          //     selectionState.active === "true"
+          //       ? "Mark as Inactive"
+          //       : "Mark as Active",
+          //   disabled: selectionState.active === "mixed",
+          //   onClick: () => {
+          //     console.log("switch active");
+          //     // selectionState.active === "true"
+          //     //   ? handleChangeActive(false)
+          //     //   : handleChangeActive(true);
+          //   },
+          // },
         ]}
       />
     </>

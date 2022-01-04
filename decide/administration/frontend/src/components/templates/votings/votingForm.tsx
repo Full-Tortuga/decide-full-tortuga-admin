@@ -3,12 +3,14 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Add, Edit } from "@mui/icons-material";
 
 import { votingType } from "types";
+import { votingApi } from "api";
+import { utils } from "utils";
 
 import { Input } from "components/01-atoms";
 import { Modal, ModalPage } from "components/02-molecules";
 import { CensusInput, QuestionInput } from ".";
 
-const Component = (props: { initialVoting?: votingType.Voting }) => {
+const Component = (props: { initialVoting?: votingType.Voting; refetch: () => void; }) => {
   const editMode = React.useMemo(
     () => !!props.initialVoting?.id,
     [props.initialVoting]
@@ -48,11 +50,27 @@ const Component = (props: { initialVoting?: votingType.Voting }) => {
     setError("name", { type: "manual", message: e });
   };
 
+  const onSubmitSuccess = () => {
+    setSent(!sent);
+    props.refetch();
+    reset({});
+  };
+
   const onSubmit: SubmitHandler<votingType.VotingFormFields> = (data) => {
     console.log("submit:", data);
-    setSent(true);
-
-    onSubmitFailed("not failed");
+    if (Object.keys(errors).length === 0)
+      if (editMode && props.initialVoting?.id) {
+        console.log("fallo")
+       // votingApi
+       //   .updateVoting(props.initialVoting?.id, data)
+         // .then(() => onSubmitSuccess())
+          //.catch((error) => onSubmitFailed(utils.parseErrors(error)));
+      } else {
+        votingApi
+          .createVoting(data)
+          .then(() => onSubmitSuccess())
+          .catch((error) => onSubmitFailed(utils.parseErrors(error)));
+      }
   };
 
   return (

@@ -22,6 +22,12 @@ const columns: GridColDef[] = [
     minWidth: 250,
   },
   {
+    //TODO GET QUESTION DESCRIPTION AND OPTIONS
+    field: "question.desc",
+    headerName: "Question",
+    minWidth: 250,
+  },
+  {
     field: "start_date",
     headerName: "Start",
     minWidth: 140,
