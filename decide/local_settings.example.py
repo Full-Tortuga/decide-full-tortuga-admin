@@ -1,4 +1,3 @@
-
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
@@ -14,7 +13,6 @@ CORS_ORIGIN_WHITELIST = (
 CSRF_TRUSTED_ORIGINS = [
     BASEURL, FE_BASEURL
 ]
-
 
 # Modules in use, commented modules that you won't use
 MODULES = [

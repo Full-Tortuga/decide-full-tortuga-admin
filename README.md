@@ -67,7 +67,8 @@ fichero requirements.txt:
     pip install -r requirements.txt
 
 En caso de fallo al instalar las dependencias, es necesario instalas el paquete wheel y volver al comando anterior:
-pip install wheel
+    
+    pip install wheel
 
 Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
@@ -79,7 +80,7 @@ A continuación, entramos en la carpeta del panel (cd decide_panel) y ejecutamos
 
     npm install
 
-Situados en el directorio raíz del proyecto, entramos en la carpeta del proyecto (cd decide) y
+Situados en el directorio raíz del proyecto, entramos en la carpeta del proyecto (cd decide) y 
 realizamos la primera migración para preparar la base de datos que utilizaremos:
 
     ./manage.py makemigrations
@@ -133,17 +134,16 @@ docker run  -p 389:389 \
 
 Para verificar que el contenedor está corriendo correctamente el servicio slapd, pruebe el siguiente
 comando en su máquina HOST.
-
 ```sh
-ldapsearch -x -b "dc=decide, dc=org" -H ldap://:389
+ldapsearch -x -b "dc=decide, dc=org" -H ldap://:389 
 ```
-
 La consola debe de devolver:
 \# extended LDIF
 \#
 \# LDAPv3
 \# base <dc=decide, dc=org> with scope subtree
-\# filter: (objectclass=\*)
+
+\# filter: (objectclass=*)
 \# requesting: ALL
 \#
 
@@ -274,6 +274,7 @@ Puede probar que funcione haciendo una petición desde Postman
 ---
 
 ## Ejecutar con docker
+
 
 Existe una configuración de docker compose que lanza 3 contenedores, uno
 para el servidor de base de datos, otro para el django y otro con un
