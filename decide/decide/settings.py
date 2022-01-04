@@ -82,7 +82,7 @@ MODULES = [
     'visualizer',
     'voting','''
 
-BASEURL = 'http://decide-full-tortuga-2.herokuapp.com/'
+BASEURL = 'http://decide-full-tortuga-2.herokuapp.com'
 
 APIS = {
     'authentication': BASEURL,
