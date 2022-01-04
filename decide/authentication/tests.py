@@ -6,6 +6,16 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
 from base import mods
+from django.test import TestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+
+from base.tests import BaseTestCase
 
 from local_settings import AUTH_LDAP_SERVER_URI
 
@@ -24,8 +34,20 @@ class AuthTestCase(APITestCase):
         u2.is_superuser = True
         u2.save()
 
+        self.base = BaseTestCase()
+        self.base.setUp()
+
+        options = webdriver.ChromeOptions()
+        options.headless = True
+        self.driver = webdriver.Chrome(options=options)
+        super().setUp()
+
     def tearDown(self):
         self.client = None
+        super().tearDown()
+        self.driver.quit()
+
+        self.base.tearDown()
 
     def test_login(self):
         data = {'username': 'voter1', 'password': '123'}
@@ -300,12 +322,6 @@ class AuthTestCase(APITestCase):
             '/authentication/login_form/', data_login, format='json')
         self.assertEqual(response.status_code, 200)
 
-    # def test_loginuser_negative_form(self):
-    #     data_login = {'username':'noUser', 'password': 'nopwd'}
-    #     response = self.client.post(
-    #         '/authentication/login_form/', data_login, format='json')
-    #     self.assertEqual(response.status_code, 400)
-
     def test_registeruser_existingusername(self):
         data_login = {'username':'voter1', 'password': '123456', 'password2':'123456'}
         response = self.client.post(
@@ -313,6 +329,8 @@ class AuthTestCase(APITestCase):
         msg = response.json()['error']
         self.assertEqual(msg, 'Ya existe este nombre de usuario')
         self.assertEqual(response.status_code, 400)
+
+    
 
     #
     #   TODO: Arreglar tests, estos tests asumen que el sistema ya tiene registrado un usuario 'foobar' en ldap,
