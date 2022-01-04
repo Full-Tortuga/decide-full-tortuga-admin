@@ -31,32 +31,30 @@ class VotingAPI(APIView):
 
     def post(self, request):
         voting_seria = AdminVotingSerializer(data=request.data)
-        if not voting_seria.is_valid():
-            return Response({"result", "Voting object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            auth_url = request.data.get("auth")
-            id_users = request.data.get("census")
-            auth, _ = Auth.objects.get_or_create(url=auth_url,
-                                                 defaults={'me': True, 'name': 'test auth'})
-            question = Question(desc=request.data.get('question').get("desc"))
-            question.save()
-            options = request.data.get('question').get("options")
-            for opt in options:
-                option = QuestionOption(question=question, option=opt.get("option"), number=opt.get("number"))
-                option.save()
-            voting = Voting(name=request.data.get("name"), desc=request.data.get("desc"),
-                            question=question)
-            voting.save()
-            voting.auths.add(auth)
-            voting_id = voting.id
-            if id_users is None:
-                users = User.objects.all()
-                id_users = [user.id for user in users]
-            if len(id_users) > 0:
-                for voter_id in id_users:
-                    census = Census(voting_id=voting_id, voter_id=voter_id)
-                    census.save()
-            return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
+        is_valid(voting_seria.is_valid(),voting_seria.errors)
+        auth_url = request.data.get("auth")
+        id_users = request.data.get("census")
+        auth, _ = Auth.objects.get_or_create(url=auth_url,
+                                             defaults={'me': True, 'name': 'test auth'})
+        question = Question(desc=request.data.get('question').get("desc"))
+        question.save()
+        options = request.data.get('question').get("options")
+        for opt in options:
+            option = QuestionOption(question=question, option=opt.get("option"), number=opt.get("number"))
+            option.save()
+        voting = Voting(name=request.data.get("name"), desc=request.data.get("desc"),
+                        question=question)
+        voting.save()
+        voting.auths.add(auth)
+        voting_id = voting.id
+        if id_users is None:
+            users = User.objects.all()
+            id_users = [user.id for user in users]
+        if len(id_users) > 0:
+            for voter_id in id_users:
+                census = Census(voting_id=voting_id, voter_id=voter_id)
+                census.save()
+        return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
 
     def put(self, request):
 
@@ -123,38 +121,36 @@ class VotingsAPI(APIView):
         return Response(rest, status=HTTP_200_OK)
 
     def put(self, request, voting_id):
-        if not AdminVotingSerializer(data=request.data).is_valid():
-            return Response({"result": "Voting object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            voting = get_object_or_404(Voting.objects.all().filter(id=voting_id))
-            voting_seria = VotingSerializer(voting)
-            voting.name = request.data.get("name")
-            voting.desc = request.data.get("desc")
-            voting.auth = request.data.get("auth")
-            voting.census = request.data.get("census")
-            question_request = request.data.get("question")
-            voting.question.desc = question_request["desc"]
-            options = QuestionOption.objects.all().filter(question__pk=voting.question.id)
-            options_request = question_request.get("options")
-            tam = max(len(options),len(options_request))
-            for i in range(0, tam):
-                if i < len(options) and i < len(options_request):
+        seria = AdminVotingSerializer(data=request.data)
+        is_valid(seria.is_valid(), seria.errors)
+        voting = get_object_or_404(Voting.objects.all().filter(id=voting_id))
+        voting.name = request.data.get("name")
+        voting.desc = request.data.get("desc")
+        voting.auth = request.data.get("auth")
+        voting.census = request.data.get("census")
+        question_request = request.data.get("question")
+        voting.question.desc = question_request["desc"]
+        options = QuestionOption.objects.all().filter(question__pk=voting.question.id)
+        options_request = question_request.get("options")
+        tam = max(len(options),len(options_request))
+        for i in range(0, tam):
+            if i < len(options) and i < len(options_request):
+                option = options[i]
+                option.number = options_request[i].get("number", option.number)
+                option.option = options_request[i].get("option", option.option)
+                option.save()
+            else:
+                if len(options) > len(options_request):
                     option = options[i]
-                    option.number = options_request[i].get("number", option.number)
-                    option.option = options_request[i].get("option", option.option)
-                    option.save()
+                    option.delete()
                 else:
-                    if len(options) > len(options_request):
-                        option = options[i]
-                        option.delete()
-                    else:
-                        opt = QuestionOption(question=voting.question,
-                                             number=options_request[i].get("number"),
-                                             option=options_request[i].get("option"))
-                        opt.save()
-            voting.question.save()
-            voting.save()
-            return Response({}, status=HTTP_200_OK)
+                    opt = QuestionOption(question=voting.question,
+                                         number=options_request[i].get("number"),
+                                         option=options_request[i].get("option"))
+                    opt.save()
+        voting.question.save()
+        voting.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, voting_id):
         Voting.objects.all().filter(id=voting_id).delete()
@@ -171,11 +167,9 @@ class QuestionsAPI(APIView):
 
     def post(self, request):
         question = AdminQuestionSerializer(data=request.data)
-        if not question.is_valid():
-            return Response({"result", "AdminQuestion object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            question.save()
-            return Response({}, status=HTTP_200_OK)
+        is_valid(question.is_valid(),question.errors)
+        question.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -199,10 +193,9 @@ class QuestionAPI(APIView):
     def put(self, request, question_id):
         question = Question.objects.get(id=question_id)
         question_serializer = AdminQuestionSerializer(question, data=request.data)
-        if question_serializer.is_valid():
-            question_serializer.save()
-            return Response(question_serializer.data, status=HTTP_200_OK)
-        return Response(question_serializer.errors, status=HTTP_400_BAD_REQUEST)
+        is_valid(question_serializer.is_valid(), question_serializer.errors)
+        question_serializer.save()
+        return Response(question_serializer.data, status=HTTP_200_OK)
 
     def delete(self, request, question_id):
         Question.objects.all().filter(id=question_id).delete()
@@ -218,11 +211,9 @@ class CensussAPI(APIView):
 
     def post(self, request):
         census = CensusSerializer(data=request.data)
-        if not census.is_valid():
-            return Response({"result", "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            census.save()
-            return Response({}, status=HTTP_200_OK)
+        is_valid(census.is_valid(), census.errors)
+        census.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -242,14 +233,13 @@ class CensusAPI(APIView):
         return Response(census, status=HTTP_200_OK)
 
     def put(self, request, census_id):
-        if not CensusSerializer(data=request.data).is_valid():
-            return Response({"result": "Census object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            census = get_object_or_404(Census.objects.all().filter(id=census_id))
-            for key, value in request.data.items():
-                setattr(census, key, value)
-            census.save()
-            return Response({}, status=HTTP_200_OK)
+        census_seria = CensusSerializer(data=request.data)
+        is_valid(census_seria.is_valid(), census_seria.errors)
+        census = get_object_or_404(Census.objects.all().filter(id=census_id))
+        for key, value in request.data.items():
+            setattr(census, key, value)
+        census.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, census_id):
         Census.objects.all().filter(id=census_id).delete()
@@ -265,11 +255,9 @@ class AuthsAPI(APIView):
 
     def post(self, request):
         auth = AuthSerializer(data=request.data)
-        if not auth.is_valid():
-            return Response({"result", "Auth object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            auth.save()
-            return Response({}, status=HTTP_200_OK)
+        is_valid(auth.is_valid(), auth.errors)
+        auth.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -290,14 +278,13 @@ class AuthAPI(APIView):
         return Response(auth, status=HTTP_200_OK)
 
     def put(self, request, auth_id):
-        if not AuthSerializer(data=request.data).is_valid():
-            return Response({"result": "Auth object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            auth = get_object_or_404(Auth.objects.all().filter(id=auth_id))
-            for key, value in request.data.items():
-                setattr(auth, key, value)
-            auth.save()
-            return Response({}, status=HTTP_200_OK)
+        auth_seria = AuthSerializer(data=request.data)
+        is_valid(auth_seria.is_valid(), auth_seria.errors)
+        auth = get_object_or_404(Auth.objects.all().filter(id=auth_id))
+        for key, value in request.data.items():
+            setattr(auth, key, value)
+        auth.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, auth_id):
         Auth.objects.all().filter(id=auth_id).delete()
@@ -313,11 +300,9 @@ class KeysAPI(APIView):
 
     def post(self, request):
         key = KeySerializer(data=request.data)
-        if not key.is_valid():
-            return Response({"result", "Key object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            key.save()
-            return Response({}, status=HTTP_200_OK)
+        is_valid(key.is_valid(), key.errors)
+        key.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -338,14 +323,13 @@ class KeyAPI(APIView):
         return Response(key, status=HTTP_200_OK)
 
     def put(self, request, key_id):
-        if not KeySerializer(data=request.data).is_valid():
-            return Response({"result": "User object is not valid"}, status=HTTP_400_BAD_REQUEST)
-        else:
-            keym = get_object_or_404(Key.objects.all().filter(id=key_id))
-            for key, value in request.data.items():
-                setattr(keym, key, value)
-            keym.save()
-            return Response({}, status=HTTP_200_OK)
+        key_seria = KeySerializer(data=request.data)
+        is_valid(key_seria.is_valid(), key_seria.errors)
+        keym = get_object_or_404(Key.objects.all().filter(id=key_id))
+        for key, value in request.data.items():
+            setattr(keym, key, value)
+        keym.save()
+        return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, key_id):
         Key.objects.all().filter(id=key_id).delete()
@@ -362,7 +346,7 @@ class UsersAPI(APIView):
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-        is_valid(serializer.is_valid(), "User object is not valid")
+        is_valid(serializer.is_valid(), serializer.errors)
         fields = request.data
         user = User(username=fields['username'], first_name=fields['first_name'],
                     last_name=fields['last_name'], email=fields['email'], is_staff=False)
@@ -391,7 +375,7 @@ class UserAPI(APIView):
 
     def put(self, request, user_id):
         user_update = UserUpdateSerializer(data=request.data)
-        is_valid(user_update.is_valid(), "User object is not valid")
+        is_valid(user_update.is_valid(), user_update.errors)
         user = get_object_or_404(User.objects.filter(id=user_id))
         for key, value in request.data.items():
             if value:
