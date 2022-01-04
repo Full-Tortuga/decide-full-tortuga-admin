@@ -4,21 +4,16 @@ from rest_framework.test import APITestCase
 
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-
-from base import mods
-from django.test import TestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-
 from base.tests import BaseTestCase
+from base import mods
 
 from local_settings import AUTH_LDAP_SERVER_URI
-
 
 class AuthTestCase(APITestCase):
 
@@ -34,20 +29,8 @@ class AuthTestCase(APITestCase):
         u2.is_superuser = True
         u2.save()
 
-        self.base = BaseTestCase()
-        self.base.setUp()
-
-        options = webdriver.ChromeOptions()
-        options.headless = True
-        self.driver = webdriver.Chrome(options=options)
-        super().setUp()
-
     def tearDown(self):
         self.client = None
-        super().tearDown()
-        self.driver.quit()
-
-        self.base.tearDown()
 
     def test_login(self):
         data = {'username': 'voter1', 'password': '123'}
@@ -330,8 +313,6 @@ class AuthTestCase(APITestCase):
         self.assertEqual(msg, 'Ya existe este nombre de usuario')
         self.assertEqual(response.status_code, 400)
 
-    
-
     #
     #   TODO: Arreglar tests, estos tests asumen que el sistema ya tiene registrado un usuario 'foobar' en ldap,
     #   lo cual es erroneo, tiene que registrarse dicho usuario en el setup de los tests
@@ -346,3 +327,47 @@ class AuthTestCase(APITestCase):
     #     response = self.client.post(
     #         '/authentication/loginLDAP/', body_form, format='json')
     #     self.assertEqual(response.status_code, 400)
+
+
+
+class SeleniumTestCase(StaticLiveServerTestCase):
+
+    def setUp(self):
+        self.base = BaseTestCase()
+        self.base.setUp()
+
+        options = webdriver.ChromeOptions()
+        # options.headless = True
+        self.driver = webdriver.Chrome(options=options)
+
+        super().setUp()            
+            
+    def tearDown(self):           
+        super().tearDown()
+        self.driver.quit()
+
+        self.base.tearDown()
+
+    def test_login_success(self):                    
+        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+        self.driver.find_element_by_name('username').send_keys("noadmin")
+        self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
+        
+        print(self.driver.current_url)
+        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+
+
+    def test_register_user(self):
+        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+        self.driver.find_elements_by_class_name("controller")[1].click()
+
+        self.driver.find_element_by_name('username').send_keys("userUser")
+        self.driver.find_element_by_name('password').send_keys("asd123")
+        self.driver.find_element_by_name('password2').send_keys("asd123",Keys.ENTER)
+
+        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+
+        self.driver.find_element_by_name('username').send_keys("userUser")
+        self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
+        
+        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
