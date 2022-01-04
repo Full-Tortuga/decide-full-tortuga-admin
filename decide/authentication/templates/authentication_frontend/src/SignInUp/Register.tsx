@@ -48,7 +48,7 @@ class RegisterBox extends React.Component {
   
             <div className="input-group">
               <label htmlFor="email">Email</label>
-              <input type="text" name="email" className="login-input" placeholder="Email"/>
+              <input type="email" name="email" className="login-input" placeholder="Email"/>
             </div>
   
             <div className="input-group">
