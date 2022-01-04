@@ -193,12 +193,12 @@ KEYBITS = 256
 # Versioning
 ALLOWED_VERSIONS = ['v1', 'v2']
 DEFAULT_VERSION = 'v1'
-
+'''
 try:
     from local_settings import *
 except ImportError:
     print("local_settings.py not found")
-
+'''
 # loading jsonnet config
 if os.path.exists("config.jsonnet"):
     import json
