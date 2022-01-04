@@ -36,7 +36,7 @@ class AdminQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('id', 'desc', 'options')
-        depht = 1
+        depth = 1
 
     def create(self, validated_data):
         options_data = validated_data.pop("options")
