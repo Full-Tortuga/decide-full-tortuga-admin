@@ -54,7 +54,7 @@ class AuthTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         user = response.json()
-        self.assertEqual(user['id'], 1)
+        # self.assertEqual(user['id'], 1)
         self.assertEqual(user['username'], 'voter1')
 
     def test_getuser_invented_token(self):
@@ -151,10 +151,9 @@ class AuthTestCase(APITestCase):
         response = self.client.post(
             '/authentication/register/', token, format='json')
         self.assertEqual(response.status_code, 400)
-    
 
+    # incremento
 
-    #incremento
     def test_getusers_API(self):
         response = self.client.get(
             '/authentication/users/', format='json')
@@ -165,17 +164,16 @@ class AuthTestCase(APITestCase):
         response = self.client.post(
             '/authentication/users/', data, format='json')
         self.assertEqual(response.status_code, 201)
-        token = response.json()
 
         response = self.client.get(
-            '/authentication/users/', token, format='json')
+            '/authentication/users/', format='json')
         self.assertEqual(response.status_code, 200)
 
         users = response.json()
 
         id = users[-1]['id']
         response = self.client.get(
-            f'/authentication/users/{id}/', token, format='json')
+            f'/authentication/users/{id}/', format='json')
         user = response.json()
         self.assertEqual(user['id'], id)
         self.assertEqual(user['username'], 'user1')
@@ -186,11 +184,11 @@ class AuthTestCase(APITestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_postuser_API(self):
-        data = {'username':'user2', 'password':'12345'}
+        data = {'username': 'user2', 'password': '12345'}
         response = self.client.post(
             '/authentication/users/', data, format='json')
         self.assertEqual(response.status_code, 201)
-        
+
     def test_postuser_alreadyexists_API(self):
         response = self.client.get(
             '/authentication/users/', format='json')
@@ -204,16 +202,82 @@ class AuthTestCase(APITestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_postuser_withoutusername_API(self):
-        data = {'password':'12345'}
+        data = {'password': '12345'}
         response = self.client.post(
             '/authentication/users/', data, format='json')
         self.assertEqual(response.status_code, 400)
 
     def test_postuser_withoutpassword_API(self):
-        data = {'username':'user3'}
+        data = {'username': 'user3'}
         response = self.client.post(
             '/authentication/users/', data, format='json')
-        self.assertEqual(response.status_code, 400)       
+        self.assertEqual(response.status_code, 400)
+
+    def test_putuser_API(self):
+        response = self.client.get(
+            '/authentication/users/', format='json')
+        self.assertEqual(response.status_code, 200)
+
+        users = response.json()
+
+        id = users[-1]['id']
+        response = self.client.get(
+            f'/authentication/users/{id}/', format='json')
+        user = response.json()
+        self.assertEqual(user['id'], id)
+
+        username = user['username']
+        data = {'username': username+'X', 'password': '12345'}
+        response = self.client.put(
+            f'/authentication/users/{id}/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            f'/authentication/users/{id}/', format='json')
+        user = response.json()
+        self.assertEqual(user['id'], id)
+        self.assertEqual(user['username'], username+'X')
+
+    def test_putuser_username_alreadyexists_API(self):
+        response = self.client.get(
+            '/authentication/users/', format='json')
+        self.assertEqual(response.status_code, 200)
+
+        users = response.json()
+
+        id1 = users[-1]['id']
+        id2 = users[-2]['id']
+        response = self.client.get(
+            f'/authentication/users/{id2}/', format='json')
+        user = response.json()
+
+        username = user['username']
+        data = {'username': username, 'password': '12345'}
+        response = self.client.put(
+            f'/authentication/users/{id1}/', data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_deleteuser_API(self):
+        data = {'username': 'user5', 'password': '12345'}
+        response = self.client.post(
+            '/authentication/users/', data,  format='json')
+        self.assertEqual(response.status_code, 201)
+
+        user = response.json()
+        id = user['id']
+
+        response = self.client.delete(
+            f'/authentication/users/{id}/', format='json')
+        self.assertEqual(response.status_code, 204)
+
+        response = self.client.get(
+            f'/authentication/users/{id}/', format='json')
+        self.assertEqual(response.status_code, 404)
+
+    def test_deleteuser_doesntexist_API(self):
+        response = self.client.delete(
+            '/authentication/users/100/', format='json')
+        self.assertEqual(response.status_code, 404)
 
     #
     #   TODO: Arreglar tests, estos tests asumen que el sistema ya tiene registrado un usuario 'foobar' en ldap,
@@ -229,7 +293,3 @@ class AuthTestCase(APITestCase):
     #     response = self.client.post(
     #         '/authentication/loginLDAP/', body_form, format='json')
     #     self.assertEqual(response.status_code, 400)
-        
-        
-        
-
