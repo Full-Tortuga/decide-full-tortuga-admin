@@ -99,13 +99,8 @@ class LDAPLogin(APIView):
         except ldap.SERVER_DOWN:
             data = {'detail': 'Problema con el servicio LDAP'}
             status = HTTP_500_INTERNAL_SERVER_ERROR
-<<<<<<< HEAD
         return render(request, 'welcome.html', status=status)
-            
-=======
-        return render(request, 'bienvenida.html', status=status)
 
->>>>>>> master
 
 class LDAPLogout(APIView):
     """
