@@ -107,11 +107,11 @@ const Component = (props: { initialVoting?: votingType.Voting; refetch: () => vo
             options={[
               {
                 label: "Local (localhost:8000)",
-                value: `http//localhost:8000`,
+                value: `http://localhost:8000`,
               },
               {
                 label: `Default (${window.location.host})`,
-                value: `http//${window.location.host}`,
+                value: `http://${window.location.host}`,
               },
             ]}
           />

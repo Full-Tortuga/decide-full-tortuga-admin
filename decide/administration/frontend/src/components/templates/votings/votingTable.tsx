@@ -10,6 +10,7 @@ const columns: GridColDef[] = [
     field: "status",
     headerName: "Status",
     minWidth: 140,
+    valueFormatter: (params) => (params.value)
   },
   {
     field: "name",
