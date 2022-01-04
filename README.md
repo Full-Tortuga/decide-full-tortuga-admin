@@ -59,6 +59,14 @@ Ubuntu: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 WSL: - https://docs.microsoft.com/es-es/windows/wsl/tutorials/wsl-database#install-mongodb
 
+# MacOs: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
+
+Windows: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+
+Ubuntu: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+WSL: - https://docs.microsoft.com/es-es/windows/wsl/tutorials/wsl-database#install-mongodb
+
 MacOs: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
 
 Una vez hecho esto, y corriendo la base de datos, será necesario instalar las dependencias del proyecto, las cuales están en el
@@ -108,6 +116,170 @@ Se recuerda que se debe copiar el archivo de configuración local de ejemplo:
 - `npm install && npm run build`
 - abrir `http://localhost:8000/administration` en el navegador
 - hacer login con un superusuario
+
+# Pasos a seguir para configurar y iniciar el cliente LDAP
+
+La instalación se ha realizado y probado en sistemas Ubuntu, no puedo garantizarles que funcione en otras distribuciones o sistemas operativos.
+Para cualquier información adicional visite la documentación oficial de los paquetes.
+
+## Prerequisitos
+
+Instale las siguientes dependencias
+
+```sh
+apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
+```
+
+## Iniciar servidor LDAP desde docker
+
+Abra un nuevo contenedor con el cliente mínimo de open ldap en su equipo, para ello utilice las siguientes instrucciones.
+
+```sh
+docker run  -p 389:389 \
+            -d carvilgar1us/decideldap
+```
+
+Para verificar que el contenedor está corriendo correctamente el servicio slapd, pruebe el siguiente
+comando en su máquina HOST.
+
+```sh
+ldapsearch -x -b "dc=decide, dc=org" -H ldap://:389
+```
+
+La consola debe de devolver:
+\# extended LDIF
+\#
+\# LDAPv3
+\# base <dc=decide, dc=org> with scope subtree
+\# filter: (objectclass=\*)
+\# requesting: ALL
+\#
+
+\# decide.org
+dn: dc=decide,dc=org
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o:: RGVjaWRlIHBsYXRhZm9ybWEgZGUgdm90byBlbGVjdHLDg8Kzbmljbw==
+dc: decide
+
+\# admin, decide.org
+dn: cn=admin,dc=decide,dc=org
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+
+Si es lo que usted ha obtenido entonces puede continuar.
+
+## Añadir objetos a la organización
+
+### Organitational Units
+
+A continuación añadiremos las _Organitational Units_(ou) a nuestra organización,para ello cree un fichero con extensión ldif y ejecútelo con privilegios root **En su maquina HOST**.
+
+```sh
+sudo su -
+```
+
+Cree un fichero con extensión ldif.
+
+```sh
+vim basedn.ldif
+```
+
+En el fichero que ha creado previamente copie lo siguiente.
+
+```sh
+dn: ou=people,dc=decide,dc=org
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=decide,dc=org
+objectClass: organizationalUnit
+ou: groups
+```
+
+Finalmente, ejecute el siguiente comando
+
+```sh
+ldapadd -x -D cn=admin,dc=decide,dc=org -W -f basedn.ldif
+```
+
+si obtiene la siguiente respuesta usted ha realizado correctamente este paso.
+
+```
+adding new entry "ou=people,dc=decide,dc=org"
+adding new entry "ou=groups,dc=decide,dc=org"
+```
+
+### Usuarios
+
+Para añadir usuarios genere una contraseña mediante el comando y cópiela en el portapapeles, la necesitará para el siguiente paso
+
+```sh
+slappasswd
+```
+
+y cree un fichero con la siguiente información y recuerde copiar la contraseña que generó en el paso anterior en **userPassword**:
+
+```sh
+vim ldapusers.ldif
+```
+
+Y a continuación, copie lo siguiente.
+
+```sh
+dn: uid=foobar,ou=people,dc=decide,dc=org
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: foo
+sn: bar
+mail: foobar@gmail.com
+userPassword: {SSHA}Zn4/E5f+Ork7WZF/alrpMuHHGufC3x0k
+loginShell: /bin/bash
+uidNumber: 2000
+gidNumber: 2000
+homeDirectory: /home/foobar
+
+
+dn: cn=foobar,ou=groups,dc=decide,dc=org
+objectClass: posixGroup
+cn: foobar
+gidNumber: 2000
+memberUid: foobar
+```
+
+y ejecutelo mediante la siguiente instruccion:
+
+```sh
+ldapadd -x -D cn=admin,dc=decide,dc=org -W -f ldapusers.ldif
+```
+
+sabrá que ha realizado bien el paso anterior si obtine la siguiente salida:
+
+```
+adding new entry "uid=foobar,ou=people,dc=decide,dc=org"
+
+adding new entry "cn=foobar,ou=groups,dc=decide,dc=org"
+```
+
+## Dependencias Django para LDAP
+
+Para finalizar, debe instalar las dependencias que django necesarias para la comunicación con el cliente LDAP.
+Para ello, borre su local_settings.py y ejecute el comando pip para instalar las nuevas dependencias:
+
+```sh
+pip install -r requirements.txt
+```
+
+una vez finalizada la instalación copie el local settings que se le ofrece como plantilla y vuelva a configurar todo como se enseñó en clases de práticas y modifique el campo **AUTH_LDAP_SERVER_URI** de la configuración LDAP con la url de sus servidor y **AUTH_LDAP_BIND_PASSWORD** con la constraseña que puso en la instalación de openLDAP.
+
+Puede probar que funcione haciendo una petición desde Postman
+![alt text](https://i.imgur.com/3a4xwaZ.png)
+
+---
 
 ## Ejecutar con docker
 
