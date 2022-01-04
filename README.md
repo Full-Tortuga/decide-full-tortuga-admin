@@ -59,14 +59,6 @@ Ubuntu: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 WSL: - https://docs.microsoft.com/es-es/windows/wsl/tutorials/wsl-database#install-mongodb
 
-# MacOs: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
-
-Windows: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
-
-Ubuntu: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
-
-WSL: - https://docs.microsoft.com/es-es/windows/wsl/tutorials/wsl-database#install-mongodb
-
 MacOs: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
 
 Una vez hecho esto, y corriendo la base de datos, será necesario instalar las dependencias del proyecto, las cuales están en el
