@@ -31,7 +31,7 @@ class VotingAPI(APIView):
 
     def post(self, request):
         voting_seria = AdminVotingSerializer(data=request.data)
-        is_valid(voting_seria.is_valid(),voting_seria.errors)
+        is_valid(voting_seria.is_valid(), voting_seria.errors)
         auth_url = request.data.get("auth")
         id_users = request.data.get("census")
         auth, _ = Auth.objects.get_or_create(url=auth_url,
@@ -132,7 +132,7 @@ class VotingsAPI(APIView):
         voting.question.desc = question_request["desc"]
         options = QuestionOption.objects.all().filter(question__pk=voting.question.id)
         options_request = question_request.get("options")
-        tam = max(len(options),len(options_request))
+        tam = max(len(options), len(options_request))
         for i in range(0, tam):
             if i < len(options) and i < len(options_request):
                 option = options[i]
@@ -167,7 +167,7 @@ class QuestionsAPI(APIView):
 
     def post(self, request):
         question = AdminQuestionSerializer(data=request.data)
-        is_valid(question.is_valid(),question.errors)
+        is_valid(question.is_valid(), question.errors)
         question.save()
         return Response({}, status=HTTP_200_OK)
 
