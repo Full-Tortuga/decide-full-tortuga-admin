@@ -45,7 +45,6 @@ class LogoutView(APIView):
 
         return Response({})
 
-
 class RegisterView(APIView):
     def post(self, request):
         key = request.data.get('token', '')
@@ -100,7 +99,7 @@ class LDAPLogin(APIView):
         except ldap.SERVER_DOWN:
             data = {'detail': 'Problema con el servicio LDAP'}
             status = HTTP_500_INTERNAL_SERVER_ERROR
-        return render(request, 'bienvenida.html', status=status)
+        return render(request, 'welcome.html', status=status)
 
 
 class LDAPLogout(APIView):
@@ -129,7 +128,7 @@ class SignInView(LoginView):
 
 
 class BienvenidaView(TemplateView):
-    template_name = 'bienvenida.html'
+   template_name = 'welcome.html'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -142,4 +141,7 @@ def cerrarsesion(request):
 
     logout(request)
     messages.success(request, F"Su sesión se ha cerrado correctamente")
-    return render(request, "bienvenida.html")
+    return render(request, "welcome.html")
+
+def landingpage(request):
+    return render(request, "welcome.html")
