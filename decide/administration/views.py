@@ -26,12 +26,12 @@ class VotingAPI(APIView):
 
     def get(self, request):
         votings = Voting.objects.all()
-        rest = VotingSerializer(votings, many=True).data
-        return Response(rest, status=HTTP_200_OK)
+        voting_serializer = VotingSerializer(votings, many=True).data
+        return Response(voting_serializer, status=HTTP_200_OK)
 
     def post(self, request):
-        voting_seria = AdminVotingSerializer(data=request.data)
-        is_valid(voting_seria.is_valid(), voting_seria.errors)
+        voting_serializer = AdminVotingSerializer(data=request.data)
+        is_valid(voting_serializer.is_valid(), voting_serializer.errors)
         auth_url = request.data.get("auth")
         id_users = request.data.get("census")
         auth, _ = Auth.objects.get_or_create(url=auth_url,
@@ -117,12 +117,12 @@ class VotingsAPI(APIView):
 
     def get(self, request, voting_id):
         votings = get_object_or_404(Voting.objects.filter(id=voting_id))
-        rest = VotingSerializer(votings).data
-        return Response(rest, status=HTTP_200_OK)
+        voting_serializer = VotingSerializer(votings).data
+        return Response(voting_serializer, status=HTTP_200_OK)
 
     def put(self, request, voting_id):
-        seria = AdminVotingSerializer(data=request.data)
-        is_valid(seria.is_valid(), seria.errors)
+        voting_serializer = AdminVotingSerializer(data=request.data)
+        is_valid(voting_serializer.is_valid(), voting_serializer.errors)
         voting = get_object_or_404(Voting.objects.all().filter(id=voting_id))
         voting.name = request.data.get("name")
         voting.desc = request.data.get("desc")
@@ -162,13 +162,13 @@ class QuestionsAPI(APIView):
 
     def get(self, request):
         questions = Question.objects.all()
-        rest = AdminQuestionSerializer(questions, many=True).data
-        return Response(rest, status=HTTP_200_OK)
+        question_serializer = AdminQuestionSerializer(questions, many=True).data
+        return Response(question_serializer, status=HTTP_200_OK)
 
     def post(self, request):
-        question = AdminQuestionSerializer(data=request.data)
-        is_valid(question.is_valid(), question.errors)
-        question.save()
+        question_serializer = AdminQuestionSerializer(data=request.data)
+        is_valid(question_serializer.is_valid(), question_serializer.errors)
+        question_serializer.save()
         return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
@@ -187,8 +187,8 @@ class QuestionAPI(APIView):
 
     def get(self, request, question_id):
         question = get_object_or_404(Question.objects.filter(id=question_id))
-        rest = AdminQuestionSerializer(question).data
-        return Response(rest, status=HTTP_200_OK)
+        question_serializer = AdminQuestionSerializer(question).data
+        return Response(question_serializer, status=HTTP_200_OK)
 
     def put(self, request, question_id):
         question = Question.objects.get(id=question_id)
@@ -210,9 +210,9 @@ class CensussAPI(APIView):
         return Response(censuss, status=HTTP_200_OK)
 
     def post(self, request):
-        census = CensusSerializer(data=request.data)
-        is_valid(census.is_valid(), census.errors)
-        census.save()
+        census_serializer = CensusSerializer(data=request.data)
+        is_valid(census_serializer.is_valid(), census_serializer.errors)
+        census_serializer.save()
         return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
@@ -233,8 +233,8 @@ class CensusAPI(APIView):
         return Response(census, status=HTTP_200_OK)
 
     def put(self, request, census_id):
-        census_seria = CensusSerializer(data=request.data)
-        is_valid(census_seria.is_valid(), census_seria.errors)
+        census_serializer = CensusSerializer(data=request.data)
+        is_valid(census_serializer.is_valid(), census_serializer.errors)
         census = get_object_or_404(Census.objects.all().filter(id=census_id))
         for key, value in request.data.items():
             setattr(census, key, value)
@@ -254,9 +254,9 @@ class AuthsAPI(APIView):
         return Response(auths, status=HTTP_200_OK)
 
     def post(self, request):
-        auth = AuthSerializer(data=request.data)
-        is_valid(auth.is_valid(), auth.errors)
-        auth.save()
+        auth_serializer = AuthSerializer(data=request.data)
+        is_valid(auth_serializer.is_valid(), auth_serializer.errors)
+        auth_serializer.save()
         return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
@@ -278,8 +278,8 @@ class AuthAPI(APIView):
         return Response(auth, status=HTTP_200_OK)
 
     def put(self, request, auth_id):
-        auth_seria = AuthSerializer(data=request.data)
-        is_valid(auth_seria.is_valid(), auth_seria.errors)
+        auth_serializer = AuthSerializer(data=request.data)
+        is_valid(auth_serializer.is_valid(), auth_serializer.errors)
         auth = get_object_or_404(Auth.objects.all().filter(id=auth_id))
         for key, value in request.data.items():
             setattr(auth, key, value)
@@ -299,9 +299,9 @@ class KeysAPI(APIView):
         return Response(keys, status=HTTP_200_OK)
 
     def post(self, request):
-        key = KeySerializer(data=request.data)
-        is_valid(key.is_valid(), key.errors)
-        key.save()
+        key_serializer = KeySerializer(data=request.data)
+        is_valid(key_serializer.is_valid(), key_serializer.errors)
+        key_serializer.save()
         return Response({}, status=HTTP_200_OK)
 
     def delete(self, request):
@@ -323,8 +323,8 @@ class KeyAPI(APIView):
         return Response(key, status=HTTP_200_OK)
 
     def put(self, request, key_id):
-        key_seria = KeySerializer(data=request.data)
-        is_valid(key_seria.is_valid(), key_seria.errors)
+        key_serializer = KeySerializer(data=request.data)
+        is_valid(key_serializer.is_valid(), key_serializer.errors)
         keym = get_object_or_404(Key.objects.all().filter(id=key_id))
         for key, value in request.data.items():
             setattr(keym, key, value)
@@ -341,12 +341,12 @@ class UsersAPI(APIView):
 
     def get(self, request):
         users = User.objects.all()
-        rest = UserAdminSerializer(users, many=True).data
-        return Response(rest, status=HTTP_200_OK)
+        user_serializer = UserAdminSerializer(users, many=True).data
+        return Response(user_serializer, status=HTTP_200_OK)
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        is_valid(serializer.is_valid(), serializer.errors)
+        user_serializer = UserSerializer(data=request.data)
+        is_valid(user_serializer.is_valid(), user_serializer.errors)
         fields = request.data
         user = User(username=fields['username'], first_name=fields['first_name'],
                     last_name=fields['last_name'], email=fields['email'], is_staff=False)
@@ -370,12 +370,12 @@ class UserAPI(APIView):
 
     def get(self, request, user_id):
         user = get_object_or_404(User.objects.filter(id=user_id))
-        rest = UserAdminSerializer(user).data
-        return Response(rest, status=HTTP_200_OK)
+        user_serializer = UserAdminSerializer(user).data
+        return Response(user_serializer, status=HTTP_200_OK)
 
     def put(self, request, user_id):
-        user_update = UserUpdateSerializer(data=request.data)
-        is_valid(user_update.is_valid(), user_update.errors)
+        user_serializer = UserUpdateSerializer(data=request.data)
+        is_valid(user_serializer.is_valid(), user_serializer.errors)
         user = get_object_or_404(User.objects.filter(id=user_id))
         for key, value in request.data.items():
             if value:
@@ -397,10 +397,10 @@ class LoginAuthAPI(APIView):
     serializer_class = AuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
+        user_serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         response = Response({}, status=HTTP_200_OK)
         response.set_cookie('token', token.key)
