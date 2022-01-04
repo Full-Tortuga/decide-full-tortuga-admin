@@ -9,9 +9,9 @@ const parseErrors = (error: any) => {
 };
 
 const getStatus = (voting: votingType.Voting) => {
-    if (voting.start_date.length > 0 && voting.end_date.length > 0) return "Finished";
-    else if (voting.start_date.length > 0 && voting.end_date.length === 0) return "In progress";
-    else if (voting.start_date.length === 0 && voting.end_date.length === 0) return "New";
+    if (voting.start_date === null && voting.end_date === null) return "New";
+    else if (voting.start_date.length > 0 && voting.end_date === null) return "In progress";
+    else if (voting.start_date.length > 0 && voting.end_date.length > 0) return "Finished";
 };
 
 export { util, parseErrors, getStatus };

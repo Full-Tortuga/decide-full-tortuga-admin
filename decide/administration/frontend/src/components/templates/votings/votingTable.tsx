@@ -2,6 +2,7 @@ import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
 
 import { votingType } from "types";
+import { utils } from "utils";
 
 import { Table } from "components/02-molecules";
 
@@ -10,7 +11,10 @@ const columns: GridColDef[] = [
     field: "status",
     headerName: "Status",
     minWidth: 140,
-    valueFormatter: (params) => (params.value)
+    renderCell: (params) => {
+      console.log(params.row)
+      return utils.getStatus(params.row)
+    }
   },
   {
     field: "name",

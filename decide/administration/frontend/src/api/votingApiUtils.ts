@@ -24,7 +24,7 @@ const votingApi = {
     deleteAllVotings: () => axios.delete(`/votings`), 
     
     startVotings:(
-        idList:number[]       
+        idList:any[]      
     ) => 
     axios.put("/votings", {
         idList: idList,
@@ -32,7 +32,7 @@ const votingApi = {
     }),
 
     stopVotings:(
-        idList:number[]       
+        idList:any[]      
     ) => 
     axios.put("/votings", {
         idList: idList,
@@ -40,7 +40,7 @@ const votingApi = {
     }),
 
     tallyVotings:(
-        idList:number[]       
+        idList:any[]       
     ) => 
     axios.put("/votings", {
         idList: idList,
