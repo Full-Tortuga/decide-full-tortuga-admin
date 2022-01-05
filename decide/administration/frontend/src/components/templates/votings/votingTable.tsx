@@ -35,7 +35,7 @@ const columns: GridColDef[] = [
     minWidth: 250,
     renderCell: (params) => {
       return (
-        <Tooltip title={params.row['question']['options']['option']} arrow>
+        <Tooltip title={params.row['question']['options']} arrow>
         <Button>{params.row['question']['desc']}</Button>
         </Tooltip>
       );
