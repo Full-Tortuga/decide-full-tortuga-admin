@@ -7,20 +7,23 @@ const votingApi = {
     //QUESTION API
     //Bulk Operations
     getQuestions: () => axios.get("/voting/question"),
-    deleteQuestions: (idList: any) => axios.delete("/voting/questions", idList),
+    deleteQuestions: (idList: number[]) => axios.delete("/voting/questions", {
+        data: { idList: idList },
+    }),
     deleteAllQuestions: () => axios.delete(`/voting/question`), 
     
     //Individual Operations
-    getQuestion: (question_id: number) => axios.get(`/voting/question/${question_id}`),
+    getQuestion: (questionId: number) => axios.get(`/voting/question/${questionId}/`),
     createQuestion: (question: Question) => axios.post("/voting/question/", question),
-    updateQuestion: (question: Question, question_id: number) => axios.put(`/voting/question/${question_id}`, question),
-    deleteQuestion: (question_id: number) => axios.delete(`/voting/question/${question_id}`),  
-
+    updateQuestion: (question: Question, questionId: number) => axios.put(`/voting/question/${questionId}/`, question),
+    deleteQuestion: (questionId: number) => axios.delete(`/voting/question/${questionId}/`),  
 
     //VOTING API
     //Bulk Operations   
     getVotings:() => axios.get(`/votings`),
-    deleteVotings: (idList: any) => axios.delete("/votings", idList),
+    deleteVotings: (idList: number[]) => axios.delete("/votings",{
+         data: { idList: idList },}
+    ),
     deleteAllVotings: () => axios.delete(`/votings`), 
     
     startVotings:(
@@ -48,9 +51,10 @@ const votingApi = {
     }),
     
     //Individual Operations
-    getVoting: (voting_id: number) => axios.get(`/votings/${voting_id}`),
+    getVoting: (votingId: number) => axios.get(`/votings/${votingId}/`),
     createVoting: (voting: Voting) => axios.post("/votings", voting),
-    deleteVoting: (voting_id: number) => axios.delete(`/votings/${voting_id}`),  
+    updateVoting: (voting: Voting, votingId: number) => axios.put(`/votings/${votingId}/`, voting),
+    deleteVoting: (votingId: number) => axios.delete(`/votings/${votingId}/`),  
 };
 
 export default votingApi;
