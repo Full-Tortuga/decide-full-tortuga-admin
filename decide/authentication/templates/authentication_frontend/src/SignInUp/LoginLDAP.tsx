@@ -1,5 +1,5 @@
-import React from 'react';
-import { checkErrors } from './Utils';
+import React from "react";
+import { checkErrors } from "./Utils";
 
 //Register Box 
 class LoginLDAP extends React.Component {

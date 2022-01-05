@@ -1,8 +1,8 @@
-import React from 'react';
-import './index.css';
-import LoginBox from './Login';
-import LoginLDAP from './LoginLDAP';
-import RegisterBox from './Register';
+import React from "react";
+import "./index.css";
+import LoginBox from "./Login";
+import LoginLDAP from "./LoginLDAP";
+import RegisterBox from "./Register";
 
 class SignInUp extends React.Component<any,State>{
 
