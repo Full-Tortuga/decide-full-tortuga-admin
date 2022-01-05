@@ -1,6 +1,7 @@
 import React from 'react';
 import './index.css';
 import LoginBox from './Login';
+import LoginLDAP from './LoginLDAP';
 import RegisterBox from './Register';
 
 class SignInUp extends React.Component<any,State>{
@@ -9,16 +10,21 @@ class SignInUp extends React.Component<any,State>{
     super(props);
     this.state = {
       isLoginOpen: true,
-      isRegisterOpen: false
+      isRegisterOpen: false,
+      isLoginLDAPOpen: false,
     };
   }
 
   showLoginBox() {
-    this.setState({isLoginOpen: true, isRegisterOpen: false});
+    this.setState({isLoginOpen: true, isRegisterOpen: false, isLoginLDAPOpen: false});
   }
 
   showRegisterBox() {
-    this.setState({isRegisterOpen: true, isLoginOpen: false});
+    this.setState({isRegisterOpen: true, isLoginOpen: false, isLoginLDAPOpen: false});
+  }
+
+  showLoginLDAP() {
+    this.setState({isRegisterOpen: false, isLoginOpen: false, isLoginLDAPOpen: true});
   }
 
   render (){
@@ -32,6 +38,7 @@ class SignInUp extends React.Component<any,State>{
         <div className="box-container">
           {this.state.isLoginOpen && <LoginBox/>}
           {this.state.isRegisterOpen && <RegisterBox/>}
+          {this.state.isLoginLDAPOpen && <LoginLDAP/>}
         </div>
 
   
@@ -44,6 +51,15 @@ class SignInUp extends React.Component<any,State>{
             .showLoginBox
             .bind(this)}>
             Login
+          </div>
+          <div
+            className={"controller " + (this.state.isLoginLDAPOpen
+            ? "selected-controller"
+            : "")}
+            onClick={this
+            .showLoginLDAP
+            .bind(this)}>
+            LDAP
           </div>
           <div
             className={"controller " + (this.state.isRegisterOpen
@@ -64,5 +80,6 @@ class SignInUp extends React.Component<any,State>{
 interface State{
   isRegisterOpen: boolean,
   isLoginOpen: boolean
+  isLoginLDAPOpen: boolean
 }
 export default SignInUp;
