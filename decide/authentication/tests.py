@@ -348,12 +348,7 @@ class SeleniumTestCase(StaticLiveServerTestCase):
 
         self.base.tearDown()
 
-    def test_login_success(self):                    
-        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
-        self.driver.find_element_by_name('username').send_keys("noadmin")
-        self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
-        
-        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+
 
 
     def test_register_user(self):
@@ -368,5 +363,12 @@ class SeleniumTestCase(StaticLiveServerTestCase):
 
         self.driver.find_element_by_name('username').send_keys("userUser")
         self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
+        
+        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+
+    def test_login_success(self):                    
+        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+        self.driver.find_element_by_name('username').send_keys("noadmin")
+        self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
         
         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
