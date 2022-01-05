@@ -326,45 +326,43 @@ class AuthTestCase(APITestCase):
 
 
 
-class SeleniumTestCase(StaticLiveServerTestCase):
+# class SeleniumTestCase(StaticLiveServerTestCase):
 
-    def setUp(self):
-        self.base = BaseTestCase()
-        self.base.setUp()
+#     def setUp(self):
+#         self.base = BaseTestCase()
+#         self.base.setUp()
 
-        options = webdriver.ChromeOptions()
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--headless")
-        self.driver = webdriver.Chrome(options=options)
-        super().setUp()            
+#         options = webdriver.ChromeOptions()
+#         options.add_argument("--no-sandbox")
+#         options.add_argument("--disable-dev-shm-usage")
+#         options.add_argument("--headless")
+#         self.driver = webdriver.Chrome(options=options)
+#         super().setUp()            
             
-    def tearDown(self):
-        super().tearDown()
-        self.driver.close()
-        self.driver.quit()
-        self.base.tearDown()
+#     def tearDown(self):
+#         super().tearDown()
+#         self.driver.close()
+#         self.driver.quit()
+#         self.base.tearDown()
 
-    def test_register_user(self):
-        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
-        self.driver.find_elements_by_class_name("controller")[1].click()
+#     def test_register_user(self):
+#         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+#         self.driver.find_elements_by_class_name("controller")[1].click()
 
-        self.driver.find_element_by_name('username').send_keys("userUser")
-        self.driver.find_element_by_name('password').send_keys("asd123")
-        self.driver.find_element_by_name('password2').send_keys("asd123",Keys.ENTER)
+#         self.driver.find_element_by_name('username').send_keys("userUser")
+#         self.driver.find_element_by_name('password').send_keys("asd123")
+#         self.driver.find_element_by_name('password2').send_keys("asd123",Keys.ENTER)
 
-        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
 
-        self.driver.find_element_by_name('username').send_keys("userUser")
-        self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
+#         self.driver.find_element_by_name('username').send_keys("userUser")
+#         self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
         
-        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
-        self.driver.quit()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
 
-    def test_login_success(self):                    
-        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
-        self.driver.find_element_by_name('username').send_keys("noadmin")
-        self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
+#     def test_login_success(self):                    
+#         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+#         self.driver.find_element_by_name('username').send_keys("noadmin")
+#         self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
         
-        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
-        self.driver.quit()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
