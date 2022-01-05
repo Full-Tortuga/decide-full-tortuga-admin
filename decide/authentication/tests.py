@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-
+import os
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -341,13 +341,12 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--headless")
         self.driver = webdriver.Chrome(options=options)
-
         super().setUp()            
             
     def tearDown(self):           
         super().tearDown()
+        self.driver.close()
         self.driver.quit()
-
         self.base.tearDown()
 
 
