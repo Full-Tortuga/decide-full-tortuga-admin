@@ -1,14 +1,10 @@
-from django.test import TestCase
+
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-import os
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from base.tests import BaseTestCase
 from base import mods
@@ -343,14 +339,11 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         self.driver = webdriver.Chrome(options=options)
         super().setUp()            
             
-    def tearDown(self):           
+    def tearDown(self):
         super().tearDown()
         self.driver.close()
         self.driver.quit()
         self.base.tearDown()
-
-
-
 
     def test_register_user(self):
         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
@@ -366,6 +359,7 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
         
         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+        self.driver.quit()
 
     def test_login_success(self):                    
         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
@@ -373,3 +367,4 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
         
         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+        self.driver.quit()
