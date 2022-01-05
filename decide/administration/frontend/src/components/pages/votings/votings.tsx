@@ -31,7 +31,7 @@ const VotingsPage = () => {
   }, [refetch]);
 
   const idList = React.useMemo(
-    () => selected.map((voting: votingType.Voting) => voting.id),
+    () => selected.map((voting: votingType.Voting) => voting.id || -1),
     [selected]
   );
 
