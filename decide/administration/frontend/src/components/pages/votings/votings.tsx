@@ -44,7 +44,7 @@ const VotingsPage = () => {
     };
 
     const checkDisabled = ()=> {
-      if (checkOptions.length === 0 && selected.length > 0) return "true";
+      if (checkOptions.length === selected.length && selected.length > 0) return "true";
       else if (checkOptions.length === 0) return "false";
       else return "mixed";
     };

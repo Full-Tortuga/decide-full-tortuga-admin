@@ -2,6 +2,7 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Add, Edit } from "@mui/icons-material";
 
+
 import { votingType } from "types";
 import { votingApi } from "api";
 import { utils } from "utils";
@@ -60,11 +61,10 @@ const Component = (props: { initialVoting?: votingType.Voting; refetch: () => vo
     console.log("submit:", data);
     if (Object.keys(errors).length === 0)
       if (editMode && props.initialVoting?.id) {
-        console.log("fallo")
-       // votingApi
-       //   .updateVoting(props.initialVoting?.id, data)
-         // .then(() => onSubmitSuccess())
-          //.catch((error) => onSubmitFailed(utils.parseErrors(error)));
+        votingApi
+          .updateVoting(data,props.initialVoting?.id)
+          .then(() => onSubmitSuccess())
+          .catch((error) => onSubmitFailed(utils.parseErrors(error)));
       } else {
         votingApi
           .createVoting(data)
@@ -76,7 +76,7 @@ const Component = (props: { initialVoting?: votingType.Voting; refetch: () => vo
   return (
     <Modal
       onSubmit={() => onSubmit(getValues())}
-      title={editMode ? "Edit Voting" : "New Voting"}
+      title={editMode ? "Edit Voting " + props.initialVoting?.name : "New Voting"}
       openerIcon={editMode ? <Edit /> : <Add />}
       externalClose={sent}
       pages={[

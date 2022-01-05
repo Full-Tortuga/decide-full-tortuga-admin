@@ -50,7 +50,7 @@ const votingApi = {
     //Individual Operations
     getVoting: (voting_id: number) => axios.get(`/votings/${voting_id}`),
     createVoting: (voting: votingType.VotingFormFields) => axios.post("/votings", voting),
-    updateVoting: (voting: votingType.VotingFormFields, voting_id: number) => axios.put(`/votings/${voting_id}`, voting),
+    updateVoting: (voting: votingType.VotingFormFields, voting_id: number) => axios.put(`/votings/${voting_id}/`, voting),
     deleteVoting: (voting_id: number) => axios.delete(`/votings/${voting_id}`),  
 };
 

@@ -1,5 +1,7 @@
 import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 
 import { votingType } from "types";
 import { utils } from "utils";
@@ -28,9 +30,16 @@ const columns: GridColDef[] = [
   },
   {
     //TODO GET QUESTION DESCRIPTION AND OPTIONS
-    field: "question.desc",
+    field: "question",
     headerName: "Question",
     minWidth: 250,
+    renderCell: (params) => {
+      return (
+        <Tooltip title={params.row['question']['options']['option']} arrow>
+        <Button>{params.row['question']['desc']}</Button>
+        </Tooltip>
+      );
+    }
   },
   {
     field: "start_date",
@@ -47,6 +56,8 @@ const columns: GridColDef[] = [
     headerName: "Tally",
     minWidth: 100,
     align: "center",
+    valueFormatter: (params) => (params.value === "[]" ? "✘" : params.value),
+
   },
 ];
 
