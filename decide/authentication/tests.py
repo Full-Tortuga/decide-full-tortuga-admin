@@ -337,7 +337,9 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         self.base.setUp()
 
         options = webdriver.ChromeOptions()
-        options.headless = True
+        options.addArguments("--no-sandbox")
+        options.addArguments("--disable-dev-shm-usage")
+        options.addArguments("--headless")
         self.driver = webdriver.Chrome(options=options)
 
         super().setUp()            
@@ -366,9 +368,9 @@ class SeleniumTestCase(StaticLiveServerTestCase):
         
         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
 
-    # def test_login_success(self):                    
-    #     self.driver.get(f'{self.live_server_url}/authentication/login_form/')
-    #     self.driver.find_element_by_name('username').send_keys("noadmin")
-    #     self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
+    def test_login_success(self):                    
+        self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+        self.driver.find_element_by_name('username').send_keys("noadmin")
+        self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
         
-    #     self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+        self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')

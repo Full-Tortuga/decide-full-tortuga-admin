@@ -31,6 +31,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        #!/bin/bash
+        set -ex
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb
         sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind chromium-browser chromium-chromedriver
     - name: Install Python requirements
       run: |
