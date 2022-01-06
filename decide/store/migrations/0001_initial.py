@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
                 ('a', base.models.BigBigField()),
                 ('b', base.models.BigBigField()),
                 ('voted', models.DateTimeField(auto_now=True)),
-                ('type', models.CharField(choices=[('V', 'Voting'), ('BV', 'BinaryVoting'), ('MV', 'MultipleVoting'), ('SV', 'ScoreVoting')], default='V', max_length=2)),
             ],
         ),
     ]

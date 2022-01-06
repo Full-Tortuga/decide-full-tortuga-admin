@@ -52,6 +52,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+decide/*/migrations
 
 # Flask stuff:
 instance/

@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('voting_id', models.PositiveIntegerField()),
                 ('voter_id', models.PositiveIntegerField()),
-                ('type', models.CharField(choices=[('V', 'Voting'), ('BV', 'BinaryVoting'), ('MV', 'MultipleVoting'), ('SV', 'ScoreVoting')], default='V', max_length=2)),
             ],
         ),
     ]
