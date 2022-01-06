@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+
+from base.models import Auth
 from census.models import Census
 from voting.models import Question, QuestionOption, Voting
 from rest_framework import serializers
@@ -71,3 +73,24 @@ class AdminVotingSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     desc = serializers.CharField(max_length=1000, allow_blank=True, allow_null=True)
     census = serializers.ListField(allow_null=True)
+
+
+class AdminVotingGetSerializer(serializers.HyperlinkedModelSerializer):
+    question = AdminQuestionSerializer(many=False)
+    census = serializers.SerializerMethodField()
+    auth = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Voting
+        fields = ('id', 'name', 'desc', 'question', 'auth', 'census')
+
+    def get_auth(self, obj):
+        auth = obj.auths.all().first()
+        if auth is not None:
+            return auth.url
+        else:
+            return ''
+
+    def get_census(self, obj):
+        censuss = Census.objects.filter(voting_id=obj.id)
+        return [census.voter_id for census in censuss]
