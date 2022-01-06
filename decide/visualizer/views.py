@@ -182,8 +182,6 @@ def graphs_requests(request, voting_id):
     
     if request.method == 'GET':  
         vot_type=translate_type(request.path_info) 
-        res= requests.get("http://127.0.0.1:8000/visualizer/graphs/?voting_id="+str(voting_id))   
-        print(res.content)
         data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))        
         return HttpResponse(json.dumps(data), content_type="application/json")
     
