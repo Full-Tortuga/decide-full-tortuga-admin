@@ -31,7 +31,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
+        #!/bin/bash
+        set -ex
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb
+        sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind chromium-browser chromium-chromedriver
     - name: Install Python requirements
       run: |
         python -m pip install --upgrade pip
@@ -48,7 +52,7 @@ jobs:
     - name: Run tests     
       run: |
         cd decide
-        coverage run --branch --source=./authentication/ ./manage.py test authentication --keepdb
+        coverage run --branch --source=./authentication/ ./manage.py test authentication --keepdb --verbosity=2
         coverage xml
     - name: Codacy Coverage Reporter
       uses: codacy/codacy-coverage-reporter-action@v1.1.0

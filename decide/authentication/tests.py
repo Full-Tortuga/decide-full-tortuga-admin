@@ -1,14 +1,15 @@
-from django.test import TestCase
+
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-
+# from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+# from selenium import webdriver
+# from selenium.webdriver.common.keys import Keys
+# from base.tests import BaseTestCase
 from base import mods
 
 from local_settings import AUTH_LDAP_SERVER_URI
-
 
 class AuthTestCase(APITestCase):
 
@@ -300,12 +301,6 @@ class AuthTestCase(APITestCase):
             '/authentication/login_form/', data_login, format='json')
         self.assertEqual(response.status_code, 200)
 
-    # def test_loginuser_negative_form(self):
-    #     data_login = {'username':'noUser', 'password': 'nopwd'}
-    #     response = self.client.post(
-    #         '/authentication/login_form/', data_login, format='json')
-    #     self.assertEqual(response.status_code, 400)
-
     def test_registeruser_existingusername(self):
         data_login = {'username':'voter1', 'password': '123456', 'password2':'123456'}
         response = self.client.post(
@@ -328,3 +323,46 @@ class AuthTestCase(APITestCase):
     #     response = self.client.post(
     #         '/authentication/loginLDAP/', body_form, format='json')
     #     self.assertEqual(response.status_code, 400)
+
+
+
+# class SeleniumTestCase(StaticLiveServerTestCase):
+
+#     def setUp(self):
+#         self.base = BaseTestCase()
+#         self.base.setUp()
+
+#         options = webdriver.ChromeOptions()
+#         options.add_argument("--no-sandbox")
+#         options.add_argument("--disable-dev-shm-usage")
+#         options.add_argument("--headless")
+#         self.driver = webdriver.Chrome(options=options)
+#         super().setUp()            
+            
+#     def tearDown(self):
+#         super().tearDown()
+#         self.driver.close()
+#         self.driver.quit()
+#         self.base.tearDown()
+
+#     def test_register_user(self):
+#         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+#         self.driver.find_elements_by_class_name("controller")[1].click()
+
+#         self.driver.find_element_by_name('username').send_keys("userUser")
+#         self.driver.find_element_by_name('password').send_keys("asd123")
+#         self.driver.find_element_by_name('password2').send_keys("asd123",Keys.ENTER)
+
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+
+#         self.driver.find_element_by_name('username').send_keys("userUser")
+#         self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
+        
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+
+#     def test_login_success(self):                    
+#         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
+#         self.driver.find_element_by_name('username').send_keys("noadmin")
+#         self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
+        
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
