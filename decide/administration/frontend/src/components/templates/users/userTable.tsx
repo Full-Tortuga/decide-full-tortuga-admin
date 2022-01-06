@@ -69,7 +69,7 @@ const Component = (props: {
       rows={props.users}
       columns={columns}
       setSelected={props.setSelected}
-      initialSelection={props.initialSelection || []}
+      initialSelection={props.initialSelection}
     />
   );
 };

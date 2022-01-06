@@ -10,7 +10,6 @@ const Component = (props: {
 }) => {
   const filterRows = React.useCallback(
     (ids: any[]) => {
-      console.log(ids);
       return props.rows.filter((row: any) => ids.includes(row.id));
     },
     [props.rows]
@@ -21,12 +20,16 @@ const Component = (props: {
 
   const updateSelectionModel = React.useCallback(
     (newSelection: GridSelectionModel) => {
-      console.log("chagnes");
       setSelectionModel(newSelection);
       props.setSelected(filterRows(newSelection));
     },
     [props, filterRows]
   );
+
+  React.useEffect(() => {
+    updateSelectionModel(selectionModel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.rows]);
 
   return (
     <div className="w-full">
