@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Count
 from voting import models
 from store import models as stmodels
 from telegram import InputMediaPhoto, Bot
@@ -10,14 +11,18 @@ from .models import TelegramBot, Graphs
 from threading import Thread
 from selenium import webdriver
 from functools import partial
+from dotenv import load_dotenv
 
 
-#This is token is temporary and won't be the same in final version, so security won't be compromised
+load_dotenv() #load token for bot
+
 #auth and front-end for '@VotitosBot'
-UPDATER = Updater(settings.TELEGRAM_TOKEN,
+UPDATER = Updater(os.environ['TELEGRAM_TOKEN'],
                 use_context=True)
 
-BOT=Bot(token=settings.TELEGRAM_TOKEN)
+BOT=Bot(token=os.environ['TELEGRAM_TOKEN'])
+
+URL='http://127.0.0.1:8000/visualizer/'
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
@@ -40,7 +45,7 @@ def setup_commands(votitos):
     dp.add_handler(CommandHandler('auto', change_auto_status))
     dp.add_handler(MessageHandler(Filters.command, unknown_command))
     dp.add_handler(CallbackQueryHandler(voting_selection_query_handler, pattern="^v_[a-zA-Z]+_[a-zA-Z]+$"))
-    dp.add_handler(CallbackQueryHandler(results_query_handler, pattern="^[1-9][0-9]*$"))
+    dp.add_handler(CallbackQueryHandler(results_query_handler, pattern="^[1-9][0-9]*_[a-zA-Z]+$"))
     dp.add_handler(CallbackQueryHandler(details_query_handler, pattern="^d[1-9][0-9]*_[a-zA-Z]+$")) 
     dp.add_handler(CallbackQueryHandler(auto_query_handler, pattern="(^True$|^False$)"))
 
@@ -90,10 +95,11 @@ def unknown_command(update, context):
 def show_results(update, context, chat_identifier, vot_type):
     votings=get_voting_objects(vot_type)
     finished_votings=votings.exclude(start_date__isnull=True).exclude(end_date__isnull=True)
+    type=vot_type.split("_")[1]
     if finished_votings is not None:
         keyboard_buttons=[]
         for v in finished_votings:
-            keyboard_buttons.append(InlineKeyboardButton(text=str(v.name), callback_data=str(v.id)))
+            keyboard_buttons.append(InlineKeyboardButton(text=str(v.name), callback_data=str(v.id)+"_"+type))
         keyboard=InlineKeyboardMarkup(build_keyboard_menu(keyboard_buttons,2))
         context.bot.send_message(chat_id=chat_identifier, text= "Aquí tienes la lista de votaciones finalizadas. Elige por favor:", reply_markup=keyboard)
     else:
@@ -104,7 +110,8 @@ def results_query_handler(update, context):
     
     query=update.callback_query
     query.answer("¡A la orden!")
-    results_graph(query.data, query.message.chat_id, context)
+    response_array=query.data.split("_")
+    results_graph(query.data[0], query.data[1], query.message.chat_id, context)
 
 #allows you to select an active or closed voting and show its details    
 def show_details(update, context, chat_identifier,vot_type):
@@ -128,7 +135,7 @@ def details_query_handler(update, context):
     vot_type=response_array[1]
     
     voting=get_voting_objects(vot_type).exclude(start_date__isnull=True).get(id=vot_id)
-    v_type=translate_type(vot_type)
+    v_type=translate_to_type(vot_type)
     msg=aux_message_builder(voting,v_type)
     context.bot.send_message(chat_id=query.message.chat_id,text=msg, parse_mode="HTML")
 
@@ -181,32 +188,7 @@ def voting_selection_query_handler(update, context):
     elif 'results' in vot_type_command:
         show_results(update, context, query.message.chat_id, vot_type_command)
     query.answer()
-
-#gets voting type objects
-def get_voting_objects(vot_type):
-    res=None
-    if 'simple' in vot_type:
-       res=models.Voting.objects
-    elif 'binary' in vot_type:
-        res=models.BinaryVoting.objects
-    elif 'multiple' in vot_type:
-        res=models.MultipleVoting.objects
-    elif 'score' in vot_type:
-        res=models.ScoreVoting.objects
-    return res
-
-#translate vot_type var to actual voting type name
-def translate_type(vot_type):
-    res=None
-    if 'simple' in vot_type:
-        res=('V', 'Voting')
-    elif 'binary' in vot_type:
-        res=('BV', 'BinaryVoting')
-    elif 'multiple' in vot_type:
-        res=('MV', 'MultipleVoting')
-    elif 'score' in vot_type:
-        res=('SV', 'ScoreVoting')
-    return res    
+  
            
 #constructs menu for inline buttons    
 def build_keyboard_menu(buttons, n_cols):
@@ -217,7 +199,9 @@ def aux_message_builder(voting, vot_type):
     
     options=list(voting.question.options.values_list('option', flat=True))
     if stmodels.Vote.objects.filter(voting_id=voting.id, type=vot_type).exists():
-        tally=stmodels.Vote.objects.filter(voting_id=voting.id, type=vot_type).values('voter_id').distinct().count()
+        unique_votes=set(stmodels.Vote.objects.filter(voting_id=voting.id, type=vot_type).annotate(Count('voter_id', distinct=True))
+                           .values_list('voter_id'))
+        tally=len(unique_votes)
     else:
         tally=0
     start_d=voting.start_date.strftime('%d-%m-%Y %H:%M:%S')+"\n"
@@ -240,8 +224,8 @@ def aux_message_builder(voting, vot_type):
 
 
 #extracts graph's images from website selected voting and sends them to the user
-def results_graph(id, chat_identifier, context):
-    open_graphs_generator_view(id)
+def results_graph(id, vot_type, chat_identifier, context):
+    open_graphs_generator_view(id, vot_type)
     if Graphs.objects.filter(voting_id=id).exists():
         graphs_base64=Graphs.objects.filter(voting_id=id).values('graphs_url')
         try:
@@ -266,19 +250,56 @@ def results_graph(id, chat_identifier, context):
 
 
 #uses selenium to call view which generates voting graphs
-def open_graphs_generator_view(id):
+def open_graphs_generator_view(id, vot_type):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     driver=webdriver.Chrome(options=options)
-    driver.get('http://127.0.0.1:8000/visualizer/' + str(id))  #VISUALIZER_VIEW will be taken from setting in production
-
-
-      
+    view_url=translate_to_url(vot_type)
+    driver.get(view_url + str(id)) 
+    
 #sends notifications when a new voting is created
 def auto_notifications(voting):
     users_id_enabled=list(TelegramBot.objects.values_list('user_id', flat=True).exclude(auto_msg=False))
     msg=aux_message_builder(voting, voting.type)
-    for id in users_id_enabled:
-        BOT.send_message(chat_id=id, text=msg, parse_mode="HTML")
+    if users_id_enabled:
+        for id in users_id_enabled:
+            BOT.send_message(chat_id=id, text=msg, parse_mode="HTML")
 
 
+#gets voting type objects
+def get_voting_objects(vot_type):
+    res=None
+    if 'simple' in vot_type:
+       res=models.Voting.objects
+    elif 'binary' in vot_type:
+        res=models.BinaryVoting.objects
+    elif 'multiple' in vot_type:
+        res=models.MultipleVoting.objects
+    elif 'score' in vot_type:
+        res=models.ScoreVoting.objects
+    return res
+
+#translate vot_type var to actual voting type name
+def translate_to_type(vot_type):
+    res=None
+    if 'simple' in vot_type:
+        res=('V', 'Voting')
+    elif 'binary' in vot_type:
+        res=('BV', 'BinaryVoting')
+    elif 'multiple' in vot_type:
+        res=('MV', 'MultipleVoting')
+    elif 'score' in vot_type:
+        res=('SV', 'ScoreVoting')
+    return res  
+
+#translate vot_type var to url of that type
+def translate_to_url(vot_type):
+    if 'binary' in vot_type:
+        res=URL+'binaryVoting/'
+    elif 'multiple' in vot_type:
+        res=URL+'multipleVoting/'
+    elif 'score' in vot_type:
+        res=URL+'scoreVoting/'
+    else:
+        res=URL
+    return res

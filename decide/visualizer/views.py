@@ -163,8 +163,11 @@ def initialize(request):
     #call to initalize telegram bot
     global TELEGRAM_BOT_STATUS
     if not TELEGRAM_BOT_STATUS:
-        init_bot()
-        TELEGRAM_BOT_STATUS=True
+        try:    #just in case someone from another team tried to start the bot when other team already did
+            init_bot()
+        except:
+            pass
+            TELEGRAM_BOT_STATUS=True
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))       
 
 def graphs_requests(request, voting_id):
@@ -181,7 +184,7 @@ def graphs_requests(request, voting_id):
         return HttpResponse()
     
     if request.method == 'GET':  
-        vot_type=translate_type(request.path_info) 
+        vot_type=translate_type(request.path_info)   
         data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))        
         return HttpResponse(json.dumps(data), content_type="application/json")
     
