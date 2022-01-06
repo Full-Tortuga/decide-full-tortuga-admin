@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import VisualizerView, VisualizerViewScoring, Votes_csv, VisualizerViewBinary, VotesBinary_csv, VotesScoring_csv, VisualizerViewMultiple, VotesMultiple_csv, initialize, graphs_requests
+from .views import (GraphViewSet, VisualizerView, VisualizerViewScoring, Votes_csv, VisualizerViewBinary, VotesBinary_csv, 
+VotesScoring_csv,VisualizerViewMultiple, VotesMultiple_csv, initialize, graphs_requests)
 
 
 app_name= 'visualizer'

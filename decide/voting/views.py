@@ -7,7 +7,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from .models import BinaryQuestion, BinaryQuestionOption, BinaryVoting, MultipleQuestion, MultipleQuestionOption, MultipleVoting, Question, QuestionOption, ScoreQuestion, ScoreQuestionOption, ScoreVoting, Voting
-from .serializers import BinaryVotingSerializer, MultipleVotingSerializer, SimpleBinaryVotingSerializer, SimpleMultipleVotingSerializer, SimpleVotingSerializer, VotingSerializer, SimpleScoreVotingSerializer,ScoreVotingSerializer
+from .serializers import (BinaryVotingSerializer, MultipleVotingSerializer, SimpleBinaryVotingSerializer, SimpleMultipleVotingSerializer, 
+                          SimpleVotingSerializer, VotingSerializer, SimpleScoreVotingSerializer,ScoreVotingSerializer)
 from base.perms import UserIsStaff
 from base.models import Auth
 
@@ -98,7 +99,11 @@ class VotingUpdate(generics.RetrieveUpdateDestroyAPIView):
                 msg = 'Voting tallied'
         else:
             msg = 'Action not found, try with start, stop or tally'
-            st = status.HTTP_400_BAD_REQUEST
+            st = status.HTTP_400_BAD_REQUESTeMultipleVotingSerializer, SimpleVotingSerializer, VotingSerializer, SimpleScoreVotingSerializer,ScoreVotingSerializer
+
+11
+
+from base.perms import UserIsStaff
         return Response(msg, status=st)
 
 class BinaryVotingView(generics.ListCreateAPIView):
