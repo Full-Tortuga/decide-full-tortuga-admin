@@ -1,6 +1,5 @@
 from os import wait
-import random
-import itertools
+import random, itertools, os
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -162,7 +161,7 @@ class TelegramBotTestCase(BaseTestCase):
         super().setUp()
         self.test_user_id=1931864468
         self.BotUsername='votitos_bot'
-        self.updater=Updater(settings.TELEGRAM_TOKEN,
+        self.updater=Updater(os.environ['TELEGRAM_TOKEN'],
         use_context=True)
         self.update=Update(
             update_id=858728489,
@@ -196,7 +195,7 @@ class TelegramBotTestCase(BaseTestCase):
     def start(self,update, context):
         name=update.message.from_user.first_name
         id=update.message.chat.id
-        response=context.bot.send_message(chat_id=id, text="Hola {}. Esto es un test para ver si funciono correctamenten, no molestes.".format(name))
+        response=context.bot.send_message(chat_id=id, text="Hola {}. Esto es un test para ver si funciono correctamente, no molestes.".format(name))
         TelegramBot.objects.get_or_create(user_id=id)
         return name, id, response
         

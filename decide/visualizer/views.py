@@ -155,8 +155,11 @@ def initialize(request):
     #call to initalize telegram bot
     global TELEGRAM_BOT_STATUS
     if not TELEGRAM_BOT_STATUS:
-        init_bot()
-        TELEGRAM_BOT_STATUS=True
+        try:    #just in case someone from another team tried to start the bot when other team already did
+            init_bot()
+        except:
+            pass
+            TELEGRAM_BOT_STATUS=True
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))       
 
 def graphs_requests(request, voting_id):
