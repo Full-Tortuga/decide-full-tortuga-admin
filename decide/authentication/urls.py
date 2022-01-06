@@ -14,7 +14,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('getuser/', GetUserView.as_view()),
     path('register/', RegisterView.as_view(), name='sign_up'),
-    path('loginLDAP_form/', LDAPSignInView.as_view(), name='loginldapform'),
     path('loginLDAP/', LDAPLogin.as_view(), name='loginldap'),
     path('login_form/', SignInView.as_view(), name='sign_in'),
     path('register_user/', RegisterUserView.as_view()),
