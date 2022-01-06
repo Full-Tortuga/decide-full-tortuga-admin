@@ -33,8 +33,12 @@ jobs:
           pip install codacy-coverage
     - name: Run migrations
       run: cd decide;python manage.py makemigrations;python manage.py migrate
+      env:
+        TELEGRAM_TOKEN = ${{ secrets.TELEGRAM_TOKEN }}
     - name: Run tests
-      run: cd decide;coverage run --branch --source=. ./manage.py test  --settings=decide.test_settings --keepdb; coverage xml;
+      run: cd decide;coverage run --branch --source=. ./manage.py test --settings=decide.test_settings --keepdb; coverage xml;
+      env:
+        TELEGRAM_TOKEN = ${{ secrets.TELEGRAM_TOKEN }}
     - name: Codacy Coverage Reporter
       uses: codacy/codacy-coverage-reporter-action@v1.1.0
       with:
