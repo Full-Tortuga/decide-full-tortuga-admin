@@ -21,6 +21,10 @@ from .models import TelegramBot
 from telegram import Update, Message, BotCommand, Chat
 from telegram import User as User_t
 from telegram.ext import Updater, CommandHandler, CallbackContext
+from dotenv import load_dotenv
+
+
+load_dotenv() #load token for bot
 
 # Create your tests here.
 class VisualizerTestCase(BaseTestCase):
