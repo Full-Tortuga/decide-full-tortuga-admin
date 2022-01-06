@@ -16,4 +16,4 @@ six==1.16.0
 sqlparse==0.2.4
 python-ldap==3.1.0
 django-auth-ldap==2.2.0
-selenium
+selenium==4.1.0
