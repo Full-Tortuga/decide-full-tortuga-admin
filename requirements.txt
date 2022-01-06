@@ -16,5 +16,6 @@ six==1.16.0
 sqlparse==0.2.4
 python-telegram-bot==13.9.0
 selenium==3.9.0
-
-
+gunicorn
+django-heroku
+dnspython
