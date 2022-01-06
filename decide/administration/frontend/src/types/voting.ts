@@ -9,6 +9,9 @@ export type Voting = {
   desc: string;
   start_date: string;
   end_date: string;
+  census: number[];
+  question: Question;
+  auth: string;
 };
 
 export type VotingFormFields = {

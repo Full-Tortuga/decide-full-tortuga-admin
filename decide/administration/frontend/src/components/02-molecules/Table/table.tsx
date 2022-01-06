@@ -6,6 +6,7 @@ const Component = (props: {
   rows: any[];
   columns: GridColDef[];
   setSelected: any;
+  initialSelection?: number[];
 }) => {
   const filterRows = React.useCallback(
     (ids: any[]) => {
@@ -16,10 +17,11 @@ const Component = (props: {
   );
 
   const [selectionModel, setSelectionModel] =
-    React.useState<GridSelectionModel>([]);
+    React.useState<GridSelectionModel>(props.initialSelection || []);
 
   const updateSelectionModel = React.useCallback(
     (newSelection: GridSelectionModel) => {
+      console.log("chagnes");
       setSelectionModel(newSelection);
       props.setSelected(filterRows(newSelection));
     },
@@ -34,7 +36,7 @@ const Component = (props: {
         columns={props.columns}
         pageSize={10}
         checkboxSelection
-        selectionModel={selectionModel}
+        selectionModel={props.initialSelection || selectionModel}
         onSelectionModelChange={(e) => updateSelectionModel(e)}
       />
     </div>

@@ -2,7 +2,6 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Add, Edit } from "@mui/icons-material";
 
-
 import { votingType } from "types";
 import { votingApi } from "api";
 import { utils } from "utils";
@@ -11,7 +10,10 @@ import { Input } from "components/01-atoms";
 import { Modal, ModalPage } from "components/02-molecules";
 import { CensusInput, QuestionInput } from ".";
 
-const Component = (props: { initialVoting?: votingType.Voting; refetch: () => void; }) => {
+const Component = (props: {
+  initialVoting?: votingType.Voting;
+  refetch: () => void;
+}) => {
   const editMode = React.useMemo(
     () => !!props.initialVoting?.id,
     [props.initialVoting]
@@ -34,14 +36,12 @@ const Component = (props: { initialVoting?: votingType.Voting; refetch: () => vo
     clearErrors();
     trigger();
     if (props.initialVoting) {
-      const census: number[] = [];
-      const question = {} as votingType.Question;
-
       control._defaultValues = {
         name: props.initialVoting?.name,
         desc: props.initialVoting?.desc,
-        census: census,
-        question: question,
+        census: props.initialVoting?.census,
+        question: props.initialVoting?.question,
+        auth: props.initialVoting?.auth,
       };
     }
   }, [props.initialVoting, control, reset, clearErrors, trigger]);
@@ -62,7 +62,7 @@ const Component = (props: { initialVoting?: votingType.Voting; refetch: () => vo
     if (Object.keys(errors).length === 0)
       if (editMode && props.initialVoting?.id) {
         votingApi
-          .updateVoting(data,props.initialVoting?.id)
+          .updateVoting(data, props.initialVoting?.id)
           .then(() => onSubmitSuccess())
           .catch((error) => onSubmitFailed(utils.parseErrors(error)));
       } else {
@@ -76,7 +76,9 @@ const Component = (props: { initialVoting?: votingType.Voting; refetch: () => vo
   return (
     <Modal
       onSubmit={() => onSubmit(getValues())}
-      title={editMode ? "Edit Voting " + props.initialVoting?.name : "New Voting"}
+      title={
+        editMode ? "Edit Voting " + props.initialVoting?.name : "New Voting"
+      }
       openerIcon={editMode ? <Edit /> : <Add />}
       externalClose={sent}
       pages={[

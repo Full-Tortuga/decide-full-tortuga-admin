@@ -10,7 +10,8 @@ from base.serializers import AuthSerializer
 class UserAdminSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff', 'is_superuser')
+        fields = ('id', 'username', 'first_name', 'last_name',
+                  'email', 'is_active', 'is_staff', 'is_superuser')
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -71,7 +72,8 @@ class AdminVotingSerializer(serializers.Serializer):
     question = AdminQuestionSerializer(many=False)
     auth = serializers.URLField()
     name = serializers.CharField(max_length=200)
-    desc = serializers.CharField(max_length=1000, allow_blank=True, allow_null=True)
+    desc = serializers.CharField(
+        max_length=1000, allow_blank=True, allow_null=True)
     census = serializers.ListField(allow_null=True)
 
 
@@ -82,7 +84,8 @@ class AdminVotingGetSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Voting
-        fields = ('id', 'name', 'desc', 'question', 'auth', 'census')
+        fields = ('id', 'name', 'desc', 'question', 'auth',
+                  'census', "end_date", "start_date", "tally")
 
     def get_auth(self, obj):
         auth = obj.auths.all().first()

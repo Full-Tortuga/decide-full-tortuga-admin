@@ -1,9 +1,16 @@
 import React from "react";
-import { Delete, Refresh, PlayArrow, Pause, Stop} from "@mui/icons-material";
+import {
+  Delete,
+  Refresh,
+  PlayArrow,
+  Stop,
+  HowToVoteOutlined,
+  Cancel,
+} from "@mui/icons-material";
 
 import { votingType } from "types";
-import { votingApi } from "api"
-import { utils } from "utils"
+import { votingApi } from "api";
+import { utils } from "utils";
 
 import { ActionBar } from "components/03-organisms";
 import { VotingTable, VotingForm } from "components/templates";
@@ -20,15 +27,13 @@ const VotingsPage = () => {
 
   React.useEffect(() => {
     votingApi
-    .getVotings()
-    .then((response) => {
-     console.log(response);
-     //response.data.setAttribute("status", utils.getStatus(response.data));
-      setVotings(response.data);
+      .getVotings()
+      .then((response) => {
+        setVotings(response.data);
       })
-    .catch((error) => {
-       console.log(error);
-     });
+      .catch((error) => {
+        console.log(error);
+      });
   }, [refetch]);
 
   const idList = React.useMemo(
@@ -38,73 +43,56 @@ const VotingsPage = () => {
 
   //See if votings have the same status
   const selectionState = React.useMemo(() => {
-    const checkOptions = (startDateNumber: number, endDateNumber: number) => {
-      if (startDateNumber === 0 && endDateNumber === 0) return "New";
-      else if (startDateNumber > 0 && endDateNumber === 0) return "In progress";
-      else if (startDateNumber > 0 && endDateNumber > 0) return "Finished";
-    };
-
-    const checkDisabled = (active: number)=> {
-      if (active === selected.length && selected.length > 0) return "true";
-      else if (active === 3) return "false";
-      else if (active === 11) return "false";
-      else if (active === 8) return "false";
+    const getSelectionStatus = (
+      newNumber: number,
+      inProgressNumber: number,
+      finishedNumber: number
+    ) => {
+      if (newNumber === selected.length && selected.length > 0) return "new";
+      else if (inProgressNumber === selected.length && selected.length > 0)
+        return "in_progress";
+      else if (finishedNumber === selected.length && selected.length > 0)
+        return "finished";
       else return "mixed";
     };
 
-    const startDateNumber = selected.filter(
-      (voting: votingType.Voting) => voting.start_date
-    ).length;
-    
-    const endDateNumber = selected.filter(
-      (voting: votingType.Voting) => voting.end_date
+    const newNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting) === "New"
     ).length;
 
-    const votingNumber = selected.filter(
-      (voting: votingType.Voting) => utils.getStatus(voting)
+    const inPogressNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting) === "In progress"
     ).length;
-    
-    let numberV = ""
-    if (startDateNumber === 0 && endDateNumber === 0) numberV = "New";
-    else if (startDateNumber > 0 && endDateNumber === 0) numberV = "In progress";
-    else if (startDateNumber > 0 && endDateNumber > 0) numberV = "Finished";
-    
+
+    const finishedNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting) === "Finished"
+    ).length;
+
     return {
-      status: checkOptions(startDateNumber||0,endDateNumber||0),
-      option: checkDisabled(numberV.length||0),
+      status: getSelectionStatus(newNumber, inPogressNumber, finishedNumber),
     };
   }, [selected]);
 
-  
-
   const handleDelete = () => {
-    console.log(idList);
-    refetchVotings();
-     votingApi.deleteVotings(idList).then((response) => {
-       console.log(response);
-       refetchVotings();
-     });
+    votingApi.deleteVotings(idList).then((response) => {
+      console.log(response);
+      refetchVotings();
+    });
   };
 
-  const handleChangeActive = (status: string) => {
-    console.log(idList);
-    if(status === "New"){
+  const handleChangeStatus = (status: string) => {
+    if (status === "new")
       votingApi.startVotings(idList).then((response) => {
-        console.log(response);
         refetchVotings();
       });
-    }else if (status === "In progress"){
+    if (status === "in_progress")
       votingApi.stopVotings(idList).then((response) => {
-        console.log(response);
         refetchVotings();
       });
-    }else{
+    if (status === "finished")
       votingApi.tallyVotings(idList).then((response) => {
-        console.log(response);
         refetchVotings();
       });
-    }
-
   };
 
   return (
@@ -132,38 +120,33 @@ const VotingsPage = () => {
             icon: <Delete />,
             title: "Delete",
             onClick: () => {
-              console.log("delete");
               handleDelete();
             },
           },
           {
             icon:
-              selectionState.status === "New" ? (
+              selectionState.status === "new" ? (
                 <PlayArrow />
-
-              ) : (selectionState.status === "In progress" ) ? (
-                <Pause />
-
-              ) :(
+              ) : selectionState.status === "in_progress" ? (
                 <Stop />
+              ) : selectionState.status === "finished" ? (
+                <HowToVoteOutlined />
+              ) : (
+                <Cancel />
               ),
             title:
-              selectionState.status === "New"
-                ? "Start voting"
-                : (selectionState.status === "In progress") 
-                ? ("Stop voting") : (
-                  "Tally voting"
-                ),
-            disabled: selectionState.option === "mixed" || selectionState.status === "Finished",
+              selectionState.status === "new"
+                ? "Start"
+                : selectionState.status === "in_progress"
+                ? "Stop"
+                : selectionState.status === "finished"
+                ? "Tally"
+                : "Cancel",
+            disabled: selectionState.status === "mixed",
             onClick: () => {
-              console.log("switch active");
-              selectionState.status === "New"
-                ? handleChangeActive("New") : (selectionState.status === "In progress") 
-                ? (handleChangeActive("In progress")) 
-                : handleChangeActive("Finished");
+              handleChangeStatus(selectionState.status);
             },
           },
-        
         ]}
       />
     </>
