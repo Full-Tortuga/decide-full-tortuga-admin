@@ -1,18 +1,18 @@
+import json, ast, requests, csv
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.http import Http404
 from django.views.generic.base import View
-
 from base import mods
 from collections import OrderedDict
-
+from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from .serializers import GraphSerializer
+from .models import Graphs
+from .telegramBot import init_bot
 from django.shortcuts import get_object_or_404
 from voting.models import BinaryVoting, MultipleVoting, ScoreVoting
-
-import json, csv
-from .telegramBot import init_bot
-from .models import Graphs
 
 TELEGRAM_BOT_STATUS=False
 
@@ -40,7 +40,6 @@ class Votes_csv(View):
 
 class VisualizerView(TemplateView):
     template_name = 'visualizer/visualizer.html'
-    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -57,7 +56,6 @@ class VisualizerView(TemplateView):
             raise Http404
 
         return context
-
 
 class VisualizerViewScoring(TemplateView):
     template_name = 'visualizer/visualizer_scoring.html'
@@ -119,7 +117,7 @@ class VotesBinary_csv(View):
         for vote in voting.postproc:
             csv_file.writerow([vote["option"], vote["postproc"], vote["votes"]])
         return res
-
+        
 class VisualizerViewMultiple(TemplateView):
     template_name = 'visualizer/visualizer_multiple.html'
 
@@ -151,12 +149,25 @@ class VotesMultiple_csv(View):
             csv_file.writerow([vote["option"], vote["postproc"], vote["votes"]])
         return res
     
+class GraphViewSet(viewsets.ModelViewSet):
+		   
+	serializer_class=GraphSerializer
+	http_method_names = ['get']
+	filter_backends = [DjangoFilterBackend]
+	filterset_fields = ['voting_id', 'voting_type']
+	    
+	def get_queryset(self):
+	    return Graphs.objects.all()
+
 def initialize(request):
     #call to initalize telegram bot
     global TELEGRAM_BOT_STATUS
     if not TELEGRAM_BOT_STATUS:
-        init_bot()
-        TELEGRAM_BOT_STATUS=True
+        try:    #just in case someone from another team tried to start the bot when other team already did
+            init_bot()
+        except:
+            pass
+            TELEGRAM_BOT_STATUS=True
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))       
 
 def graphs_requests(request, voting_id):
@@ -173,7 +184,7 @@ def graphs_requests(request, voting_id):
         return HttpResponse()
     
     if request.method == 'GET':  
-        vot_type=translate_type(request.path_info)    
+        vot_type=translate_type(request.path_info)   
         data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))        
         return HttpResponse(json.dumps(data), content_type="application/json")
     
