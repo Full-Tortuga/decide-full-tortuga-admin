@@ -7,7 +7,7 @@ import { utils } from "utils";
 
 import { Table } from "components/02-molecules";
 import { IconButton } from "components/01-atoms";
-import { HowToVoteOutlined } from "@mui/icons-material";
+import { HowToVoteOutlined, Visibility } from "@mui/icons-material";
 
 const columns: GridColDef[] = [
   {
@@ -78,24 +78,43 @@ const columns: GridColDef[] = [
   },
   {
     field: "link",
-    headerName: "Link",
+    headerName: "Links",
     align: "center",
     renderCell: (params) => {
+      const status = utils.getStatus(params.row);
       return (
-        <IconButton
-          title={"Vote!"}
-          icon={<HowToVoteOutlined />}
-          onClick={() =>
-            window.open(
-              "http://" +
-                window.location.hostname +
-                ":" +
-                window.location.port +
-                "/booth/" +
-                params.row.id
-            )
-          }
-        />
+        <>
+          {status === "In progress" && (
+            <IconButton
+              title={"Vote!"}
+              icon={<HowToVoteOutlined />}
+              onClick={() =>
+                window.open(
+                  "http://" +
+                    window.location.hostname +
+                    (window.location.port ? ":" + window.location.port : "") +
+                    "/booth/" +
+                    params.row.id
+                )
+              }
+            />
+          )}
+          {status === "Finished" && (
+            <IconButton
+              title={"Results"}
+              icon={<Visibility />}
+              onClick={() =>
+                window.open(
+                  "http://" +
+                    window.location.hostname +
+                    (window.location.port ? ":" + window.location.port : "") +
+                    "/visualizer/" +
+                    params.row.id
+                )
+              }
+            />
+          )}
+        </>
       );
     },
   },
