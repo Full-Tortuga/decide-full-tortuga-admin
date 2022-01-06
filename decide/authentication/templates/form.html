@@ -1,5 +1,4 @@
-
-{% load static %}
+ {% load static %}
 <!doctype html>
 <html lang="en">
 
@@ -8,13 +7,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Web site created using create-react-app" />
-    <title>React App</title>
-    <script defer="defer" src="{% static 'main.f3eff200.js' %}"></script>
-    <link href="{% static 'main.159e7c5b.css' %}" rel="stylesheet">
+    <title>Login</title>
+    <script defer="defer" src="{% static 'main.e05b167d.js' %}"></script>
+    <link href="{% static 'main.b205982b.css' %}" rel="stylesheet">
 </head>
 
-<body><noscript>You need to enable JavaScript to run this app.</noscript>
-    {% csrf_token %}
+<body><noscript>You need to enable JavaScript to run this app.</noscript> {% csrf_token %}
     <div id="root"></div>
 </body>
 

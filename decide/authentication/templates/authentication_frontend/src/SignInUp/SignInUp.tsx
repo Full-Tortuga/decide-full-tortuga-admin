@@ -1,11 +1,12 @@
 import React from 'react';
+import { Alert, Button, ButtonGroup, Card, Col, Container, Row } from 'react-bootstrap';
 import './index.css';
 import LoginBox from './Login';
 import RegisterBox from './Register';
 
-class SignInUp extends React.Component<any,State>{
+class SignInUp extends React.Component<any, State>{
 
-  constructor(props:any) {
+  constructor(props: any) {
     super(props);
     this.state = {
       isLoginOpen: true,
@@ -14,54 +15,46 @@ class SignInUp extends React.Component<any,State>{
   }
 
   showLoginBox() {
-    this.setState({isLoginOpen: true, isRegisterOpen: false});
+    this.setState({ isLoginOpen: true, isRegisterOpen: false });
   }
 
   showRegisterBox() {
-    this.setState({isRegisterOpen: true, isLoginOpen: false});
+    this.setState({ isRegisterOpen: true, isLoginOpen: false });
   }
 
-  render (){
+  render() {
     console.log(this.state)
     return (
-      <div className="root-container">
-        <div id="error-box">
+      <Container>
+        <Alert variant="danger" className="error-box">
           <span id="error-msg"> </span>
-        </div>
-
-        <div className="box-container">
-          {this.state.isLoginOpen && <LoginBox/>}
-          {this.state.isRegisterOpen && <RegisterBox/>}
-        </div>
-
-  
-        <div className="box-controller">
-          <div
-            className={"controller " + (this.state.isLoginOpen
-            ? "selected-controller"
-            : "")}
-            onClick={this
-            .showLoginBox
-            .bind(this)}>
-            Login
-          </div>
-          <div
-            className={"controller " + (this.state.isRegisterOpen
-            ? "selected-controller"
-            : "")}
-            onClick={this
-            .showRegisterBox
-            .bind(this)}>
-            Register
-          </div>
-        </div>
-      </div>
+        </Alert>
+        <Card className="mx-auto text-center rounded-3" >
+          <Card.Body>
+            <Card.Title>
+              {this.state.isLoginOpen && <h4>LOGIN</h4>}
+              {this.state.isRegisterOpen && <h4>REGISTER</h4>}
+            </Card.Title>
+            <Card.Text>
+              {this.state.isLoginOpen && <LoginBox />}
+              {this.state.isRegisterOpen && <RegisterBox />}
+              <br />
+              {this.state.isLoginOpen && <p>¿Aún no tienes cuenta? Regístrate <a className="link" onClick={this
+                .showRegisterBox
+                .bind(this)}>aquí</a></p>}
+              {this.state.isRegisterOpen && <p>¿Ya tienes cuenta? Inicia sesión <a className="link" onClick={this
+                .showLoginBox
+                .bind(this)}>aquí</a></p>}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </Container>
     );
   }
-  
+
 }
 
-interface State{
+interface State {
   isRegisterOpen: boolean,
   isLoginOpen: boolean
 }
