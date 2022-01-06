@@ -51,7 +51,7 @@ class VisualizerView(TemplateView):
             for e in dataList:
                 ls_dicc.append(dict(e))
             voting = (r[0], ls_dicc)
-            context['voting'] = voting
+            context['voting'] = json.dumps(voting)
         except:
             raise Http404
 

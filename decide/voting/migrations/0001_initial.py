@@ -29,7 +29,6 @@ class Migration(migrations.Migration):
                 ('end_date', models.DateTimeField(blank=True, null=True)),
                 ('tally', models.Field(blank=True, default=[], null=True)),
                 ('postproc', models.Field(blank=True, default=[], null=True)),
-                ('type', models.CharField(choices=[('V', 'Voting')], default='V', max_length=2)),
                 ('auths', models.ManyToManyField(related_name='votings', to='base.Auth')),
                 ('pub_key', models.ForeignKey(blank=True, db_index=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='voting', to='base.Key')),
                 ('question', models.ForeignKey(db_index=False, on_delete=django.db.models.deletion.CASCADE, related_name='voting', to='voting.Question')),

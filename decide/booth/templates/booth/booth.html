@@ -196,7 +196,7 @@
                     }
                     this.postData("{% url "gateway" "store" "/" %}", data)
                         .then(data => {
-                            this.showAlert("success", '{% trans "Conglatulations. Your vote has been sent" %}');
+                            this.showAlert("success", '{% trans "Congratulations. Your vote has been sent" %}');
                         })
                         .catch(error => {
                             this.showAlert("danger", '{% trans "Error: " %}' + error);

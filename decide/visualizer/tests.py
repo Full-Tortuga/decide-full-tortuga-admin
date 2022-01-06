@@ -47,7 +47,7 @@ class VisualizerTestCase(BaseTestCase):
         for i in range(5):
             opt = QuestionOption(question=q, option='option {}'.format(i+1))
             opt.save()
-        v = Voting(id=101,name='test voting', question=q)
+        v = Voting(id=101,name='test voting', question=q, type='V')
 
         a, _ = Auth.objects.get_or_create(url=settings.BASEURL,
                                           defaults={'me': True, 'name': 'test auth'})
@@ -65,11 +65,11 @@ class VisualizerTestCase(BaseTestCase):
             u, _ = User.objects.get_or_create(username='testvoter{}'.format(i))
             u.is_active = True
             u.save()
-            c = Census(voter_id=u.id, voting_id=v.id)
+            c = Census(voter_id=u.id, voting_id=v.id, type=v.type)
             c.save()
 
         #Store Votes 
-        voters = list(Census.objects.filter(voting_id=v.id))
+        voters = list(Census.objects.filter(voting_id=v.id,type=v.type))
         voter = voters.pop()
 
         for opt in v.question.options.all():
@@ -94,7 +94,7 @@ class VisualizerTestCase(BaseTestCase):
         for i in range(5):
             opt = ScoreQuestionOption(question=q, option='{}'.format(i+1))
             opt.save()
-        v = ScoreVoting(id=101,name='test voting', question=q)
+        v = ScoreVoting(id=101,name='test voting', question=q, type='SV')
 
         a, _ = Auth.objects.get_or_create(url=settings.BASEURL,
                                           defaults={'me': True, 'name': 'test auth'})
@@ -112,11 +112,11 @@ class VisualizerTestCase(BaseTestCase):
             u, _ = User.objects.get_or_create(username='testvoter{}'.format(i))
             u.is_active = True
             u.save()
-            c = Census(voter_id=u.id, voting_id=v.id)
+            c = Census(voter_id=u.id, voting_id=v.id, type=v.type)
             c.save()
 
         #Store Votes 
-        voters = list(Census.objects.filter(voting_id=v.id))
+        voters = list(Census.objects.filter(voting_id=v.id,type=v.type))
         voter = voters.pop()
 
         for opt in v.question.options.all():
@@ -141,7 +141,7 @@ class VisualizerTestCase(BaseTestCase):
         for i in range(5):
             opt = MultipleQuestionOption(question=q, option='option {}'.format(i+1))
             opt.save()
-        v = MultipleVoting(id=101,name='test voting', question=q)
+        v = MultipleVoting(id=101,name='test voting', question=q,type='MV')
 
         a, _ = Auth.objects.get_or_create(url=settings.BASEURL,
                                           defaults={'me': True, 'name': 'test auth'})
@@ -159,11 +159,11 @@ class VisualizerTestCase(BaseTestCase):
             u, _ = User.objects.get_or_create(username='testvoter{}'.format(i))
             u.is_active = True
             u.save()
-            c = Census(voter_id=u.id, voting_id=v.id)
+            c = Census(voter_id=u.id, voting_id=v.id,type=v.type)
             c.save()
 
         #Store Votes 
-        voters = list(Census.objects.filter(voting_id=v.id))
+        voters = list(Census.objects.filter(voting_id=v.id, type=v.type))
         voter = voters.pop()
 
         for opt in v.question.options.all():
@@ -172,7 +172,7 @@ class VisualizerTestCase(BaseTestCase):
                 data = {
                     'voting': v.id,
                     'voter': voter.voter_id,
-                    'vote': { 'a': a, 'b': b },
+                    'vote': [{ 'a': a, 'b': b }],
                     'type': 'MV'
                 }
                 user = self.get_or_create_user(voter.voter_id)
@@ -207,11 +207,11 @@ class VisualizerTestCase(BaseTestCase):
             u, _ = User.objects.get_or_create(username='testvoter{}'.format(i))
             u.is_active = True
             u.save()
-            c = Census(voter_id=u.id, voting_id=v.id)
+            c = Census(voter_id=u.id, voting_id=v.id,type=v.type)
             c.save()
 
         #Store Votes 
-        voters = list(Census.objects.filter(voting_id=v.id))
+        voters = list(Census.objects.filter(voting_id=v.id,type=v.type))
         voter = voters.pop()
 
         for opt in v.question.options.all():

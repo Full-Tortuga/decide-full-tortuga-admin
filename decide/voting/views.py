@@ -99,11 +99,7 @@ class VotingUpdate(generics.RetrieveUpdateDestroyAPIView):
                 msg = 'Voting tallied'
         else:
             msg = 'Action not found, try with start, stop or tally'
-            st = status.HTTP_400_BAD_REQUESTeMultipleVotingSerializer, SimpleVotingSerializer, VotingSerializer, SimpleScoreVotingSerializer,ScoreVotingSerializer
-
-11
-
-from base.perms import UserIsStaff
+            st = status.HTTP_400_BAD_REQUEST
         return Response(msg, status=st)
 
 class BinaryVotingView(generics.ListCreateAPIView):
