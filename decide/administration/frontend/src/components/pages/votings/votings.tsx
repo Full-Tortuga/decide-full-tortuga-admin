@@ -3,6 +3,7 @@ import { Delete, Refresh, PlayArrow, Pause, Stop} from "@mui/icons-material";
 
 import { votingType } from "types";
 import { votingApi } from "api"
+import { utils } from "utils"
 
 import { ActionBar } from "components/03-organisms";
 import { VotingTable, VotingForm } from "components/templates";
@@ -37,35 +38,40 @@ const VotingsPage = () => {
 
   //See if votings have the same status
   const selectionState = React.useMemo(() => {
-    const checkOptions = (start_date: number, end_date: number) => {
-      if (start_date === 0 && end_date === 0) return "New";
-      else if (start_date > 0 && end_date === 0) return "In progress";
-      else if (start_date > 0 && end_date > 0) return "Finished";
+    const checkOptions = (startDateNumber: number, endDateNumber: number) => {
+      if (startDateNumber === 0 && endDateNumber === 0) return "New";
+      else if (startDateNumber > 0 && endDateNumber === 0) return "In progress";
+      else if (startDateNumber > 0 && endDateNumber > 0) return "Finished";
     };
 
-    const checkDisabled = ()=> {
-      if (checkOptions.length === selected.length && selected.length > 0) return "true";
-      else if (checkOptions.length === 0) return "false";
+    const checkDisabled = (active: number)=> {
+      if (active === selected.length && selected.length > 0) return "true";
+      else if (active === 3) return "false";
+      else if (active === 11) return "false";
+      else if (active === 8) return "false";
       else return "mixed";
     };
-    let start_date=0;
-    if(selected.filter((voting: votingType.Voting) => voting.start_date
-    )!==null){
-      start_date = selected.filter(
-        (voting: votingType.Voting) => voting.start_date
-      ).length;
-    }
-        
-    let end_date=0;
-    if(selected.filter((voting: votingType.Voting) => voting.end_date
-    )!==null){
-      end_date = selected.filter(
-        (voting: votingType.Voting) => voting.end_date
-      ).length;
-    }
+
+    const startDateNumber = selected.filter(
+      (voting: votingType.Voting) => voting.start_date
+    ).length;
+    
+    const endDateNumber = selected.filter(
+      (voting: votingType.Voting) => voting.end_date
+    ).length;
+
+    const votingNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting)
+    ).length;
+    
+    let numberV = ""
+    if (startDateNumber === 0 && endDateNumber === 0) numberV = "New";
+    else if (startDateNumber > 0 && endDateNumber === 0) numberV = "In progress";
+    else if (startDateNumber > 0 && endDateNumber > 0) numberV = "Finished";
+    
     return {
-      status: checkOptions(start_date,end_date),
-      option: checkDisabled()
+      status: checkOptions(startDateNumber||0,endDateNumber||0),
+      option: checkDisabled(numberV.length||0),
     };
   }, [selected]);
 
@@ -136,7 +142,7 @@ const VotingsPage = () => {
                 <PlayArrow />
 
               ) : (selectionState.status === "In progress" ) ? (
-                <Pause color="warning" />
+                <Pause />
 
               ) :(
                 <Stop />
@@ -148,7 +154,7 @@ const VotingsPage = () => {
                 ? ("Stop voting") : (
                   "Tally voting"
                 ),
-            disabled: selectionState.option === "mixed",
+            disabled: selectionState.option === "mixed" || selectionState.status === "Finished",
             onClick: () => {
               console.log("switch active");
               selectionState.status === "New"
