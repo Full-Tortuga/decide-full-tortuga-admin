@@ -40,23 +40,26 @@ class SignInUp extends React.Component<any, State>{
             <Card.Title>
               {this.state.isLoginOpen && <h4>LOGIN</h4>}
               {this.state.isRegisterOpen && <h4>REGISTER</h4>}
+              {this.state.isLoginLDAPOpen && <h4>LOGIN LDAP</h4>}
             </Card.Title>
             <Card.Text>
               {this.state.isLoginOpen && <LoginBox />}
               {this.state.isRegisterOpen && <RegisterBox />}
               {this.state.isLoginLDAPOpen && <LoginLDAP />}
               <br />
-              {this.state.isLoginOpen && <p>¿Aún no tienes cuenta? Regístrate <a className="link" onClick={this
-                .showRegisterBox
-                .bind(this)}>aquí</a></p>}
-              {this.state.isRegisterOpen && <p>¿Ya tienes cuenta? Inicia sesión <a className="link" onClick={this
+              {this.state.isLoginOpen && <><p>Would you prefer to log in via LDAP? Click <a className="link" onClick={this
+                .showLoginLDAP
+                .bind(this)}>here</a></p><p>Not a member yet? Click <a className="link" onClick={this
+                  .showRegisterBox
+                  .bind(this)}>here</a> to join </p></>}
+              {this.state.isRegisterOpen && <p>Do you already have an account? Sign in <a className="link" onClick={this
                 .showLoginBox
-                .bind(this)}>aquí</a> o desde <a className="link" onClick={this
-                  .showLoginBox
-                  .bind(this)}>LDAP</a></p>}
-              {this.state.isLoginLDAPOpen && <p>¿Aún no tienes cuenta? Regístrate <a className="link" onClick={this
+                .bind(this)}>here</a> or via <a className="link" onClick={this
+                  .showLoginLDAP
+                  .bind(this)}>LDAP</a> </p>}
+              {this.state.isLoginLDAPOpen && <p>Not a member yet? Click <a className="link" onClick={this
                 .showRegisterBox
-                .bind(this)}>aquí</a></p>}
+                .bind(this)}>here</a> to join</p>}
             </Card.Text>
           </Card.Body>
         </Card>
