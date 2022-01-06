@@ -2,16 +2,16 @@
     position: fixed;
     width: 100%;
     bottom : 0px;  
+    margin-top: 10px;
     height : 60px;
     text-align: center;
     vertical-align: middle; 
     padding-top: 0.5 rem;
-    padding-bottom: 0.5 rem;
     background-color: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity));
     color: #fff;
 }
 
-#start-tlg {
+#start_tlg {
     border: #79aec8;
     border-radius: 12px;
     font-size: 14px;
@@ -26,6 +26,9 @@
     -o-border-radius: 12px;
 }
 
-#start-tlg:hover{
+#start_tlg:hover{
     background-color: #417690;
+}
+.chartjs-render-monitor{
+    margin: 77px 10px; 
 }

@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import VisualizerView, VisualizerViewScoring, Votes_csv, VisualizerViewBinary, VotesBinary_csv, VotesScoring_csv, VisualizerViewMultiple, VotesMultiple_csv
+from .views import VisualizerView, VisualizerViewScoring, Votes_csv, VisualizerViewBinary, VotesBinary_csv, VotesScoring_csv, VisualizerViewMultiple, VotesMultiple_csv, initialize, graphs_requests
+
 
 app_name= 'visualizer'
 urlpatterns = [
@@ -10,5 +11,11 @@ urlpatterns = [
     path('scoringVoting/<int:voting_id>/', VisualizerViewScoring.as_view()),
     path('votes/scoryVoting/<int:voting_id>/', VotesScoring_csv.as_view()),
     path('multipleVoting/<int:voting_id>/', VisualizerViewMultiple.as_view()),
-    path('votes/multipleVoting/<int:voting_id>/', VotesMultiple_csv.as_view())
+    path('votes/multipleVoting/<int:voting_id>/', VotesMultiple_csv.as_view()),
+    path('startTelegram/', initialize, name="start_telegram"),
+    path('<int:voting_id>/graphs/', graphs_requests),
+    path('binaryVoting/<int:voting_id>/graphs/', graphs_requests),
+    path('scoringVoting/<int:voting_id>/graphs/', graphs_requests),
+    path('multipleVoting/<int:voting_id>/graphs/', graphs_requests),
+
 ]

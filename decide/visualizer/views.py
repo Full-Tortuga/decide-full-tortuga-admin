@@ -1,4 +1,3 @@
-import json
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.conf import settings
@@ -11,11 +10,11 @@ from collections import OrderedDict
 from django.shortcuts import get_object_or_404
 from voting.models import BinaryVoting, MultipleVoting, ScoreVoting
 
-import json
-import csv
-import os
+import json, csv
+from .telegramBot import init_bot
+from .models import Graphs
 
-
+TELEGRAM_BOT_STATUS=False
 
 #Generate a CSV File 
 class Votes_csv(View):
@@ -33,7 +32,6 @@ class Votes_csv(View):
         res = HttpResponse(content_type="text/csv")
         res['Content-Disposition'] = 'attachment; filename=' + str(r[0]["id"]) + '.csv'
 
-
         csv_file = csv.writer(res)
         csv_file.writerow(["Opcion", "Puntuacion", "Votos"])
         for vote in voting:
@@ -43,6 +41,7 @@ class Votes_csv(View):
 class VisualizerView(TemplateView):
     template_name = 'visualizer/visualizer.html'
     
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         vid = kwargs.get('voting_id', 0)
@@ -151,3 +150,40 @@ class VotesMultiple_csv(View):
         for vote in voting.postproc:
             csv_file.writerow([vote["option"], vote["postproc"], vote["votes"]])
         return res
+    
+def initialize(request):
+    #call to initalize telegram bot
+    global TELEGRAM_BOT_STATUS
+    if not TELEGRAM_BOT_STATUS:
+        init_bot()
+        TELEGRAM_BOT_STATUS=True
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))       
+
+def graphs_requests(request, voting_id):
+    if request.method == 'POST':
+        vot_type=request.POST.get('type')
+        urls=request.POST.getlist('graphs[]')
+        if Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).exists():
+            to_update=Graphs.objects.get(voting_id=voting_id, voting_type=vot_type)
+            to_update.voting_type=vot_type
+            to_update.graphs_url=urls
+            to_update.save()
+        else:
+            Graphs.objects.create(voting_id=voting_id, voting_type=vot_type, graphs_url=urls)
+        return HttpResponse()
+    
+    if request.method == 'GET':  
+        vot_type=translate_type(request.path_info)    
+        data=list(Graphs.objects.filter(voting_id=voting_id, voting_type=vot_type).values('voting_id', 'voting_type','graphs_url'))        
+        return HttpResponse(json.dumps(data), content_type="application/json")
+    
+#translate path to vot_type
+def translate_type(path_url):
+    vot_type='V'
+    if 'binaryVoting' in path_url:
+        vot_type='BV'
+    elif 'multiple' in path_url:
+        vot_type='MV'
+    elif 'score' in path_url:
+        vot_type='SV'
+    return vot_type   

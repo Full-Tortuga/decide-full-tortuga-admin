@@ -6,10 +6,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from .models import BinaryQuestion, MultipleQuestion, Question, ScoreQuestion
-from .models import BinaryQuestionOption, MultipleQuestionOption, QuestionOption, ScoreQuestionOption 
-from .models import BinaryVoting, MultipleVoting, ScoreVoting, Voting
-from .serializers import BinaryVotingSerializer, MultipleVotingSerializer, SimpleBinaryVotingSerializer, SimpleMultipleVotingSerializer, SimpleVotingSerializer, VotingSerializer, SimpleScoreVotingSerializer, ScoreVotingSerializer
+from .models import BinaryQuestion, BinaryQuestionOption, BinaryVoting, MultipleQuestion, MultipleQuestionOption, MultipleVoting, Question, QuestionOption, ScoreQuestion, ScoreQuestionOption, ScoreVoting, Voting
+from .serializers import BinaryVotingSerializer, MultipleVotingSerializer, SimpleBinaryVotingSerializer, SimpleMultipleVotingSerializer, SimpleVotingSerializer, VotingSerializer, ScoreVotingSerializer
+
 from base.perms import UserIsStaff
 from base.models import Auth
 
