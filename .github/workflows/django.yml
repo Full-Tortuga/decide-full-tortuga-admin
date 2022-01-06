@@ -5,7 +5,6 @@ on:
      branches:
           - master
           - develop
-          - config/set-up-CI/CD
 
 jobs:
   build:
@@ -32,10 +31,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install codacy-coverage
-    - name: Test env vars for python
-      run: python -c 'import os;print(os.environ)'
-      env:
-        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
     - name: Run migrations
       run: cd decide;python manage.py makemigrations;python manage.py migrate
       env:
