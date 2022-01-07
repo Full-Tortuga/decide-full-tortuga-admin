@@ -21,6 +21,31 @@ def index(request):
     return render(request, "build/index.html")
 
 
+class DashboardAPI(APIView):
+    permission_classes = (IsAdminAPI,)
+
+    def get(self, request):
+        n_of_users = User.objects.count()
+        n_of_active_users = User.objects.filter(is_active=True).count()
+        n_of_admins = User.objects.filter(is_superuser=True).count()
+        n_of_employees = User.objects.filter(is_staff=True).count()
+
+        n_of_not_started_votings = Voting.objects.filter(
+            start_date__isnull=True, end_date__isnull=True).count()
+        n_of_in_progress_votings = Voting.objects.filter(
+            start_date__isnull=False, end_date__isnull=True).count()
+        n_of_finished_votings = Voting.objects.filter(
+            start_date__isnull=False, end_date__isnull=False).count()
+
+        current_user = request.user
+
+        return Response({
+            "session": UserAdminSerializer(current_user).data,
+            "users": {"total": n_of_users, "active": n_of_active_users, "admins": n_of_admins, "employees": n_of_employees},
+            "votings": {"notStarted": n_of_not_started_votings, "inProgress": n_of_in_progress_votings, "finished": n_of_finished_votings}
+        })
+
+
 class VotingAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
