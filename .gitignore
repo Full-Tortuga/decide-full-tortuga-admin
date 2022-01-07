@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# ide
+.vscode
+
 # Distribution / packaging
 .Python
 env/
@@ -46,6 +49,8 @@ coverage.xml
 *.cover
 .hypothesis/
 
+**/package-lock.json
+
 # Translations
 *.mo
 *.pot
@@ -53,6 +58,8 @@ coverage.xml
 # Django stuff:
 *.log
 decide/*/migrations
+
+migrations/
 
 # Flask stuff:
 instance/
@@ -105,6 +112,5 @@ ENV/
 #node
 nodesource_setup.sh
 
-# Visual Studio Code settings
-.vscode
-
+# new db migrations
+decide/*/migrations/0001_initial.py

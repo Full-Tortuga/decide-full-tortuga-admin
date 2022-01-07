@@ -22,7 +22,7 @@ UPDATER = Updater(os.environ['TELEGRAM_TOKEN'],
 
 BOT=Bot(token=os.environ['TELEGRAM_TOKEN'])
 
-URL='http://127.0.0.1:8000/visualizer/'
+URL='http://127.0.0.1:8011/visualizer/'
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():

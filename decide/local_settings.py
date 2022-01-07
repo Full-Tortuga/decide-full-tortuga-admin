@@ -16,25 +16,27 @@ CORS_ORIGIN_ALLOW_ALL = True
 ]'''
 
 APIS = {
-    'authentication': 'http://localhost:8000',
-    'base': 'http://localhost:8000',
-    'booth': 'http://localhost:8000',
-    'census': 'http://localhost:8000',
-    'mixnet': 'http://localhost:8000',
-    'postproc': 'http://localhost:8000',
-    'store': 'http://localhost:8000',
-    'visualizer': 'http://localhost:8000',
-    'voting': 'http://localhost:8000',
+    'authentication': 'http://localhost:8011',
+    'base': 'http://localhost:8011',
+    'booth': 'http://localhost:8011',
+    'census': 'http://localhost:8011',
+    'mixnet': 'http://localhost:8011',
+    'postproc': 'http://localhost:8011',
+    'store': 'http://localhost:8011',
+    'visualizer': 'http://localhost:8011',
+    'voting': 'http://localhost:8011',
 }
 
-BASEURL = 'http://localhost:8000'
+BASEURL = 'http://localhost:8011'
 
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'decide',
         'CLIENT': {
-           'host': '127.0.0.1',
+           'host': '172.31.0.2',
+           'username': 'mongo',
+           'password': 'mongo'
         }
 
     }
