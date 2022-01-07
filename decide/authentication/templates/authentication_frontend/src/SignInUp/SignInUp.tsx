@@ -1,12 +1,13 @@
-import React from "react";
-import "./index.css";
-import LoginBox from "./Login";
+import React from 'react';
+import { Alert, Button, ButtonGroup, Card, Col, Container, Row } from 'react-bootstrap';
+import './index.css';
+import LoginBox from './Login';
+import RegisterBox from './Register';
 import LoginLDAP from "./LoginLDAP";
-import RegisterBox from "./Register";
 
-class SignInUp extends React.Component<any,State>{
+class SignInUp extends React.Component<any, State>{
 
-  constructor(props:any) {
+  constructor(props: any) {
     super(props);
     this.state = {
       isLoginOpen: true,
@@ -16,68 +17,56 @@ class SignInUp extends React.Component<any,State>{
   }
 
   showLoginBox() {
-    this.setState({isLoginOpen: true, isRegisterOpen: false, isLoginLDAPOpen: false});
+    this.setState({ isLoginOpen: true, isRegisterOpen: false, isLoginLDAPOpen: false });
   }
 
   showRegisterBox() {
-    this.setState({isRegisterOpen: true, isLoginOpen: false, isLoginLDAPOpen: false});
+    this.setState({ isRegisterOpen: true, isLoginOpen: false, isLoginLDAPOpen: false });
   }
 
   showLoginLDAP() {
-    this.setState({isRegisterOpen: false, isLoginOpen: false, isLoginLDAPOpen: true});
+    this.setState({ isRegisterOpen: false, isLoginOpen: false, isLoginLDAPOpen: true });
   }
 
-  render (){
+  render() {
     console.log(this.state)
     return (
-      <div className="root-container">
-        <div id="error-box">
-          <span id="error-msg"> </span>
-        </div>
-
-        <div className="box-container">
-          {this.state.isLoginOpen && <LoginBox/>}
-          {this.state.isRegisterOpen && <RegisterBox/>}
-          {this.state.isLoginLDAPOpen && <LoginLDAP/>}
-        </div>
-
-  
-        <div className="box-controller">
-          <div
-            className={"controller " + (this.state.isLoginOpen
-            ? "selected-controller"
-            : "")}
-            onClick={this
-            .showLoginBox
-            .bind(this)}>
-            Login
-          </div>
-          <div
-            className={"controller " + (this.state.isLoginLDAPOpen
-            ? "selected-controller"
-            : "")}
-            onClick={this
-            .showLoginLDAP
-            .bind(this)}>
-            LDAP
-          </div>
-          <div
-            className={"controller " + (this.state.isRegisterOpen
-            ? "selected-controller"
-            : "")}
-            onClick={this
-            .showRegisterBox
-            .bind(this)}>
-            Register
-          </div>
-        </div>
-      </div>
+      <Container>
+        <Card className="mx-auto text-center rounded-3" >
+          <Card.Body>
+            <Card.Title>
+              {this.state.isLoginOpen && <h4>LOGIN</h4>}
+              {this.state.isRegisterOpen && <h4>REGISTER</h4>}
+              {this.state.isLoginLDAPOpen && <h4>LOGIN LDAP</h4>}
+            </Card.Title>
+            <Card.Text>
+              {this.state.isLoginOpen && <LoginBox />}
+              {this.state.isRegisterOpen && <RegisterBox />}
+              {this.state.isLoginLDAPOpen && <LoginLDAP />}
+              <br />
+              {this.state.isLoginOpen && <><p>Would you prefer to log in via LDAP? Click <a className="link" onClick={this
+                .showLoginLDAP
+                .bind(this)}>here</a></p><p>Not a member yet? Click <a className="link" onClick={this
+                  .showRegisterBox
+                  .bind(this)}>here</a> to join </p></>}
+              {this.state.isRegisterOpen && <p>Do you already have an account? Sign in <a className="link" onClick={this
+                .showLoginBox
+                .bind(this)}>here</a> or via <a className="link" onClick={this
+                  .showLoginLDAP
+                  .bind(this)}>LDAP</a> </p>}
+              {this.state.isLoginLDAPOpen && <p>Not a member yet? Click <a className="link" onClick={this
+                .showRegisterBox
+                .bind(this)}>here</a> to join</p>}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </Container>
     );
   }
-  
+
 }
 
-interface State{
+interface State {
   isRegisterOpen: boolean,
   isLoginOpen: boolean
   isLoginLDAPOpen: boolean
