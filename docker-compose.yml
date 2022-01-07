@@ -7,10 +7,27 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
       - MONGO_INITDB_USER=mongo
-      - MONGO_INITDB_PD=mongo
+      - MONGO_INITDB_PWD=mongo
     volumes:
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
       - mongo_decide_data:/data/db
+    ports:
+      - 27017:27017
+  decide:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./decide:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_NAME=db
+      - MONGO_USER=mongo
+      - MONGO_HOST=mongo-decide
+      - MONGO_PASSWORD=mongo
+      - MONGO_PORT=27017
+    depends_on:
+      - mongo-decide
 volumes:
   mongo_decide_data: {}
     
