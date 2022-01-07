@@ -5,7 +5,15 @@ const util = () => {
 };
 
 const parseErrors = (error: any) => {
-  return error.response?.data?.join(", ");
+  return (
+    JSON.stringify(error.response?.data)
+      .replaceAll("[", "")
+      .replaceAll("]", "")
+      .replaceAll('"', "")
+      .replaceAll("{", "")
+      .replaceAll("}", "")
+      .replaceAll(",", "\n") || error.message
+  );
 };
 
 const getStatus = (voting: votingType.Voting) => {

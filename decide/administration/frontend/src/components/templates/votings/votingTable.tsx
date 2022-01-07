@@ -1,5 +1,6 @@
 import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
+import { HowToVoteOutlined, Visibility } from "@mui/icons-material";
 import { Chip, Tooltip } from "@mui/material";
 
 import { votingType } from "types";
@@ -7,7 +8,6 @@ import { utils } from "utils";
 
 import { Table } from "components/02-molecules";
 import { IconButton } from "components/01-atoms";
-import { HowToVoteOutlined, Visibility } from "@mui/icons-material";
 
 const columns: GridColDef[] = [
   {
