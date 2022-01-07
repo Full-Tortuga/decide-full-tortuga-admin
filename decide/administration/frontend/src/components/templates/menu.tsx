@@ -10,7 +10,7 @@ import { Link, useLocation } from "react-router-dom";
 import { authApi } from "api";
 import { sessionUtils } from "utils";
 
-import { Button, IconButton } from "components/01-atoms";
+import { IconButton } from "components/01-atoms";
 
 const LinkTab = (props: {
   label?: string;

@@ -1,15 +1,13 @@
 import React from "react";
+import { HowToVote, Person, Refresh } from "@mui/icons-material";
 
-import { sessionUtils } from "utils";
-import { authApi } from "api";
+import { dashboardApi } from "api";
 import { userType } from "types";
 
-import { Button, StatBox } from "components/01-atoms";
+import { IconButton, StatBox } from "components/01-atoms";
 import { Severity } from "components/01-atoms/Notification";
 
 import Page from "../page";
-import dashboardApi from "api/dashboardApiUtils";
-import { HowToVote, Person } from "@mui/icons-material";
 
 type DashboardData = {
   session: userType.User;
@@ -104,6 +102,7 @@ const HomePage = () => {
           color="success"
         />
       </div>
+      <IconButton icon={<Refresh />} title="Refetch" onClick={refetchData} />
     </Page>
   );
 };
