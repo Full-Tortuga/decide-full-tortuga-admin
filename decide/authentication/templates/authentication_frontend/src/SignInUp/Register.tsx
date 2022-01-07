@@ -3,18 +3,27 @@ import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
 import { checkErrors } from './Utils';
 
 //Register Box 
-class RegisterBox extends React.Component {
+class RegisterBox extends React.Component<any,any> {
 
   constructor(props: any) {
     super(props);
-    this.state = {};
+    this.state = {passwordsAreEqual:true};
   }
 
-  submitRegister(e: any) { }
+  
+
+  submitRegister(e: any) {
+    const b = checkErrors(e)
+    if(!b){
+      e.preventDefault()
+      this.setState({passwordsAreEqual:false})
+    }
+  }
 
   render() {
+    const {passwordsAreEqual}=this.state
     return (
-      <Form id='register-form' method='POST' action='/authentication/register_user/' onSubmit={checkErrors}>
+      <Form id='register-form' method='POST' action='/authentication/register_user/' onSubmit={this.submitRegister.bind(this)}>
 
         <InputGroup className="mb-3">
           <InputGroup.Text id="basic-addon3">
@@ -61,7 +70,8 @@ class RegisterBox extends React.Component {
             Repeat password
           </InputGroup.Text>
           <FormControl type="password" name="password2"
-            className="login-input" required={true} />
+            className="login-input" required={true} isInvalid={!passwordsAreEqual}/>
+          <Form.Control.Feedback type="invalid" > Las contraseñas no coinciden </Form.Control.Feedback>
         </InputGroup>
 
         <Button

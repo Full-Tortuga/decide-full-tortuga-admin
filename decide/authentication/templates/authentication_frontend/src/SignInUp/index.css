@@ -17,9 +17,6 @@
      flex-direction: column;
  }
  
- div.alert {
-     display: none;
- }
  
  .card {
      width: 25rem;

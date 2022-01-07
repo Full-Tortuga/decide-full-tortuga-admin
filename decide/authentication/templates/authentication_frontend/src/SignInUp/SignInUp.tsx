@@ -32,9 +32,6 @@ class SignInUp extends React.Component<any, State>{
     console.log(this.state)
     return (
       <Container>
-        <Alert variant="danger" className="error-box">
-          <span id="error-msg"> </span>
-        </Alert>
         <Card className="mx-auto text-center rounded-3" >
           <Card.Body>
             <Card.Title>
