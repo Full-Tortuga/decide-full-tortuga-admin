@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     # API
+    path('api/dashboard', views.DashboardAPI.as_view()),
     path('api/users', views.UsersAPI.as_view()),
     path('api/users/<int:user_id>', views.UserAPI.as_view()),
     path('api/auth/login', views.LoginAuthAPI.as_view()),
