@@ -1,10 +1,22 @@
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
-ALLOWED_HOSTS = ["*"]
+# dev env CORS SETTINGS
+BASEURL = 'http://localhost:8000'
+FE_BASEURL = 'http://localhost:3000'
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    BASEURL, FE_BASEURL
+)
+CSRF_TRUSTED_ORIGINS = [
+    BASEURL, FE_BASEURL
+]
 
 # Modules in use, commented modules that you won't use
 MODULES = [
+    'administration',
     'authentication',
     'base',
     'booth',
@@ -16,28 +28,27 @@ MODULES = [
     'voting',
 ]
 
-APIS = {
-    'authentication': 'http://localhost:8000',
-    'base': 'http://localhost:8000',
-    'booth': 'http://localhost:8000',
-    'census': 'http://localhost:8000',
-    'mixnet': 'http://localhost:8000',
-    'postproc': 'http://localhost:8000',
-    'store': 'http://localhost:8000',
-    'visualizer': 'http://localhost:8000',
-    'voting': 'http://localhost:8000',
-}
 
-BASEURL = 'http://localhost:8000'
+APIS = {
+    'administration': BASEURL,
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
+}
 
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'decide',
         'CLIENT': {
-           'host': '127.0.0.1'
+            'host': '127.0.0.1',
         }
-
     }
 }
 
@@ -68,4 +79,3 @@ AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
     'base.backends.AuthBackend',
 ]
-

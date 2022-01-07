@@ -17,6 +17,7 @@ ALLOWED_HOSTS = ['*']
 
 # Modules in use, commented modules that you won't use
 MODULES = [
+    'administration',
     'authentication',
     'base',
     'booth',
@@ -31,6 +32,7 @@ MODULES = [
 BASEURL = 'http://localhost:8000'
 
 APIS = {
+    'administration': 'http://localhost:8000',
     'authentication': 'http://localhost:8000',
     'base': 'http://localhost:8000',
     'booth': 'http://localhost:8000',
