@@ -24,7 +24,6 @@ const Component = (props: {
     control,
     getValues,
     trigger,
-    setError,
     clearErrors,
     formState: { errors },
     reset,
