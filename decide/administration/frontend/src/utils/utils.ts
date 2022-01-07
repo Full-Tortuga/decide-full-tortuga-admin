@@ -5,7 +5,7 @@ const util = () => {
 };
 
 const parseErrors = (error: any) => {
-  return error.response.data?.join(", ");
+  return error.response?.data?.join(", ");
 };
 
 const getStatus = (voting: votingType.Voting) => {

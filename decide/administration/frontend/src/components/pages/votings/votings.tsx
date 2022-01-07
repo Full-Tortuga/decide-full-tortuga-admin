@@ -12,6 +12,7 @@ import { votingType } from "types";
 import { votingApi } from "api";
 import { utils } from "utils";
 
+import { Severity } from "components/01-atoms/Notification";
 import { ActionBar } from "components/03-organisms";
 import { VotingTable, VotingForm } from "components/templates";
 import Page from "../page";
@@ -20,6 +21,14 @@ const VotingsPage = () => {
   const [votings, setVotings] = React.useState<votingType.Voting[]>([]);
   const [selected, setSelected] = React.useState([]);
   const [refetch, setRefetch] = React.useState(false);
+
+  const [notifications, setNotifications] = React.useState<
+    { type: Severity; message: string }[]
+  >([]);
+
+  const notify = (type: Severity, message: string) => {
+    setNotifications((prev) => [...prev, { type, message }]);
+  };
 
   const refetchVotings = () => {
     setRefetch(!refetch);
@@ -31,9 +40,9 @@ const VotingsPage = () => {
       .then((response) => {
         setVotings(response.data);
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((error) =>
+        notify("error", "Votings not fetched: " + error.message)
+      );
   }, [refetch]);
 
   const idList = React.useMemo(
@@ -82,22 +91,40 @@ const VotingsPage = () => {
 
   const handleChangeStatus = (status: string) => {
     if (status === "new")
-      votingApi.startVotings(idList).then((response) => {
-        refetchVotings();
-      });
+      votingApi
+        .startVotings(idList)
+        .then((response) => {
+          refetchVotings();
+          notify("success", "Voting/s started");
+        })
+        .catch((error) =>
+          notify("error", "Voting/s not started: " + error.message)
+        );
     if (status === "in_progress")
-      votingApi.stopVotings(idList).then((response) => {
-        refetchVotings();
-      });
+      votingApi
+        .stopVotings(idList)
+        .then((response) => {
+          refetchVotings();
+          notify("success", "Voting/s stopped");
+        })
+        .catch((error) =>
+          notify("error", "Voting/s not stopped: " + error.message)
+        );
     if (status === "finished")
-      votingApi.tallyVotings(idList).then((response) => {
-        refetchVotings();
-      });
+      votingApi
+        .tallyVotings(idList)
+        .then((response) => {
+          refetchVotings();
+          notify("success", "Voting/s tallied");
+        })
+        .catch((error) =>
+          notify("error", "Voting/s not tallied: " + error.message)
+        );
   };
 
   return (
     <>
-      <Page title="Votings">
+      <Page title="Votings" notifications={notifications}>
         <VotingTable votings={votings} setSelected={setSelected} />
       </Page>
       <ActionBar
@@ -106,6 +133,7 @@ const VotingsPage = () => {
           <VotingForm
             initialVoting={selected.length === 1 ? selected[0] : undefined}
             refetch={refetchVotings}
+            notify={notify}
           />,
         ]}
         individualActions={[

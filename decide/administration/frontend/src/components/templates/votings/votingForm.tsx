@@ -7,12 +7,14 @@ import { votingApi } from "api";
 import { utils } from "utils";
 
 import { Input } from "components/01-atoms";
+import { Severity } from "components/01-atoms/Notification";
 import { Modal, ModalPage } from "components/02-molecules";
 import { CensusInput, QuestionInput } from ".";
 
 const Component = (props: {
   initialVoting?: votingType.Voting;
   refetch: () => void;
+  notify?: (type: Severity, message: string) => void;
 }) => {
   const editMode = React.useMemo(
     () => !!props.initialVoting?.id,
@@ -47,13 +49,14 @@ const Component = (props: {
   }, [props.initialVoting, control, reset, clearErrors, trigger]);
 
   const onSubmitFailed = (e: any) => {
-    console.log("error", e);
     setError("name", { type: "manual", message: e });
+    props.notify?.("error", "Submit failed: " + e);
   };
 
   const onSubmitSuccess = () => {
     setSent(!sent);
     props.refetch();
+    props.notify?.("success", editMode ? "Voting updated" : "Voting created");
     reset({});
   };
 
