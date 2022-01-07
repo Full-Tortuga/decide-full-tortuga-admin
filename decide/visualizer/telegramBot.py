@@ -1,16 +1,18 @@
 from django.conf import settings
 from django.db.models import Count
+from decide.decide.settings import BASEURL
 from voting import models
 from store import models as stmodels
 from telegram import InputMediaPhoto, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-import os, sys, base64
+import os, sys, base64,requests
 from .models import TelegramBot, Graphs
 from threading import Thread
 from selenium import webdriver
 from functools import partial
+from local_settings import BASEURL as LOCALURL
 from dotenv import load_dotenv
 
 
@@ -22,7 +24,6 @@ UPDATER = Updater(os.environ['TELEGRAM_TOKEN'],
 
 BOT=Bot(token=os.environ['TELEGRAM_TOKEN'])
 
-URL='http://127.0.0.1:8011/visualizer/'
 
 #configures and activate '@VotitosBot' to receive any messages from users
 def init_bot():
@@ -251,11 +252,14 @@ def results_graph(id, vot_type, chat_identifier, context):
 
 #uses selenium to call view which generates voting graphs
 def open_graphs_generator_view(id, vot_type):
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    driver=webdriver.Chrome(options=options)
-    view_url=translate_to_url(vot_type)
-    driver.get(view_url + str(id)) 
+    try:
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        driver=webdriver.Chrome(options=options)
+        view_url=translate_to_url(vot_type)
+        driver.get(view_url + str(id)) 
+    except:
+        pass
     
 #sends notifications when a new voting is created
 def auto_notifications(voting):
@@ -294,12 +298,18 @@ def translate_to_type(vot_type):
 
 #translate vot_type var to url of that type
 def translate_to_url(vot_type):
+    try:
+        if requests.get(settings.BASEURL).status_code == 404:
+            url=LOCALURL
+    except:
+         url=BASEURL
+         
     if 'binary' in vot_type:
-        res=URL+'binaryVoting/'
+        res=url+'binaryVoting/'
     elif 'multiple' in vot_type:
-        res=URL+'multipleVoting/'
+        res=url+'multipleVoting/'
     elif 'score' in vot_type:
-        res=URL+'scoreVoting/'
+        res=url+'scoreVoting/'
     else:
-        res=URL
+        res=url
     return res
