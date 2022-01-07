@@ -1,81 +1,23 @@
 import React from "react";
-import { Delete, Refresh } from "@mui/icons-material";
+import {
+  Delete,
+  Refresh,
+  PlayArrow,
+  Stop,
+  HowToVoteOutlined,
+  Cancel,
+} from "@mui/icons-material";
 
 import { votingType } from "types";
+import { votingApi } from "api";
+import { utils } from "utils";
 
 import { ActionBar } from "components/03-organisms";
 import { VotingTable, VotingForm } from "components/templates";
 import Page from "../page";
 
-const rows = [
-  {
-    id: 1,
-    name: "Votacion 1",
-    desc: "Jon",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 2,
-    name: "Votacion 2",
-    desc: "Cersei",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 3,
-    name: "Votacion 3",
-    desc: "Jaime",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 4,
-    name: "Votacion 4",
-    desc: "Arya",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 5,
-    name: "Votacion 5",
-    desc: "Daenerys",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 6,
-    name: "Votacion 6",
-    desc: "Saliba",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 7,
-    name: "Votacion 7",
-    desc: "Ferrara",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 8,
-    name: "Votacion 8",
-    desc: "Rossini",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-  {
-    id: 9,
-    name: "Votacion 9",
-    desc: "Harvey",
-    start_date: "11/11/2011",
-    end_date: "11/11/2011",
-  },
-];
-
 const VotingsPage = () => {
-  const [votings, setVotings] = React.useState<votingType.Voting[]>(rows);
-
+  const [votings, setVotings] = React.useState<votingType.Voting[]>([]);
   const [selected, setSelected] = React.useState([]);
   const [refetch, setRefetch] = React.useState(false);
 
@@ -84,43 +26,86 @@ const VotingsPage = () => {
   };
 
   React.useEffect(() => {
-    //votingApi
-    //.getVotings()
-    //.then((response) => {
-    // console.log(response);
-    //  setVotings(response.data);
-    //  })
-    //.catch((error) => {
-    //   console.log(error);
-    // });
-    setVotings(rows);
+    votingApi
+      .getVotings()
+      .then((response) => {
+        setVotings(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [refetch]);
 
   const idList = React.useMemo(
-    () => selected.map((voting: votingType.Voting) => voting.id),
+    () => selected.map((voting: votingType.Voting) => voting.id || -1),
     [selected]
   );
 
+  //See if votings have the same status
+  const selectionState = React.useMemo(() => {
+    const getSelectionStatus = (
+      newNumber: number,
+      inProgressNumber: number,
+      finishedNumber: number
+    ) => {
+      if (newNumber === selected.length && selected.length > 0) return "new";
+      else if (inProgressNumber === selected.length && selected.length > 0)
+        return "in_progress";
+      else if (finishedNumber === selected.length && selected.length > 0)
+        return "finished";
+      else return "mixed";
+    };
+
+    const newNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting) === "New"
+    ).length;
+
+    const inPogressNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting) === "In progress"
+    ).length;
+
+    const finishedNumber = selected.filter(
+      (voting: votingType.Voting) => utils.getStatus(voting) === "Finished"
+    ).length;
+
+    return {
+      status: getSelectionStatus(newNumber, inPogressNumber, finishedNumber),
+    };
+  }, [selected]);
+
   const handleDelete = () => {
-    // todo: remove this 2 lines and uncomment the lines after
-    console.log(idList);
-    refetchVotings();
-    // votingApi.deleteVotings(idList).then((response) => {
-    //   console.log(response);
-    //   refetchVotings();
-    // });
+    votingApi.deleteVotings(idList).then((response) => {
+      console.log(response);
+      refetchVotings();
+    });
+  };
+
+  const handleChangeStatus = (status: string) => {
+    if (status === "new")
+      votingApi.startVotings(idList).then((response) => {
+        refetchVotings();
+      });
+    if (status === "in_progress")
+      votingApi.stopVotings(idList).then((response) => {
+        refetchVotings();
+      });
+    if (status === "finished")
+      votingApi.tallyVotings(idList).then((response) => {
+        refetchVotings();
+      });
   };
 
   return (
     <>
       <Page title="Votings">
-        <VotingTable votings={votings || rows} setSelected={setSelected} />
+        <VotingTable votings={votings} setSelected={setSelected} />
       </Page>
       <ActionBar
         selection={selected}
         actions={[
           <VotingForm
             initialVoting={selected.length === 1 ? selected[0] : undefined}
+            refetch={refetchVotings}
           />,
         ]}
         individualActions={[
@@ -135,8 +120,31 @@ const VotingsPage = () => {
             icon: <Delete />,
             title: "Delete",
             onClick: () => {
-              console.log("delete");
               handleDelete();
+            },
+          },
+          {
+            icon:
+              selectionState.status === "new" ? (
+                <PlayArrow />
+              ) : selectionState.status === "in_progress" ? (
+                <Stop />
+              ) : selectionState.status === "finished" ? (
+                <HowToVoteOutlined />
+              ) : (
+                <Cancel />
+              ),
+            title:
+              selectionState.status === "new"
+                ? "Start"
+                : selectionState.status === "in_progress"
+                ? "Stop"
+                : selectionState.status === "finished"
+                ? "Tally"
+                : "Cancel",
+            disabled: selectionState.status === "mixed",
+            onClick: () => {
+              handleChangeStatus(selectionState.status);
             },
           },
         ]}

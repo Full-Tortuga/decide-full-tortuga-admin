@@ -40,6 +40,7 @@ const Component = (props: { control: any }) => {
             setSelected={(selection: userType.User[]) =>
               field.onChange(selection.map((u) => u.id))
             }
+            initialSelection={field.value || []}
             users={users}
           />
           <IconButton

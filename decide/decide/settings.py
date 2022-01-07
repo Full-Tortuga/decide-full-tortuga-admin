@@ -69,13 +69,6 @@ MODULES = [
     'visualizer',
 ]
 
-''''
-    'mixnet',
-    'postproc',
-    'store',
-    'visualizer',
-    'voting','''
-
 ENV_DEVELOP = os.environ.get('ENV_DEVELOP', False)
 ENV_MAIN = os.environ.get('ENV_MAIN', False)
 

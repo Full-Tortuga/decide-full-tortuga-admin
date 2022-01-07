@@ -3,8 +3,22 @@ import { GridColDef } from "@mui/x-data-grid";
 
 import { userType } from "types";
 import { Table } from "components/02-molecules";
+import { Chip } from "@mui/material";
 
 const columns: GridColDef[] = [
+  {
+    field: "is_active",
+    headerName: "Status",
+    minWidth: 120,
+    renderCell: (params) => {
+      return (
+        <Chip
+          label={params.value ? "active" : "not-active"}
+          color={params.value ? "success" : "warning"}
+        />
+      );
+    },
+  },
   {
     field: "username",
     headerName: "Username",
@@ -26,34 +40,36 @@ const columns: GridColDef[] = [
     minWidth: 230,
   },
   {
-    field: "is_active",
-    headerName: "Active",
-    minWidth: 80,
-    align: "center",
-    valueFormatter: (params) => (params.value ? "✔" : "✘"),
-  },
-  {
     field: "is_staff",
     headerName: "Staff",
     minWidth: 80,
     align: "center",
-    valueFormatter: (params) => (params.value ? "✔" : "✘"),
+    renderCell: (params) => {
+      return params.value && <Chip label="✔" color="primary" />;
+    },
   },
   {
     field: "is_superuser",
     headerName: "Superuser",
     minWidth: 120,
     align: "center",
-    valueFormatter: (params) => (params.value ? "✔" : "✘"),
+    renderCell: (params) => {
+      return params.value && <Chip label="⛨" color="primary" />;
+    },
   },
 ];
 
-const Component = (props: { users: userType.User[]; setSelected: any }) => {
+const Component = (props: {
+  users: userType.User[];
+  setSelected: any;
+  initialSelection?: number[];
+}) => {
   return (
     <Table
       rows={props.users}
       columns={columns}
       setSelected={props.setSelected}
+      initialSelection={props.initialSelection}
     />
   );
 };

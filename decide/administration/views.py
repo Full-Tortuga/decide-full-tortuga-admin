@@ -26,21 +26,24 @@ class VotingAPI(APIView):
 
     def get(self, request):
         votings = Voting.objects.all()
-        voting_serializer = VotingSerializer(votings, many=True).data
-        return Response(voting_serializer, status=HTTP_200_OK)
+        voting_serializer = AdminVotingGetSerializer(votings, many=True)
+        return Response(voting_serializer.data, status=HTTP_200_OK)
 
     def post(self, request):
         voting_serializer = AdminVotingSerializer(data=request.data)
         is_valid(voting_serializer.is_valid(), voting_serializer.errors)
         auth_url = request.data.get("auth")
         id_users = request.data.get("census")
-        auth, _ = Auth.objects.get_or_create(url=auth_url,
-                                             defaults={'me': True, 'name': 'test auth'})
+        auth = Auth.objects.filter(url=auth_url).first()
+        if auth is None:
+            auth = Auth(name="Auth", url=auth_url, me=True)
+            auth.save()
         question = Question(desc=request.data.get('question').get("desc"))
         question.save()
         options = request.data.get('question').get("options")
         for opt in options:
-            option = QuestionOption(question=question, option=opt.get("option"), number=opt.get("number"))
+            option = QuestionOption(question=question, option=opt.get(
+                "option"), number=opt.get("number"))
             option.save()
         voting = Voting(name=request.data.get("name"), desc=request.data.get("desc"),
                         question=question)
@@ -65,7 +68,8 @@ class VotingAPI(APIView):
         msg = ''
         st = status.HTTP_200_OK
         if action == 'start':
-            votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=True)
+            votings = Voting.objects.filter(
+                id__in=votings_id, start_date__isnull=True)
             if len(votings) > 0:
                 for voting in votings:
                     voting.create_pubkey()
@@ -77,7 +81,8 @@ class VotingAPI(APIView):
                 st = status.HTTP_400_BAD_REQUEST
 
         elif action == 'stop':
-            votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=False, end_date__isnull=True)
+            votings = Voting.objects.filter(
+                id__in=votings_id, start_date__isnull=False, end_date__isnull=True)
             if len(votings) > 0:
                 for voting in votings:
                     voting.end_date = timezone.now()
@@ -87,7 +92,8 @@ class VotingAPI(APIView):
                 msg = 'All votings all already stopped or not started'
                 st = status.HTTP_400_BAD_REQUEST
         elif action == 'tally':
-            votings = Voting.objects.filter(id__in=votings_id, start_date__isnull=False, end_date__isnull=False)
+            votings = Voting.objects.filter(
+                id__in=votings_id, start_date__isnull=False, end_date__isnull=False)
             if len(votings) > 0:
                 for voting in votings:
                     key = request.COOKIES.get('token', "")
@@ -126,8 +132,11 @@ class VotingsAPI(APIView):
         voting = get_object_or_404(Voting.objects.all().filter(id=voting_id))
         voting.name = request.data.get("name")
         voting.desc = request.data.get("desc")
-        voting.auth = request.data.get("auth")
-        voting.census = request.data.get("census")
+        auth_url = request.data.get("auth")
+        auth = voting.auths.all().first()
+        if auth is not None and auth.url != auth_url:
+            auth.url = request.data.get("auth")
+            auth.save()
         question_request = request.data.get("question")
         voting.question.desc = question_request["desc"]
         options = QuestionOption.objects.all().filter(question__pk=voting.question.id)
@@ -145,11 +154,25 @@ class VotingsAPI(APIView):
                     option.delete()
                 else:
                     opt = QuestionOption(question=voting.question,
-                                         number=options_request[i].get("number"),
+                                         number=options_request[i].get(
+                                             "number"),
                                          option=options_request[i].get("option"))
                     opt.save()
         voting.question.save()
         voting.save()
+
+        census_request = set(request.data.get("census"))
+        census = set(
+            [census.voter_id for census in Census.objects.filter(voting_id=voting_id)])
+        census_add = census_request - census
+        census_delete = census - census_request
+        if len(census_add) > 0:
+            for voter_id in census_add:
+                census = Census(voting_id=voting_id, voter_id=voter_id)
+                census.save()
+        if len(census_delete) > 0:
+            Census.objects.filter(voter_id__in=census_delete).delete()
+
         return Response({}, status=HTTP_200_OK)
 
     def delete(self, request, voting_id):
@@ -162,7 +185,8 @@ class QuestionsAPI(APIView):
 
     def get(self, request):
         questions = Question.objects.all()
-        question_serializer = AdminQuestionSerializer(questions, many=True).data
+        question_serializer = AdminQuestionSerializer(
+            questions, many=True).data
         return Response(question_serializer, status=HTTP_200_OK)
 
     def post(self, request):
@@ -192,7 +216,8 @@ class QuestionAPI(APIView):
 
     def put(self, request, question_id):
         question = Question.objects.get(id=question_id)
-        question_serializer = AdminQuestionSerializer(question, data=request.data)
+        question_serializer = AdminQuestionSerializer(
+            question, data=request.data)
         is_valid(question_serializer.is_valid(), question_serializer.errors)
         question_serializer.save()
         return Response(question_serializer.data, status=HTTP_200_OK)
@@ -229,7 +254,8 @@ class CensusAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, census_id):
-        census = get_object_or_404(Census.objects.all().values().filter(id=census_id))
+        census = get_object_or_404(
+            Census.objects.all().values().filter(id=census_id))
         return Response(census, status=HTTP_200_OK)
 
     def put(self, request, census_id):
@@ -274,7 +300,8 @@ class AuthAPI(APIView):
     permission_classes = (IsAdminAPI,)
 
     def get(self, request, auth_id):
-        auth = get_object_or_404(Auth.objects.all().values().filter(id=auth_id))
+        auth = get_object_or_404(
+            Auth.objects.all().values().filter(id=auth_id))
         return Response(auth, status=HTTP_200_OK)
 
     def put(self, request, auth_id):
@@ -398,7 +425,7 @@ class LoginAuthAPI(APIView):
 
     def post(self, request, *args, **kwargs):
         user_serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
+                                                context={'request': request})
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
@@ -423,7 +450,8 @@ class UpdateUserStateAPI(APIView):
         state = request.data['state']
         value = request.data['value']
         is_valid(len(ids) > 0, 'The ids list can not be empty')
-        is_valid(value == 'True' or value == 'False', 'The field value must be True or False')
+        is_valid(value == 'True' or value == 'False',
+                 'The field value must be True or False')
         res = Response({}, status=HTTP_200_OK)
         if state == 'Active':
             users = User.objects.filter(id__in=ids)

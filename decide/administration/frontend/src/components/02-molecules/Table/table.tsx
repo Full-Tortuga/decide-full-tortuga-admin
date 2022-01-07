@@ -6,17 +6,17 @@ const Component = (props: {
   rows: any[];
   columns: GridColDef[];
   setSelected: any;
+  initialSelection?: number[];
 }) => {
   const filterRows = React.useCallback(
     (ids: any[]) => {
-      console.log(ids);
       return props.rows.filter((row: any) => ids.includes(row.id));
     },
     [props.rows]
   );
 
   const [selectionModel, setSelectionModel] =
-    React.useState<GridSelectionModel>([]);
+    React.useState<GridSelectionModel>(props.initialSelection || []);
 
   const updateSelectionModel = React.useCallback(
     (newSelection: GridSelectionModel) => {
@@ -26,6 +26,11 @@ const Component = (props: {
     [props, filterRows]
   );
 
+  React.useEffect(() => {
+    updateSelectionModel(selectionModel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.rows]);
+
   return (
     <div className="w-full">
       <DataGrid
@@ -34,7 +39,7 @@ const Component = (props: {
         columns={props.columns}
         pageSize={10}
         checkboxSelection
-        selectionModel={selectionModel}
+        selectionModel={props.initialSelection || selectionModel}
         onSelectionModelChange={(e) => updateSelectionModel(e)}
       />
     </div>
