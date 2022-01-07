@@ -1,22 +1,31 @@
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
+import os
 
-# dev env CORS SETTINGS
-BASEURL = 'http://localhost:8000'
-FE_BASEURL = 'http://localhost:3000'
+DEBUG = True
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-    BASEURL, FE_BASEURL
-)
-CSRF_TRUSTED_ORIGINS = [
-    BASEURL, FE_BASEURL
-]
+STATIC_ROOT = '/app/static/'
+MEDIA_ROOT = '/app/static/media/'
+ALLOWED_HOSTS = ['*']
+
+BASEURL = 'http://localhost'
+
+APIS = {
+    'authentication': 'http://localhost:8000',
+    'base': 'http://localhost:8000',
+    'booth': 'http://localhost:8000',
+    'census': 'http://localhost:8000',
+    'mixnet': 'http://localhost:8000',
+    'postproc': 'http://localhost:8000',
+    'store': 'http://localhost:8000',
+    'visualizer': 'http://localhost:8000',
+    'voting': 'http://localhost:8000',
+}
+
+
 
 # Modules in use, commented modules that you won't use
 MODULES = [
-    'administration',
     'authentication',
     'base',
     'booth',
@@ -28,34 +37,23 @@ MODULES = [
     'voting',
 ]
 
-
-APIS = {
-    'administration': BASEURL,
-    'authentication': BASEURL,
-    'base': BASEURL,
-    'booth': BASEURL,
-    'census': BASEURL,
-    'mixnet': BASEURL,
-    'postproc': BASEURL,
-    'store': BASEURL,
-    'visualizer': BASEURL,
-    'voting': BASEURL,
-}
-
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'decide',
+        'NAME': os.environ.get('DATABASE_NAME'),
         'CLIENT': {
-            'host': '127.0.0.1',
+           'host': os.environ.get('DATABASE_HOST'),
+           'username':  os.environ.get('DATABASE_USER'),
+           'password': os.environ.get('DATABASE_PASSWORD'),
+	       'SSL': 'true'
         }
+
     }
 }
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
 
-# Baseline configuration.
 AUTH_LDAP_SERVER_URI = 'ldap://:389'
 
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
@@ -77,6 +75,6 @@ AUTH_LDAP_USER_ATTR_MAP = {
 # superuser.
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
