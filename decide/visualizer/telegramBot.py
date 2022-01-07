@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db.models import Count
-from decide.decide.settings import BASEURL
 from voting import models
 from store import models as stmodels
 from telegram import InputMediaPhoto, Bot
@@ -112,7 +111,7 @@ def results_query_handler(update, context):
     query=update.callback_query
     query.answer("¡A la orden!")
     response_array=query.data.split("_")
-    results_graph(query.data[0], query.data[1], query.message.chat_id, context)
+    results_graph(response_array[0], response_array[1], query.message.chat_id, context)
 
 #allows you to select an active or closed voting and show its details    
 def show_details(update, context, chat_identifier,vot_type):
@@ -215,7 +214,7 @@ def aux_message_builder(voting, vot_type):
   
     opt_msg=""
     for i,o in enumerate(options,1): 
-        opt_msg+="  " + str(i)+". " + o+"\n"
+        opt_msg+="  " + str(i)+". " + str(o)+"\n"
     
     msg="<b>{}\n\n</b><b><i>Descripción:</i></b> {}\n<b><i>Pregunta:</i></b> {}\n".format(str(voting.name).upper(), voting.desc, str(voting.question)) 
     msg+="<b><i>Opciones:</i></b>\n{}\n".format(opt_msg)
@@ -227,8 +226,8 @@ def aux_message_builder(voting, vot_type):
 #extracts graph's images from website selected voting and sends them to the user
 def results_graph(id, vot_type, chat_identifier, context):
     open_graphs_generator_view(id, vot_type)
-    if Graphs.objects.filter(voting_id=id).exists():
-        graphs_base64=Graphs.objects.filter(voting_id=id).values('graphs_url')
+    if Graphs.objects.filter(voting_id=id).exclude(voting_type=vot_type).exists():
+        graphs_base64=Graphs.objects.filter(voting_id=id).exclude(voting_type=vot_type).values('graphs_url')
         try:
             base64_url_list=eval(graphs_base64[0]['graphs_url'])
             b64_images=[]
@@ -302,14 +301,13 @@ def translate_to_url(vot_type):
         if requests.get(settings.BASEURL).status_code == 404:
             url=LOCALURL
     except:
-         url=BASEURL
-         
+         url=LOCALURL    
     if 'binary' in vot_type:
         res=url+'binaryVoting/'
     elif 'multiple' in vot_type:
         res=url+'multipleVoting/'
     elif 'score' in vot_type:
-        res=url+'scoreVoting/'
+        res=url+'scoringVoting/'
     else:
         res=url
     return res
