@@ -8,15 +8,25 @@ STATIC_ROOT = '/app/static/'
 MEDIA_ROOT = '/app/static/media/'
 ALLOWED_HOSTS = ['*']
 
-BASEURL = 'http://localhost'
 
+BASEURL = os.environ.get('APP_URL')
 
+APIS = {
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
+}
 
 
 
 # Modules in use, commented modules that you won't use
 MODULES = [
-    'administration',
     'authentication',
     'base',
     'booth',
@@ -34,7 +44,7 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME'),
         'CLIENT': {
            'host': os.environ.get('DATABASE_HOST'),
-           'username':  os.environ.get('DATABASE_USER'),
+           'username':  os.environ.get('DATABASE_USERNAME'),
            'password': os.environ.get('DATABASE_PASSWORD'),
 	       'SSL': 'true'
         }
@@ -61,24 +71,12 @@ AUTH_LDAP_USER_ATTR_MAP = {
     'last_name': 'sn',
     'email': 'mail',
 }
-APIS = {
-    'administration': 'http://10.5.0.1:8000',
-    'authentication': 'http://10.5.0.1:8000',
-    'base': 'http://10.5.0.1:8000',
-    'booth': 'http://10.5.0.1:8000',
-    'census': 'http://10.5.0.1:8000',
-    'mixnet': 'http://10.5.0.1:8000',
-    'postproc': 'http://10.5.0.1:8000',
-    'store': 'http://10.5.0.1:8000',
-    'visualizer': 'http://10.5.0.1:8000',
-    'voting': 'http://10.5.0.1:8000',
-}
 
 # Keep ModelBackend around for per-user permissions and maybe a local
 # superuser.
 
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'base.backends.AuthBackend',
 ]
 

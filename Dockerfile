@@ -28,4 +28,4 @@ ADD docker-settings.py /app/decide/local_settings.py
 
 RUN ./manage.py collectstatic
 
-CMD ["gunicorn", "-w 5", "decide.wsgi", "--timeout=500", "-b 0.0.0.0:80"]
+CMD ./manage.py runserver 0.0.0.0:$PORT
