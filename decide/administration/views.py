@@ -82,7 +82,7 @@ class VotingAPI(APIView):
             for voter_id in id_users:
                 census = Census(voting_id=voting_id, voter_id=voter_id)
                 census.save()
-        return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
+        return Response({"id": voting_id, "name": voting.name}, status=HTTP_201_CREATED)
 
     def put(self, request):
 
@@ -218,7 +218,7 @@ class QuestionsAPI(APIView):
         question_serializer = AdminQuestionSerializer(data=request.data)
         is_valid(question_serializer.is_valid(), question_serializer.errors)
         question_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -263,7 +263,7 @@ class CensussAPI(APIView):
         census_serializer = CensusSerializer(data=request.data)
         is_valid(census_serializer.is_valid(), census_serializer.errors)
         census_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -308,7 +308,7 @@ class AuthsAPI(APIView):
         auth_serializer = AuthSerializer(data=request.data)
         is_valid(auth_serializer.is_valid(), auth_serializer.errors)
         auth_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -354,7 +354,7 @@ class KeysAPI(APIView):
         key_serializer = KeySerializer(data=request.data)
         is_valid(key_serializer.is_valid(), key_serializer.errors)
         key_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -404,7 +404,7 @@ class UsersAPI(APIView):
                     last_name=fields['last_name'], email=fields['email'], is_staff=False)
         user.set_password(request.data['password'])
         user.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
