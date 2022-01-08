@@ -92,6 +92,7 @@ class VotingAPI(APIView):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         msg = ''
         st = status.HTTP_200_OK
+
         if action == 'start':
             votings = Voting.objects.filter(
                 id__in=votings_id, start_date__isnull=True)
@@ -104,7 +105,6 @@ class VotingAPI(APIView):
             else:
                 msg = 'All votings all already started'
                 st = status.HTTP_400_BAD_REQUEST
-
         elif action == 'stop':
             votings = Voting.objects.filter(
                 id__in=votings_id, start_date__isnull=False, end_date__isnull=True)
