@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 
+from base.models import Auth
 from census.models import Census
 from .serializers import AdminVotingGetSerializer
 from voting.models import Voting, QuestionOption
@@ -24,6 +25,23 @@ user_json_mock_updated = {
     "email": "updated@admin.com",
     "first_name": "updated",
     "last_name": "updated",
+}
+auth_json_mock = {
+    "name": "pruebaeeww",
+    "url": "http://localhost:8000",
+    "me": True
+}
+
+auth_json_mock_update = {
+    "name": "update",
+    "url": "http://localhost:3000",
+    "me": False
+}
+
+auth_json_mock_delete = {
+    "name": "pruebaeeww2222",
+    "url": "http://localhost:9000",
+    "me": False
 }
 
 voting_json_mock = {
@@ -62,6 +80,12 @@ class AdministrationTestCase(APITestCase):
         url = base_url + "/votings"
         response = self.client.post(url,
                                     voting_json_mock, format='json')
+        return response
+
+    def create_auth(self, data=auth_json_mock):
+        url = base_url + "/base/auth"
+        response = self.client.post(url,
+                                    data, format='json')
         return response
 
     def setUp(self):
@@ -117,6 +141,11 @@ class AdministrationTestCase(APITestCase):
         censuss = Census.objects.filter(voting_id=db_voting.id)
         self.assertEqual([census.voter_id for census in censuss], [1])
 
+        url = base_url + "/votings"
+        response = self.client.post(url,
+                                    {"question": ""}, format='json')
+        self.assertEqual(response.status_code, 400)
+
     def test_get_voting_api(self):
         self.create_voting()
 
@@ -147,6 +176,10 @@ class AdministrationTestCase(APITestCase):
         censuss = Census.objects.filter(voting_id=db_voting.id)
         self.assertEqual([census.voter_id for census in censuss], [1])
 
+        response = self.client.put(url,
+                                   {"name": "hola", "desc": ""}, format='json')
+        self.assertEqual(response.status_code, 400)
+
     def test_delete_voting_api(self):
         self.create_voting()
         db_voting = Voting.objects.last()
@@ -155,3 +188,79 @@ class AdministrationTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Voting.objects.filter(id=db_voting.id).count(), 0)
+
+    def test_get_list_auth_api(self):
+        self.create_auth()
+        url = base_url + "/base/auth"
+        response = self.client.get(url, format="json")
+        self.assertEqual(len(response.data), Auth.objects.count())
+        self.assertEqual(response.data[len(response.data) - 1]['name'], "pruebaeeww")
+        self.assertEqual(response.data[len(response.data) - 1]['url'], "http://localhost:8000")
+        self.assertEqual(response.data[len(response.data) - 1]['me'], True)
+
+    def test_get_auth_api(self):
+        self.create_auth()
+        db_auth = Auth.objects.last()
+        url = base_url + "/base/auth/" + str(db_auth.id)
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.data['name'], "pruebaeeww")
+        self.assertEqual(response.data['url'], "http://localhost:8000")
+        self.assertEqual(response.data['me'], True)
+
+    def test_post_auth_api(self):
+        self.create_auth()
+        db_auth = Auth.objects.last()
+        self.assertEqual(auth_json_mock.get('name'), db_auth.name)
+        self.assertEqual(auth_json_mock.get('url'), db_auth.url)
+        self.assertEqual(auth_json_mock.get('me'), db_auth.me)
+
+        url = base_url + "/base/auth"
+        response = self.client.post(url,
+                                    {"name": "hola"}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_put_auth_api(self):
+        self.create_auth()
+        db_auth = Auth.objects.last()
+        url = base_url + "/base/auth/" + str(db_auth.id)
+        response = self.client.put(
+            url, auth_json_mock_update, format="json")
+        db_auth = Auth.objects.last()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(auth_json_mock_update.get('name'), db_auth.name)
+        self.assertEqual(auth_json_mock_update.get('url'), db_auth.url)
+        self.assertEqual(auth_json_mock_update.get('me'), db_auth.me)
+
+        response = self.client.put(url,
+                                   {"name": "hola"}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_delete_auth_api(self):
+        self.create_auth()
+        db_auth = Auth.objects.last()
+
+        url = base_url + "/base/auth/" + str(db_auth.id)
+        response = self.client.delete(url, format="json")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Voting.objects.filter(id=db_auth.id).count(), 0)
+
+    def test_bulk_delete_auth_api(self):
+        self.create_auth()
+        self.create_auth(auth_json_mock_delete)
+        db_auth_id = Auth.objects.last().id
+
+        url = base_url + "/base/auth"
+        id_list = [db_auth_id, db_auth_id - 1]
+        response = self.client.delete(url, {"idList": id_list}, format="json")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Voting.objects.filter(id__in=id_list).count(), 0)
+
+        self.create_auth()
+        self.create_auth(auth_json_mock_delete)
+
+        response = self.client.delete(url, format="json")
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Voting.objects.count(), 0)
