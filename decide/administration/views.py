@@ -1,19 +1,24 @@
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
-from rest_framework.status import *
+
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_201_CREATED, HTTP_403_FORBIDDEN
 from rest_framework import parsers, renderers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from base.models import Auth, Key
-from authentication.serializers import UserSerializer
-from administration.serializers import *
-from base.serializers import AuthSerializer, KeySerializer
-from voting.serializers import VotingSerializer
-from .serializers import CensusSerializer
+
 from base.perms import IsAdminAPI
-from voting.models import Question
+
+from base.serializers import KeySerializer, AuthSerializer
+from voting.serializers import VotingSerializer
+from .serializers import AdminQuestionSerializer, AdminVotingGetSerializer, AdminVotingSerializer, CensusSerializer, UserAdminSerializer, UserSerializer, UserUpdateSerializer
+
+from base.models import Auth, Key
+from voting.models import Question, Voting, QuestionOption
+from census.models import Census
+
 from utils.utils import is_valid
 
 
