@@ -135,12 +135,12 @@ class VotingAPI(APIView):
     def delete(self, request):
         if request.data.get("idList") is None:
             Voting.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The format of the ids list is not correct')
             Voting.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class VotingsAPI(APIView):
@@ -202,7 +202,7 @@ class VotingsAPI(APIView):
 
     def delete(self, request, voting_id):
         Voting.objects.all().filter(id=voting_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class QuestionsAPI(APIView):
@@ -223,12 +223,12 @@ class QuestionsAPI(APIView):
     def delete(self, request):
         if request.data.get("idList") is None:
             Question.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The format of the ids list is not correct')
             Question.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class QuestionAPI(APIView):
@@ -249,7 +249,7 @@ class QuestionAPI(APIView):
 
     def delete(self, request, question_id):
         Question.objects.all().filter(id=question_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class CensussAPI(APIView):
@@ -294,7 +294,7 @@ class CensusAPI(APIView):
 
     def delete(self, request, census_id):
         Census.objects.all().filter(id=census_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class AuthsAPI(APIView):
@@ -313,12 +313,12 @@ class AuthsAPI(APIView):
     def delete(self, request):
         if request.data.get("idList") is None:
             Auth.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             Auth.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class AuthAPI(APIView):
@@ -340,7 +340,7 @@ class AuthAPI(APIView):
 
     def delete(self, request, auth_id):
         Auth.objects.all().filter(id=auth_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class KeysAPI(APIView):
@@ -359,12 +359,12 @@ class KeysAPI(APIView):
     def delete(self, request):
         if request.data.get("idList") is None:
             Key.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             Key.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class KeyAPI(APIView):
@@ -385,7 +385,7 @@ class KeyAPI(APIView):
 
     def delete(self, request, key_id):
         Key.objects.all().filter(id=key_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class UsersAPI(APIView):
@@ -414,7 +414,7 @@ class UsersAPI(APIView):
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             User.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class UserAPI(APIView):
@@ -439,7 +439,7 @@ class UserAPI(APIView):
 
     def delete(self, request, user_id):
         User.objects.all().filter(is_superuser=False, id=user_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class LoginAuthAPI(APIView):
