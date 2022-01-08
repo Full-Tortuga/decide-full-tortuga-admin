@@ -97,6 +97,20 @@ question_json_mock_delete = {
             {"number": 2, "option": "Test option 2 delete"}
     ]
 }
+census_json_mock = {
+    "voting_id": 1,
+    "voter_id": 1
+}
+
+census_json_mock_updated = {
+    "voting_id": 2,
+    "voter_id": 2
+}
+
+census_json_mock_delete = {
+    "voting_id": 1,
+    "voter_id": 1
+}
 
 def create_voting(self):
     response = self.client.post(base_url + "/votings",
@@ -141,6 +155,12 @@ def create_question(self):
     self.assertEqual(response.status_code, 201)
     return response
 
+
+def create_census(self):
+    response = self.client.post(base_url + "/census",
+                                census_json_mock, format="json")
+    self.assertEqual(response.status_code, 201)
+    return response
 
 class AdministrationTestCase(APITestCase):
     def setUp(self):
@@ -416,7 +436,7 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(db_key.y, 8732482384744)
         self.assertEqual(db_key.x, 670)
 
-    # ! AUTH TESTS
+    #!AUTH TESTS
     def test_get_list_auth_api(self):
         create_auth(self)
         url = base_url + "/base/auth"
@@ -571,3 +591,71 @@ class AdministrationTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Question.objects.count(), 0)
+
+        #! CENSUS TESTS
+    def test_get_list_census_api(self):
+        create_census(self)
+        url = base_url + "/census"
+        response = self.client.get(url, format="json")
+        self.assertEqual(len(response.data), Census.objects.count())
+        self.assertEqual(response.data[len(response.data) - 1]['voting_id'], 1)
+        self.assertEqual(response.data[len(response.data) - 1]['voter_id'], 1)
+
+    def test_get_census_api(self):
+        create_census(self)
+        db_census = Census.objects.last()
+
+        url = base_url + "/census/" + str(db_census.id)
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.data['voting_id'], 1)
+        self.assertEqual(response.data['voter_id'], 1)
+
+    def test_post_census_api(self):
+        create_census(self)
+        db_census = Census.objects.last()
+        self.assertEqual(db_census.voting_id, census_json_mock.get("voting_id"))
+        self.assertEqual(db_census.voter_id, census_json_mock.get("voter_id"))
+
+        url = base_url + "/census"
+        response = self.client.post(url,
+                                    {"desc":"Test description"}, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_put_census_api(self):
+        create_census(self)
+        db_census = Census.objects.last()
+        url = base_url + "/census/" + str(db_census.id)
+        response = self.client.put(
+            url, census_json_mock_updated, format="json")
+        db_census = Census.objects.last()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(census_json_mock_updated.get('voting_id'), db_census.voting_id)
+        self.assertEqual(census_json_mock_updated.get('voter_id'), db_census.voter_id)
+
+        response = self.client.put(url,
+                                   {"voting_id": 2}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_delete_census_api(self):
+        create_census(self)
+        db_census = Census.objects.last()
+
+        url = base_url + "/census/" + str(db_census.id)
+        response = self.client.delete(url, format = "json")
+
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Census.objects.filter(id=db_census.id).count(),0)
+
+    def test_bulk_delete_census_api(self):
+        create_census(self)
+        self.assertEqual(Census.objects.count(), 1)
+
+        data = {
+            "idList": [Census.objects.last().id]
+        }
+        url = base_url + "/census"
+        response = self.client.delete(url, data, format="json")
+        self.assertEqual(Census.objects.count(), 0)
+
+
