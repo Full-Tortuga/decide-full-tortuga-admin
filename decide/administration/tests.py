@@ -2,10 +2,9 @@ from django.contrib.auth.models import User
 
 from rest_framework.test import APITestCase, APIClient
 
-from voting.models import Voting, QuestionOption
+from voting.models import Voting, QuestionOption, Question
 from census.models import Census
 from base.models import Auth, Key
-
 
 # Create your tests here.
 
@@ -73,7 +72,31 @@ voting_json_mock_updated = {
     "auth": "http://localhost:8080",
     "census": [1]
 }
+question_json_mock = {
+    "id": 1,
+    "desc": "Test description",
+    "options": [
+        {"number": 1, "option": "Test option 1"},
+        {"number": 2, "option": "Test option 2"}
+    ]
+}
 
+question_json_mock_updated = {
+    "id": 1,
+    "desc": "Test description updated",
+    "options": [
+        {"number": 1, "option": "Test option 1 updated"},
+        {"number": 2, "option": "Test option 2 updated"}
+    ]
+}
+
+question_json_mock_delete = {
+        "desc": "Test description delete",
+        "options": [
+            {"number": 1, "option": "Test option 1 delete"},
+            {"number": 2, "option": "Test option 2 delete"}
+    ]
+}
 
 def create_voting(self):
     response = self.client.post(base_url + "/votings",
@@ -109,6 +132,13 @@ def create_key(self):
                                 }, format='json')
     self.assertEqual(response.status_code, 201)
 
+    return response
+
+
+def create_question(self):
+    response = self.client.post(base_url + "/votings/question",
+                                 question_json_mock, format="json")
+    self.assertEqual(response.status_code, 201)
     return response
 
 
@@ -324,7 +354,7 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Voting.objects.filter(id=db_voting.id).count(), 0)
 
-    #! KEY TESTS
+    # ! KEY TESTS
     def test_post_key_api(self):
         response = create_key(self)
 
@@ -462,3 +492,82 @@ class AdministrationTestCase(APITestCase):
         response = self.client.delete(url, format="json")
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Voting.objects.count(), 0)
+
+    #! QUESTION TESTS
+    def test_get_list_question_api(self):
+        create_question(self)
+        url = base_url + "/votings/question"
+        response = self.client.get(url, format="json")
+        self.assertEqual(len(response.data), Question.objects.count())
+        self.assertEqual(response.data[len(response.data) - 1]['desc'], "Test description")
+        self.assertEqual(response.data[len(response.data) - 1]['options'][0].get("option"), "Test option 1")
+        self.assertEqual(response.data[len(response.data) - 1]['options'][1].get("option"), "Test option 2")
+        self.assertEqual(response.data[len(response.data) - 1]['options'][0].get("number"), 1)
+        self.assertEqual(response.data[len(response.data) - 1]['options'][1].get("number"), 2)
+
+    def test_get_question_api(self):
+        create_question(self)
+        db_question = Question.objects.last()
+
+        url = base_url + "/votings/question/" + str(db_question.id) +"/"
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.data['desc'], "Test description")
+        self.assertEqual(response.data['options'][0].get("option"), "Test option 1")
+        self.assertEqual(response.data['options'][1].get("option"), "Test option 2")
+        self.assertEqual(response.data['options'][0].get("number"), 1)
+        self.assertEqual(response.data['options'][1].get("number"), 2)
+
+
+    def test_post_question_api(self):
+        create_question(self)
+        db_question = Question.objects.last()
+        self.assertEqual(db_question.desc, question_json_mock.get("desc"))
+        options = QuestionOption.objects.all().filter(question__pk=db_question.id)
+        self.assertEqual(options.count(), 2)
+
+        url = base_url + "/votings/question"
+        response = self.client.post(url,
+                                    {"desc":"Test description"}, format="json")
+        self.assertEqual(response.status_code, 400)
+
+
+    def test_put_question_api(self):
+        create_question(self)
+        db_question = Question.objects.last()
+        url = base_url + "/votings/question/" + str(db_question.id) + "/"
+        response = self.client.put(
+            url, question_json_mock_updated, format="json")
+        db_question = Question.objects.last()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(question_json_mock_updated.get('desc'), db_question.desc)
+        options = QuestionOption.objects.all().filter(question__pk=db_question.id)
+        self.assertEqual(question_json_mock_updated.get('options')[0]["option"], options.values("option")[0]["option"])
+        self.assertEqual(question_json_mock_updated.get('options')[1]["option"], options.values("option")[1]["option"])
+
+        response = self.client.put(url,
+                                   {"desc": "Test description 1 update"}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_delete_question_api(self):
+        create_question(self)
+        db_question = Question.objects.last()
+
+        url = base_url + "/votings/question/" + str(db_question.id) + "/"
+        response = self.client.delete(url, format = "json")
+
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Question.objects.filter(id=db_question.id).count(),0)
+
+    def test_bulk_delete_question_api(self):
+        create_question(self)
+        self.assertEqual(Question.objects.count(), 1)
+
+        data = {
+            "idList": [Question.objects.last().id]
+        }
+        url = base_url + "/votings/question"
+        response = self.client.delete(url, data, format="json")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Question.objects.count(), 0)
