@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
+
+from voting.models import Voting, QuestionOption
+from census.models import Census
+
 from .serializers import AdminVotingGetSerializer
-from voting.models import Voting
 
 from rest_framework.test import APITestCase, APIClient
-
 
 # Create your tests here.
 
@@ -30,11 +32,11 @@ voting_json_mock = {
     "desc": "Test description",
     "question": {
         "desc": "Test question",
-            "options": [
-                {"number": 1, "option": "Test option 1"},
-                {"number": 2, "option": "Test option 2"},
-                {"number": 3, "option": "Test option 3"}
-            ]
+        "options": [
+            {"number": 1, "option": "Test option 1"},
+            {"number": 2, "option": "Test option 2"},
+            {"number": 3, "option": "Test option 3"}
+        ]
     },
     "auth": "http://localhost:8000",
     "census": [1]
@@ -47,19 +49,19 @@ voting_json_mock_updated = {
     "question": {
         "desc": "Test updated question",
         "options": [
-            {"number": 1, "desc": "Test option 1"},
-            {"number": 2, "desc": "Test option 2"},
+            {"number": 1, "option": "Test option 1"},
+            {"number": 2, "option": "Test option 2"},
         ]
     },
     "auth": "http://localhost:8080",
-            "census": [1]
+    "census": [1]
 }
 
 
 def create_voting(self):
-    response = self.client.post(base_url + "/voting",
+    response = self.client.post(base_url + "/votings",
                                 voting_json_mock, format='json')
-    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.status_code, 201)
 
     return response
 
@@ -107,9 +109,9 @@ class AdministrationTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['votings'], {
-                         "notStarted": 0, "inProgress": 0, "finished": 0})
+            "notStarted": 0, "inProgress": 0, "finished": 0})
         self.assertEqual(response.data['users'], {
-                         "active": 1, "admins": 1, "employees": 0, "total": 1})
+            "active": 1, "admins": 1, "employees": 0, "total": 1})
 
     def test_create_user_api(self):
         response = create_user(self)
@@ -126,6 +128,8 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(db_user.is_staff, False)
 
     def test_get_users_api(self):
+        create_user(self)
+
         url = base_url + '/users'
         response = self.client.get(url, format="json")
         user_count = User.objects.count()
@@ -194,62 +198,63 @@ class AdministrationTestCase(APITestCase):
         url = base_url + '/users/' + str(db_user_id)
         response = self.client.delete(url, format="json")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         self.assertEqual(User.objects.count(), 1)
 
-
-'''
     def test_post_voting_api(self):
-        response = self.create_voting()
-        db_voting = Voting.objects.get(id=1)
+        response = create_voting(self)
+        db_voting = Voting.objects.last()
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertTrue(db_voting)
         self.assertEqual(Voting.objects.count(), 1)
         self.assertEqual(db_voting.desc, voting_json_mock.get("desc"))
         self.assertEqual(db_voting.question.desc,
                          voting_json_mock.get("question").get("desc"))
-        self.assertEqual(db_voting.question.options.count(), 3)
-        self.assertEqual(db_voting.auth, voting_json_mock.get("auth"))
-        self.assertEqual(db_voting.census, [1])
+        options = QuestionOption.objects.all().filter(
+            question__pk=db_voting.question.id)
+        self.assertEqual(options.count(), 3)
+        self.assertEqual(db_voting.auths.all().first().url,
+                         voting_json_mock.get("auth"))
+        censuss = Census.objects.filter(voting_id=db_voting.id)
+        self.assertEqual([census.voter_id for census in censuss], [1])
 
     def test_get_voting_api(self):
-        self.create_voting()
+        create_voting(self)
 
         url = base_url + "/votings"
         response = self.client.get(url, format="json")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['id'], 1)
         self.assertEqual(response.data[0]['name'], "Test voting")
         self.assertEqual(response.data[0]['desc'], "Test description")
 
     def test_update_voting_api(self):
-        self.create_voting()
-
-        url = base_url + "/votings/1"
+        create_voting(self)
+        db_voting = Voting.objects.last()
+        url = base_url + "/votings/" + str(db_voting.id) + "/"
         data = voting_json_mock_updated
         response = self.client.put(
             url, voting_json_mock_updated, format="json")
-        db_voting = Voting.objects.get(id=1)
-
+        db_voting = Voting.objects.last()
         self.assertEqual(response.status_code, 200)
         self.assertTrue(db_voting)
         self.assertEqual(db_voting.desc, data.get("desc"))
         self.assertEqual(db_voting.question.desc,
                          data.get("question").get("desc"))
-        self.assertEqual(db_voting.question.options.count(), 2)
-        self.assertEqual(db_voting.auth, data.get("auth"))
-        self.assertEqual(db_voting.census, [1])
+        options = QuestionOption.objects.all().filter(
+            question__pk=db_voting.question.id)
+        self.assertEqual(options.count(), 2)
+        self.assertEqual(db_voting.auths.all().first().url, data.get("auth"))
+        censuss = Census.objects.filter(voting_id=db_voting.id)
+        self.assertEqual([census.voter_id for census in censuss], [1])
 
     def test_delete_voting_api(self):
-        self.create_voting()
-
-        url = base_url + "/votings/1"
+        create_voting(self)
+        db_voting = Voting.objects.last()
+        url = base_url + "/votings/" + str(db_voting.id) + "/"
         response = self.client.delete(url, format="json")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(Voting.objects.count(), 0)
-
-'''
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Voting.objects.filter(id=db_voting.id).count(), 0)
