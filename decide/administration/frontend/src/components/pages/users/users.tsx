@@ -85,6 +85,8 @@ const UsersPage = () => {
   };
 
   const handleChangeActive = (value: boolean) => {
+    notify("info", "Loading...");
+
     userApi
       .updateUsersActive(idList, value)
       .then((response) => {
@@ -96,6 +98,8 @@ const UsersPage = () => {
       );
   };
   const handleChangeRole = (value: boolean, role: "Staff" | "Superuser") => {
+    notify("info", "Loading...");
+
     userApi
       .updateUsersRole(idList, value, role)
       .then((response) => {
