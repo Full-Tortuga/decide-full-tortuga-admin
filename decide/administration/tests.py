@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
 
-from base.models import Auth
+from rest_framework.test import APITestCase, APIClient
+
 from voting.models import Voting, QuestionOption
 from census.models import Census
+from base.models import Auth, Key
 
-from .serializers import AdminVotingGetSerializer
-
-from rest_framework.test import APITestCase, APIClient
 
 # Create your tests here.
 
@@ -95,6 +94,19 @@ def create_auth(self, data=auth_json_mock):
 def create_user(self):
     response = self.client.post(base_url + "/users",
                                 user_json_mock, format='json')
+    self.assertEqual(response.status_code, 201)
+
+    return response
+
+
+def create_key(self):
+    response = self.client.post(base_url + "/base/key",
+                                {
+                                    "p": 9945,
+                                    "g": 7876878768,
+                                    "y": 876254876254,
+                                    "x": 675
+                                }, format='json')
     self.assertEqual(response.status_code, 201)
 
     return response
@@ -312,6 +324,69 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Voting.objects.filter(id=db_voting.id).count(), 0)
 
+    #! KEY TESTS
+    def test_post_key_api(self):
+        response = create_key(self)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Key.objects.count(), 1)
+        self.assertEqual(Key.objects.last().p, 9945)
+
+    def test_get_keys_api(self):
+        create_key(self)
+
+        url = base_url + "/base/key"
+        response = self.client.get(url, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['p'], 9945)
+
+    def test_bulk_delete_keys_api(self):
+        create_key(self)
+        self.assertEqual(Key.objects.count(), 1)
+
+        data = {
+            "idList": [Key.objects.last().id]
+        }
+        url = base_url + "/base/key"
+        response = self.client.delete(url, data, format="json")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Key.objects.count(), 0)
+
+    def test_delete_key_api(self):
+        create_key(self)
+        self.assertEqual(Key.objects.count(), 1)
+
+        db_key = Key.objects.last()
+        url = base_url + "/base/key/" + str(db_key.id)
+        response = self.client.delete(url, format="json")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Key.objects.count(), 0)
+
+    def test_update_key_api(self):
+        create_key(self)
+        db_key = Key.objects.last()
+        url = base_url + "/base/key/" + str(db_key.id)
+        data = {
+            "p": 5000,
+            "g": 7878787878,
+            "y": 8732482384744,
+            "x": 670
+        }
+        response = self.client.put(url, data, format="json")
+
+        db_key = Key.objects.last()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(db_key)
+        self.assertEqual(db_key.p, 5000)
+        self.assertEqual(db_key.g, 7878787878)
+        self.assertEqual(db_key.y, 8732482384744)
+        self.assertEqual(db_key.x, 670)
+
+    # ! AUTH TESTS
     def test_get_list_auth_api(self):
         create_auth(self)
         url = base_url + "/base/auth"
