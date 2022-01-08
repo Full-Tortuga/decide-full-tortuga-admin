@@ -275,7 +275,7 @@ class CensussAPI(APIView):
             Census.objects.all().delete()
             return Response({}, status=HTTP_200_OK)
         else:
-            ids = request.get("idList")
+            ids = request.data.get("idList")
             Census.objects.filter(id__in=ids).delete()
             return Response({}, status=HTTP_200_OK)
 
