@@ -454,6 +454,8 @@ class LoginAuthAPI(APIView):
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        if not token.user.is_superuser:
+            return Response({"error": "Only super user can access here"}, status=HTTP_403_FORBIDDEN)
         response = Response({}, status=HTTP_200_OK)
         response.set_cookie('token', token.key)
         return response
