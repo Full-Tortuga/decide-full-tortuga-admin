@@ -20,38 +20,43 @@ antes de realizar los tests
 '''
 
 
-#USER TESTS
-def log_in(driver, cont): 
+# USER TESTS
+def log_in(driver, cont):
     try:
         print("Test LogIn")
         time.sleep(2)
         driver.get('http://localhost:8000/administration/')
         time.sleep(2)
-        driver.find_element(By.XPATH,'//*[@id="content"]/div/form/div[1]/div/input').send_keys("admin")
-        driver.find_element(By.XPATH,'//*[@id="content"]/div/form/div[2]/div/input').send_keys("qwerty")
-        driver.find_element(By.XPATH,'//*[@id="content"]/div/form/button').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/div[1]/div/input').send_keys("admin")
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/div[2]/div/input').send_keys("qwerty")
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/button').click()
         time.sleep(2)
         print("Test correctamente realizado\n")
         return cont
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1 
+        cont = cont + 1
         return cont
+
 
 def log_out(driver, cont):
     try:
         print("Test LogOut")
         driver.get('http://localhost:8000/administration/')
         time.sleep(2)
-        driver.find_element(By.XPATH, '//*[@id="root"]/div/div[1]/button').click()  
+        driver.find_element(
+            By.XPATH, '//*[@id="root"]/div/div[1]/button').click()
         time.sleep(1)
         print("Test correctamente realizado\n")
         return cont
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1
+        cont = cont + 1
         return cont
 
 
@@ -59,11 +64,15 @@ def incorrect_log_in(driver, cont):
     try:
         print("Test LogIn Incorrecto")
         driver.get('http://localhost:8000/administration/')
-        driver.find_element(By.XPATH, '//*[@id="content"]/div/form/div[1]/div/input').send_keys("badadmin")
-        driver.find_element(By.XPATH, '//*[@id="content"]/div/form/div[2]/div/input').send_keys("qwerty")
-        driver.find_element(By.XPATH, '//*[@id="content"]/div/form/button').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/div[1]/div/input').send_keys("badadmin")
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/div[2]/div/input').send_keys("qwerty")
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/button').click()
         time.sleep(1)
-        elemento = driver.find_element(By.XPATH,'//*[@id="content"]/div/form/div[2]/p')
+        elemento = driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/form/div[2]/p')
         error_text = 'Unable to log in with provided credentials.'
         if elemento.text == error_text:
             print("Test correctamente realizado\n")
@@ -71,34 +80,42 @@ def incorrect_log_in(driver, cont):
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1 
+        cont = cont + 1
         return cont
-    
-    
+
+
 def create_user(driver, cont):
     try:
         print("Test Create User")
         time.sleep(1)
         driver.get("http://localhost:8000/administration/users")
         time.sleep(4)
-        driver.find_element(By.XPATH, '//*[@id="actions"]/div/button[1]').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="actions"]/div/button[1]').click()
         time.sleep(4)
-        numalea =  str(random.randint(0,9)) + str(random.randint(0,9))+ str(random.randint(0,9))
-        username = str("nuevouser"+ str(numalea))
-        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[1]/div/input').send_keys(username)
-        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[2]/div/input').send_keys("passwordNew")
-        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[3]/div/input').send_keys("Nueva")
-        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[4]/div/input').send_keys("Cuenta")
-        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[5]/div/input').send_keys("email@gmail.com")
+        numalea = str(random.randint(0, 9)) + \
+            str(random.randint(0, 9)) + str(random.randint(0, 9))
+        username = str("nuevouser" + str(numalea))
+        driver.find_element(
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[1]/div/input').send_keys(username)
+        driver.find_element(
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[2]/div/input').send_keys("passwordNew")
+        driver.find_element(
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[3]/div/input').send_keys("Nueva")
+        driver.find_element(
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[4]/div/input').send_keys("Cuenta")
+        driver.find_element(
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[5]/div/input').send_keys("email@gmail.com")
         time.sleep(2)
-        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/form/div[2]/button').click()     
+        driver.find_element(
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[2]/button').click()
         time.sleep(5)
         print("Test correctamente realizado\n")
         return cont
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1 
+        cont = cont + 1
         return cont
 
 
@@ -106,9 +123,11 @@ def make_staff(driver, cont):
     try:
         driver.get("http://localhost:8000/administration/users")
         print("Test hacer staff")
-        driver.find_element(By.XPATH,'//*[@id="content"]/div/div/div[2]/div[2]/div/div/div/div[4]/div[1]/span/input').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/div/div[2]/div[2]/div/div/div/div[4]/div[1]/span/input').click()
         time.sleep(2)
-        driver.find_element(By.XPATH, '//*[@id="actions"]/div/button[5]').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="actions"]/div/button[5]').click()
         #driver.find_element(By.XPATH, '')
         print("Test correctamente realizado\n")
 
@@ -116,24 +135,27 @@ def make_staff(driver, cont):
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1 
+        cont = cont + 1
         return cont
+
 
 def make_superuser(driver, cont):
     try:
         driver.get("http://localhost:8000/administration/users")
         print("Test hacer superuser")
-        driver.find_element(By.XPATH,'//*[@id="content"]/div/div/div[2]/div[2]/div/div/div/div[4]/div[1]/span/input').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/div/div[2]/div[2]/div/div/div/div[4]/div[1]/span/input').click()
         time.sleep(2)
-        driver.find_element(By.XPATH, '//*[@id="actions"]/div/button[6]').click()
-        #print(element)
+        driver.find_element(
+            By.XPATH, '//*[@id="actions"]/div/button[6]').click()
+        # print(element)
         #driver.find_element(By.XPATH, '')
         print("Test correctamente realizado\n")
         return cont
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1 
+        cont = cont + 1
         return cont
 
 
@@ -141,16 +163,18 @@ def delete_user(driver, cont):
     try:
         driver.get("http://localhost:8000/administration/users")
         print("Test borrar usuario")
-        driver.find_element(By.XPATH,'//*[@id="content"]/div/div/div[2]/div[2]/div/div/div/div[4]/div[1]/span/input').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="content"]/div/div/div[2]/div[2]/div/div/div/div[4]/div[1]/span/input').click()
         time.sleep(2)
-        driver.find_element(By.XPATH, '//*[@id="actions"]/div/button[3]').click()
+        driver.find_element(
+            By.XPATH, '//*[@id="actions"]/div/button[3]').click()
         time.sleep(1)
         print("Test correctamente realizado\n")
         return cont
     except Exception as e:
         print("Error")
         print(e)
-        cont = cont +1 
+        cont = cont + 1
         return cont
 
 
@@ -159,9 +183,9 @@ def base(driver, cont):
         print("Test")
         driver.find_element(By.XPATH, '')
         return cont
-    except :
+    except:
         print("Error")
-        cont = cont +1 
+        cont = cont + 1
         return cont
 
 
@@ -169,8 +193,8 @@ if __name__ == "__main__":
     cont = 0
     options = webdriver.ChromeOptions()
     driver = webdriver.Chrome(options=options)
-    
-    #USER TESTS
+
+    # USER TESTS
     cont = incorrect_log_in(driver, cont)
     cont = log_in(driver, cont)
     cont = create_user(driver, cont)
@@ -186,6 +210,4 @@ if __name__ == "__main__":
     cont = log_out(driver, cont)
 
     print("Se han realizado Test de FrontEnd")
-    print("Se han encontrado: "+ str(cont) + " errores ")
-
-        
+    print("Se han encontrado: " + str(cont) + " errores ")
