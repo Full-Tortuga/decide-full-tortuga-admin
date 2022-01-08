@@ -4,8 +4,9 @@ import { HowToVote, Person, Refresh } from "@mui/icons-material";
 import { dashboardApi } from "api";
 import { userType } from "types";
 
-import { IconButton, StatBox } from "components/01-atoms";
+import { StatBox } from "components/01-atoms";
 import { Severity } from "components/01-atoms/Notification";
+import { ActionBar } from "components/03-organisms";
 
 import Page from "../page";
 
@@ -57,53 +58,64 @@ const HomePage = () => {
   );
 
   return (
-    <Page title="Home" notifications={notifications}>
-      <div className="grid grid-cols-3 gap-7">
-        <StatBox
-          title="Active users"
-          active={data?.users.active || 0}
-          total={data?.users.total || 0}
-          icon={<Person />}
-          color="success"
-        />
-        <StatBox
-          title="Employees"
-          active={data?.users.employees || 0}
-          total={data?.users.total || 0}
-          icon={<Person />}
-          color="primary"
-        />
-        <StatBox
-          title="Admins"
-          active={data?.users.admins || 0}
-          total={data?.users.total || 0}
-          icon={<Person />}
-          color="primary"
-        />
-        <StatBox
-          title="Votings not started"
-          active={data?.votings.notStarted || 0}
-          total={totalVotings}
-          icon={<HowToVote />}
-          color="primary"
-        />
-        <StatBox
-          title="Votings in progress"
-          active={data?.votings.inProgress || 0}
-          total={totalVotings}
-          icon={<HowToVote />}
-          color="warning"
-        />
-        <StatBox
-          title="Votings finished"
-          active={data?.votings.finished || 0}
-          total={totalVotings}
-          icon={<HowToVote />}
-          color="success"
-        />
-      </div>
-      <IconButton icon={<Refresh />} title="Refetch" onClick={refetchData} />
-    </Page>
+    <>
+      <Page title="Home" notifications={notifications}>
+        <div className="grid grid-cols-3 gap-7">
+          <StatBox
+            title="Active users"
+            active={data?.users.active || 0}
+            total={data?.users.total || 0}
+            icon={<Person />}
+            color="success"
+          />
+          <StatBox
+            title="Employees"
+            active={data?.users.employees || 0}
+            total={data?.users.total || 0}
+            icon={<Person />}
+            color="primary"
+          />
+          <StatBox
+            title="Admins"
+            active={data?.users.admins || 0}
+            total={data?.users.total || 0}
+            icon={<Person />}
+            color="primary"
+          />
+          <StatBox
+            title="Votings not started"
+            active={data?.votings.notStarted || 0}
+            total={totalVotings}
+            icon={<HowToVote />}
+            color="primary"
+          />
+          <StatBox
+            title="Votings in progress"
+            active={data?.votings.inProgress || 0}
+            total={totalVotings}
+            icon={<HowToVote />}
+            color="warning"
+          />
+          <StatBox
+            title="Votings finished"
+            active={data?.votings.finished || 0}
+            total={totalVotings}
+            icon={<HowToVote />}
+            color="success"
+          />
+        </div>
+      </Page>
+
+      <ActionBar
+        individualActions={[
+          {
+            icon: <Refresh />,
+            title: "Refresh",
+            onClick: () => refetchData(),
+          },
+        ]}
+      />
+    </>
   );
 };
 

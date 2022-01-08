@@ -84,12 +84,14 @@ const VotingsPage = () => {
 
   const handleDelete = () => {
     votingApi.deleteVotings(idList).then((response) => {
-      console.log(response);
       refetchVotings();
+      notify("success", "Voting/s deleted");
     });
   };
 
   const handleChangeStatus = (status: string) => {
+    notify("info", "Loading...");
+
     if (status === "new")
       votingApi
         .startVotings(idList)

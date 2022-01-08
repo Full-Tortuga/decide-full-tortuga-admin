@@ -25,7 +25,6 @@ const Component = (props: {
     control,
     getValues,
     trigger,
-    setError,
     clearErrors,
     formState: { errors },
     reset,
@@ -49,8 +48,8 @@ const Component = (props: {
   }, [props.initialVoting, control, reset, clearErrors, trigger]);
 
   const onSubmitFailed = (e: any) => {
-    setError("name", { type: "manual", message: e });
-    props.notify?.("error", "Submit failed: " + e);
+    clearErrors();
+    props.notify?.("error", "Submit failed: \n" + e);
   };
 
   const onSubmitSuccess = () => {
@@ -108,7 +107,7 @@ const Component = (props: {
           <Input.Radio
             control={control}
             name="auth"
-            rules={[{ required: true }]}
+            rules={{ required: true }}
             options={[
               {
                 label: "Local (localhost:8000)",

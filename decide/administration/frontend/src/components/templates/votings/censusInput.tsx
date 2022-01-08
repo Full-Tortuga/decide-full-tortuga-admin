@@ -33,6 +33,7 @@ const Component = (props: { control: any }) => {
     <Controller
       name="census"
       control={props.control}
+      rules={{ required: true }}
       render={({ field, fieldState }) => (
         <>
           <FormLabel>{"Census".toLowerCase()}</FormLabel>
