@@ -1,0 +1,54 @@
+#!/bin/bash
+
+exec < /dev/tty
+
+COMMIT_SOURCE=$2
+if [ "${COMMIT_SOURCE}" = "message" ] || [ "${COMMIT_SOURCE}" = "template" ] || [ "${COMMIT_SOURCE}" = "merge" ] || [ "${COMMIT_SOURCE}" = "squash" ] || [ "${COMMIT_SOURCE}" = "commit" ];then
+    exit 0
+fi
+echo Task id:
+read id
+
+PS3="Type of Task: "
+select opt in "feat" "fix" "refactor" "test" "wip" "ci" "style"
+do
+    case $opt in
+        "feat")
+            type="feat"
+            break
+            ;;
+        "fix")
+            type="fix"
+            break
+            ;;
+        "refactor")
+            type="refactor"
+            break
+            ;;
+        "test")
+            type="test"
+            break
+            ;;
+        "wip")
+            type="wip"
+            break
+            ;;
+        "ci")
+            type="ci"
+            break
+            ;;
+        "style")
+            type="style"
+            break
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
+echo Description:
+read description
+
+firstLine=$(head -n1 $1)
+if [ -z "$firstLine"  ] ;then
+	echo "#$id-$type: $description" > $1
+fi
