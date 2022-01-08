@@ -103,6 +103,7 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(self.token["expires"],
                          "Thu, 01 Jan 1970 00:00:00 GMT")
 
+    #! DASHBOARD TESTS
     def test_get_dashboard_api(self):
         url = base_url + '/dashboard'
         response = self.client.get(url, format="json")
@@ -113,6 +114,7 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(response.data['users'], {
             "active": 1, "admins": 1, "employees": 0, "total": 1})
 
+    #! USER TESTS
     def test_create_user_api(self):
         response = create_user(self)
         db_user = User.objects.get(username="mock")
@@ -193,6 +195,7 @@ class AdministrationTestCase(APITestCase):
 
     def test_delete_user_api(self):
         create_user(self)
+        self.assertEqual(User.objects.count(), 2)
         db_user_id = User.objects.get(username="mock").id
 
         url = base_url + '/users/' + str(db_user_id)
@@ -201,6 +204,21 @@ class AdministrationTestCase(APITestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(User.objects.count(), 1)
 
+    def test_bulk_delete_users_api(self):
+        create_user(self)
+        self.assertEqual(User.objects.count(), 2)
+        db_user_id = User.objects.get(username="mock").id
+
+        data = {
+            "idList": [db_user_id]
+        }
+        url = base_url + '/users'
+        response = self.client.delete(url, data, format="json")
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(User.objects.count(), 1)
+
+    #! VOTING TESTS
     def test_post_voting_api(self):
         response = create_voting(self)
         db_voting = Voting.objects.last()
