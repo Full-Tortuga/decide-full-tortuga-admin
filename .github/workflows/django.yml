@@ -38,15 +38,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install codacy-coverage
-      - name: Migrate
-        run: |
-          cd decide
-          python manage.py 
-          makemigrations
-          python manage.py migrate
       - name: Copy local_settings
         run: |
           cp ./decide/local_settings.example.py ./decide/local_settings.py
+      - name: Migrate
+        run: |
+          cd decide
+          python manage.py makemigrations
+          python manage.py migrate
       - name: Test administration module
         run: |
           cd decide
