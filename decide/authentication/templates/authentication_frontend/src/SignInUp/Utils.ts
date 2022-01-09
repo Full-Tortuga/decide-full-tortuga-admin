@@ -12,3 +12,12 @@ export function getCookie(name:string) {
     }
     return cookieValue;
 }
+
+export function checkErrors(event:any){
+    
+    var pwd = event.target.password.value;
+    var pwd2 = event.target.password2.value;
+    return pwd == pwd2;
+    
+
+}
