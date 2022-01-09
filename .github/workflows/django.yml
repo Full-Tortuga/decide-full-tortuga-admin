@@ -16,9 +16,13 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:3.4.23
+        image: mongo
+        env:
+          MONGO_INITDB_DATABASE: decide
         ports:
           - 27017:27017
+        options: --health-cmd mongo --health-interval 10s --health-timeout 5s --health-retries 5
+
       ldap:
         image: carvilgar1us/decideldap
         ports:
@@ -28,7 +32,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install linux dependencies
         run: |
-          sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
+          sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind libpq-dev
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -37,11 +41,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install codacy-coverage
       - name: Copy local_settings
         run: |
           cp ./decide/local_settings.example.py ./decide/local_settings.py
+      - name: Migrate
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          cd decide
+          python manage.py flush --noinput
+          python manage.py sqlflush
+          python manage.py makemigrations
+          python manage.py migrate
       - name: Test administration module
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
-          python ./decide/manage.py test administration
+          cd decide
+          coverage run --branch --source=./administration/ ./manage.py test --settings=decide.test_settings administration --noinput -v 2
+          coverage xml
+      - name: Codacy Coverage Reporter
+        uses: codacy/codacy-coverage-reporter-action@v1.1.0
+        with:
+          project-token: ${{ secrets.CODACY_API_TOKEN }}
+          coverage-reports: decide/coverage.xml
