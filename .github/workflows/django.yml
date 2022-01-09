@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install linux dependencies
         run: |
-          sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind
+          sudo apt-get install build-essential python3-dev python2.7-dev libldap2-dev libsasl2-dev tox lcov valgrind libpq-dev
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -59,7 +59,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
           cd decide
-          coverage run --branch --source=./administration/ ./manage.py test administration --keepdb -v 2
+          coverage run --branch --source=./administration/ ./manage.py test administration --noinput -v 2
           coverage xml
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.1.0
