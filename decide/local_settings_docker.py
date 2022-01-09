@@ -1,17 +1,20 @@
+
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 import os
 
-DEBUG = True
+# dev env CORS SETTINGS
+BASEURL = 'http://localhost:8000'
+FE_BASEURL = 'http://localhost:3000'
 
-STATIC_ROOT = '/app/static/'
-MEDIA_ROOT = '/app/static/media/'
-ALLOWED_HOSTS = ['*']
-
-BASEURL = 'http://localhost'
-
-
-
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    BASEURL, FE_BASEURL
+)
+CSRF_TRUSTED_ORIGINS = [
+    BASEURL, FE_BASEURL
+]
 
 
 # Modules in use, commented modules that you won't use
@@ -28,23 +31,39 @@ MODULES = [
     'voting',
 ]
 
+
+APIS = {
+    'administration': BASEURL,
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': os.environ.get('DATABASE_NAME'),
+        'NAME': 'db',
         'CLIENT': {
-           'host': os.environ.get('DATABASE_HOST'),
-           'username':  os.environ.get('DATABASE_USER'),
-           'password': os.environ.get('DATABASE_PASSWORD'),
-	       'SSL': 'true'
+            'username': os.environ.get('MONGO_USER'),
+            'password': os.environ.get('MONGO_PASSWORD'),
+            'host': os.environ.get('MONGO_HOST'),
+            'port': int(os.environ.get('MONGO_PORT')),
+            'authSource': os.environ.get('MONGO_NAME'),
+            'authMechanism': 'SCRAM-SHA-1'
         }
-
     }
 }
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
 
+# Baseline configuration.
 AUTH_LDAP_SERVER_URI = 'ldap://:389'
 
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
@@ -61,24 +80,11 @@ AUTH_LDAP_USER_ATTR_MAP = {
     'last_name': 'sn',
     'email': 'mail',
 }
-APIS = {
-    'administration': 'http://10.5.0.1:8000',
-    'authentication': 'http://10.5.0.1:8000',
-    'base': 'http://10.5.0.1:8000',
-    'booth': 'http://10.5.0.1:8000',
-    'census': 'http://10.5.0.1:8000',
-    'mixnet': 'http://10.5.0.1:8000',
-    'postproc': 'http://10.5.0.1:8000',
-    'store': 'http://10.5.0.1:8000',
-    'visualizer': 'http://10.5.0.1:8000',
-    'voting': 'http://10.5.0.1:8000',
-}
 
 # Keep ModelBackend around for per-user permissions and maybe a local
 # superuser.
 
 AUTHENTICATION_BACKENDS = [
-    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'django_auth_ldap.backend.LDAPBackend',
 ]
-
