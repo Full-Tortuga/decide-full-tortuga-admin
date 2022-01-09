@@ -46,6 +46,8 @@ jobs:
         run: |
           cp ./decide/local_settings.example.py ./decide/local_settings.py
       - name: Migrate
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
           cd decide
           python manage.py flush --noinput
