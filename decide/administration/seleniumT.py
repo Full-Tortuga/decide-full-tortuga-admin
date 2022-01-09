@@ -3,13 +3,16 @@ from selenium.webdriver.common.by import By
 import time
 import random
 
-'''Para poder ejecutar este test, se debe crear un superusuario
+'''
+README:
+
+Para poder ejecutar este test, se debe crear un superusuario
 con el siguiente comando:
 
 ./manage.py createsuperuser
 
 con datos:
-    Username: admin
+    username: admin
     password: qwerty
 y hacer bypass de la restriccion de contraseña
 
@@ -17,6 +20,7 @@ Entrar en http://localhost:8000/administration/users
 iniciar sesión con el usuario admin
 y si hubiera más usuarios creados, hay que eliminarlos
 antes de realizar los tests
+
 '''
 
 
@@ -178,7 +182,7 @@ def delete_user(driver, cont):
         return cont
 
 
-#VOTING TESTS
+# VOTING TESTS
 def create_voting(driver, cont):
     try:
         print("Test Create Voting")
@@ -191,7 +195,7 @@ def create_voting(driver, cont):
         driver.find_element(
             By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[1]/div/input').send_keys("Nueva votacion")
         driver.find_element(
-            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[2]/div/input').send_keys("descripcion") 
+            By.XPATH, '/html/body/div[2]/div[3]/div/form/div[1]/div/div/div[2]/div/input').send_keys("descripcion")
         driver.find_element(
             By.XPATH, '/html/body/div[2]/div[3]/div/form/div[5]/div/button[2]').click()
         time.sleep(2)
@@ -221,6 +225,7 @@ def create_voting(driver, cont):
         print(e)
         cont = cont + 1
         return cont
+
 
 def update_voting(driver, cont):
     try:
@@ -258,6 +263,7 @@ def update_voting(driver, cont):
         cont = cont + 1
         return cont
 
+
 def delete_voting(driver, cont):
     try:
         print("Test Delete Voting")
@@ -276,6 +282,7 @@ def delete_voting(driver, cont):
         print(e)
         cont = cont + 1
         return cont
+
 
 def start_voting(driver, cont):
     try:
@@ -296,6 +303,7 @@ def start_voting(driver, cont):
         cont = cont + 1
         return cont
 
+
 def stop_voting(driver, cont):
     try:
         print("Test Stop Voting")
@@ -314,6 +322,7 @@ def stop_voting(driver, cont):
         print(e)
         cont = cont + 1
         return cont
+
 
 def tally_voting(driver, cont):
     try:
@@ -342,6 +351,7 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(options=options)
 
     # USER TESTS
+    print("USER TESTS START \n")
     cont = incorrect_log_in(driver, cont)
     cont = log_in(driver, cont)
     cont = create_user(driver, cont)
@@ -356,10 +366,10 @@ if __name__ == "__main__":
     cont = delete_user(driver, cont)
     cont = log_out(driver, cont)
     print("Se han realizado los test de User")
-    print("Se han encontrado: " + str(cont) + " errores ")
-    
+    print("Se han encontrado: " + str(cont) + " errores \n\n")
 
-    #VOTING TESTS
+    # VOTING TESTS
+    print("VOTING TESTS START \n")
     cont2 = 0
     cont2 = log_in(driver, cont2)
     cont2 = create_voting(driver, cont2)
@@ -372,4 +382,4 @@ if __name__ == "__main__":
     time.sleep(3)
     cont2 = delete_voting(driver, cont2)
     print("Se han realizado los test de Votings")
-    print("Se han encontrado: " + str(cont2) + " errores ")
+    print("Se han encontrado: " + str(cont2) + " errores \n\n")
