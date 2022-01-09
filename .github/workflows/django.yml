@@ -48,12 +48,14 @@ jobs:
       - name: Migrate
         run: |
           cd decide
+          python manage.py flush --noinput
+          python manage.py sqlflush
           python manage.py makemigrations
           python manage.py migrate
       - name: Test administration module
         run: |
           cd decide
-          coverage run --branch --source=./administration/ ./manage.py test administration --settings=decide.settings --keepdb -v 2
+          coverage run --branch --source=./administration/ ./manage.py test administration --settings=decide.settings -v 2
           coverage xml
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.1.0
