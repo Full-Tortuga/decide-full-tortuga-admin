@@ -94,21 +94,6 @@ También debemos lanzar el panel de control, para ello dentro de la carpeta deci
 
     npm start
 
-## Nuevo panel de administración
-
-Para configurar el nuevo panel de control de administración se deben seguir los siguientes pasos. (se deben haber instalado los nuevos requirements y configurado la nueva base de datos tal y como se describe previamente)
-
-Se recuerda que se debe copiar el archivo de configuración local de ejemplo:
-
-- `cp local_settings.example.py local_settings.py`
-
-### setup
-
-- `cd /decide/administration/frontend`
-- `npm install && npm run build`
-- abrir `http://localhost:8000/administration` en el navegador
-- hacer login con un superusuario
-
 # Pasos a seguir para configurar y iniciar el cliente LDAP
 
 La instalación se ha realizado y probado en sistemas Ubuntu, no puedo garantizarles que funcione en otras distribuciones o sistemas operativos.
@@ -257,7 +242,7 @@ adding new entry "uid=foobar,ou=people,dc=decide,dc=org"
 adding new entry "cn=foobar,ou=groups,dc=decide,dc=org"
 ```
 
-## Dependencias Django para LDAP
+## Dependencias Djando para LDAP
 
 Para finalizar, debe instalar las dependencias que django necesarias para la comunicación con el cliente LDAP.
 Para ello, borre su local_settings.py y ejecute el comando pip para instalar las nuevas dependencias:
@@ -270,8 +255,6 @@ una vez finalizada la instalación copie el local settings que se le ofrece como
 
 Puede probar que funcione haciendo una petición desde Postman
 ![alt text](https://i.imgur.com/3a4xwaZ.png)
-
----
 
 ## Ejecutar con docker
 
