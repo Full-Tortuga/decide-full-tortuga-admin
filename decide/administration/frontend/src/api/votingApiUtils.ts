@@ -13,13 +13,13 @@ const votingApi = {
 
   //Individual Operations
   getQuestion: (questionId: number) =>
-    axios.get(`/voting/question/${questionId}/`),
+    axios.get(`/voting/question/${questionId}`),
   createQuestion: (question: votingType.Question) =>
     axios.post("/voting/question/", question),
   updateQuestion: (question: votingType.Question, questionId: number) =>
-    axios.put(`/voting/question/${questionId}/`, question),
+    axios.put(`/voting/question/${questionId}`, question),
   deleteQuestion: (questionId: number) =>
-    axios.delete(`/voting/question/${questionId}/`),
+    axios.delete(`/voting/question/${questionId}`),
 
   //VOTING API
   //Bulk Operations
@@ -49,12 +49,12 @@ const votingApi = {
     }),
 
   //Individual Operations
-  getVoting: (votingId: number) => axios.get(`/votings/${votingId}/`),
+  getVoting: (votingId: number) => axios.get(`/votings/${votingId}`),
   createVoting: (voting: votingType.VotingFormFields) =>
     axios.post("/votings", voting),
   updateVoting: (voting: votingType.VotingFormFields, votingId: number) =>
-    axios.put(`/votings/${votingId}/`, voting),
-  deleteVoting: (votingId: number) => axios.delete(`/votings/${votingId}/`),
+    axios.put(`/votings/${votingId}`, voting),
+  deleteVoting: (votingId: number) => axios.delete(`/votings/${votingId}`),
 };
 
 export default votingApi;
