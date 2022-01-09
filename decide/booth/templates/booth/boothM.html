@@ -30,6 +30,22 @@
 
             <!-- Register -->
             <b-form @submit="onSubmitLogin" v-if="signup">
+                <b-form-group label="{% trans "Username" %}" label-for="username">
+                    <b-form-input
+                        id="username"
+                        type="text"
+                        v-model="form.username"
+                        autocomplete="username"
+                        required />
+                </b-form-group>
+                <b-form-group label="{% trans "Password" %}" label-for="password">
+                    <b-form-input
+                        id="password"
+                        type="password"
+                        autocomplete="current-password"
+                        v-model="form.password"
+                        required />
+                </b-form-group>
                 <b-button type="submit" variant="primary">{% trans "Login" %}</b-button>
             </b-form>
 
@@ -37,12 +53,12 @@
             <div v-if="!signup">
                 <h2>[[ voting.question.desc ]]</h2>
                 <b-form-group v-for="opt in voting.question.options" :key="opt.number">
-                    <b-form-radio v-model="selected"
+                    <b-form-checkbox v-model="selected"
                                   :id="'q' + opt.number"
                                   name="question"
                                   :value="opt.number">
                         [[ opt.option ]]
-                    </b-form-radio>
+                    </b-form-checkbox>
                 </b-form-group>
                 <b-button type="button" variant="primary" v-on:click="decideSend">
                     {% trans "Vote" %}
@@ -71,22 +87,19 @@
 
     <script>
         var voting = {{voting|safe}};
-        var token = "{{token|safe}}";
-        var user = {{user|safe}};
-
         var app = new Vue({
             delimiters: ['[[', ']]'],
             el: '#app-booth',
             data: {
                 keybits: {{ KEYBITS }},
                 voting: voting,
-                selected: "",
+                selected: [],
                 signup: true,
                 alertShow: false,
                 alertMsg: "",
                 alertLvl: "info",
-                token,
-                user,
+                token: null,
+                user: null,
                 form: {
                     username: '',
                     password: ''
@@ -103,9 +116,14 @@
             },
             methods: {
                 init() {
-                    if(this.token) {
-                        this.signup = false
-                    }
+                    var cookies = document.cookie.split("; ");
+                    cookies.forEach((c) => {
+                        var cs = c.split("=");
+                        if (cs[0] == 'decide' && cs[1]) {
+                            this.token = cs[1];
+                            this.getUser();
+                        }
+                    });
                 },
                 postData(url, data) {
                     // Default options are marked with *
@@ -132,26 +150,54 @@
                 },
                 onSubmitLogin(evt) {
                     evt.preventDefault();
-                    location.href = "/authentication/login_form"
-                     
+                    this.postData("{% url "gateway" "authentication" "/login/" %}", this.form)
+                        .then(data => {
+                            document.cookie = 'decide='+data.token+';';
+                            this.token = data.token;
+                            this.getUser();
+                        })
+                        .catch(error => {
+                            this.showAlert("danger", '{% trans "Error: " %}' + error);
+                        });
+                },
+                getUser(evt) {
+                    var data = {token: this.token};
+                    this.postData("{% url "gateway" "authentication" "/getuser/" %}", data)
+                        .then(data => {
+                            this.user = data;
+                            this.signup = false;
+                        }).catch(error => {
+                            this.showAlert("danger", '{% trans "Error: " %}' + error);
+                        });
                 },
                 decideLogout(evt) {
-                   location.href = "/authentication/userlogout/"
+                    evt.preventDefault();
+                    var data = {token: this.token};
+                    this.postData("{% url "gateway" "authentication" "/logout/" %}", data);
+                    this.token = null;
+                    this.user = null;
+                    document.cookie = 'decide=;';
+                    this.signup = true;
                 },
-                decideEncrypt() {
-                    var bigmsg = BigInt.fromJSONObject(this.selected.toString());
+                decideEncrypt(selO) {
+                    var bigmsg = BigInt.fromJSONObject(selO.toString());
                     var cipher = ElGamal.encrypt(this.bigpk, bigmsg);
                     return cipher;
                 },
                 decideSend(evt) {
                     evt.preventDefault();
-                    var v = this.decideEncrypt();
+                    aux = []
+                    for (selO of this.selected){
+                        var v = this.decideEncrypt(selO);
+                        voteAux = {a:v.alpha.toString(), b: v.beta.toString()}
+                        aux.push(voteAux)
+                    }
                     var data = {
-                        vote: {a: v.alpha.toString(), b: v.beta.toString()},
-                        voting: this.voting.id,
-                        voter: this.user.id,
-                        token: this.token,
-                        type: this.voting.type
+                    vote: aux,
+                    voting: this.voting.id,
+                    voter: this.user.id,
+                    token: this.token,
+                    type: this.voting.type
                     }
                     this.postData("{% url "gateway" "store" "/" %}", data)
                         .then(data => {

@@ -79,8 +79,23 @@ MODULES = [
     'store',
     'visualizer',
     'voting','''
+    
 
 BASEURL = 'http://localhost:8000'
+
+APIS = {
+    'administration': BASEURL,
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
+}
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # added to solve CORS

@@ -7,10 +7,12 @@
     <link type="text/css" rel="stylesheet"
          href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
     <link type="text/css" rel="stylesheet" href="{% static "booth/style.css" %}" />
+
+
 {% endblock %}
 
 {% block content %}
-    {% csrf_token %}
+    {% csrf_token %}    
     <div id="app-visualizer">
         <!-- Navbar -->
         <b-navbar type="dark" variant="secondary">
@@ -18,11 +20,11 @@
         </b-navbar>
 
         <div class="voting container">
-            <input id="vot_type" type="hidden" value="V">
-            <h1>[[ voting[0]["id"] ]] - [[ voting[0]["name"] ]]</h1>
+            <input id="vot_type" type="hidden" :value="voting.type">
+            <h1>[[ voting.id ]] - [[ voting.name ]]</h1>
 
-            <h2 v-if="!voting[0]['start_date']">Votación no comenzada</h2>
-            <h2 v-else-if="!voting[0]['end_date']">Votación en curso</h2>
+            <h2 v-if="voting.start_date == 'None'">Votación no comenzada</h2>
+            <h2 v-else-if="voting.end_date == 'None'">Votación en curso</h2>
             <div v-else>
                 <h2 class="heading">Resultados:</h2>
                 <table class="table table-bordered table-striped">
@@ -34,16 +36,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="vote in voting[1]" :key="vote['number']">
-                            <th>[[ vote['option'] ]]</th>
-                            <td>[[ vote['postproc'] ]]</td>
-                            <td class="text-muted">[[ vote['votes'] ]]</td>
+                        <tr v-for="opt in voting.postproc" :key="opt.number">
+                            <th>[[ opt.option ]]</th>
+                            <td>[[ opt.postproc ]]</td>
+                            <td class="text-muted">[[ opt.votes ]]</td>
                         </tr>
                     </tbody>
                 </table>
-                <a v-bind:href="'/visualizer/votes/' + [[ voting[0]['id'] ]] ">Descargar datos en CSV</a>
-                <pie-chart></pie-chart> 
-                <bar-chart></bar-chart>
+                <a v-bind:href="'/visualizer/votes/multipleVoting/' + [[ voting.id ]] ">Descargar datos en CSV</a> 
+                <pie-chart></pie-chart>
+                <bar-chart></bar-chart> 
             </div>
         </div>
         
@@ -54,7 +56,8 @@
             onclick="window.location='https://t.me/votitos_bot'">
             <img src="https://img.icons8.com/color/48/000000/discord-new-logo.png" class = "logodiscord" title="Votitos #5072"/>
         </p>
-    </footer>
+    </footer>        
+
 {% endblock %}
 
 
@@ -100,7 +103,7 @@
             },
             methods:{
                 loadData(){
-                    (voting[1]).forEach(element =>{
+                    (voting.postproc).forEach(element =>{
                         randomColor = Math.floor(Math.random()*16777215).toString(16);
                         this.bgColor.push("#" + randomColor)
                         this.votesOptions.push(element.option)
@@ -139,7 +142,7 @@
             },
             methods:{
                 loadData(){
-                    (voting[1]).forEach(element =>{
+                    (voting.postproc).forEach(element =>{
                         randomColor = Math.floor(Math.random()*16777215).toString(16);
                         this.bgColor.push("#" + randomColor)
                         this.votesOptions.push(element.option)
@@ -150,11 +153,11 @@
             }
 
         })
-    </script>
+    </script> 
+ 
 
     <script>   
         var voting = {{voting|safe}};
-        console.log(voting);
         var app = new Vue({
             delimiters: ['[[', ']]'],
             el: '#app-visualizer',
@@ -163,7 +166,7 @@
             }
         })
     </script>
-
-    <script src="{% static "scripts/get_graphs.js" %}"></script> 
+    
+    <script src="{% static "scripts/get_graphs.js" %}"></script>    
 </body>
 {% endblock %}
