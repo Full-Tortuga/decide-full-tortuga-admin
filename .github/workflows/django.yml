@@ -16,7 +16,7 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:3.4.23
+        image: mongo
         env:
           MONGO_INITDB_DATABASE: decide
         ports:
@@ -55,7 +55,7 @@ jobs:
       - name: Test administration module
         run: |
           cd decide
-          coverage run --branch --source=./administration/ ./manage.py test administration --noinput -v 2
+          coverage run --branch --source=./administration/ ./manage.py test administration --keepdb -v 2
           coverage xml
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.1.0
