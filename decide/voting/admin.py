@@ -6,7 +6,6 @@ from .models import Question, BinaryQuestion, ScoreQuestion
 from .models import Voting, BinaryVoting, ScoreVoting
 from .filters import StartedFilter
 from visualizer.telegramBot import auto_notifications
-import visualizer.views
 
 def start(modeladmin, request, queryset):
     for v in queryset.all():
@@ -30,8 +29,7 @@ def tally(ModelAdmin, request, queryset):
 
 #for users who have auto notifications enabled
 def send_notifications(v):
-    if visualizer.views.TELEGRAM_BOT_STATUS:
-        auto_notifications(v)
+    auto_notifications(v)
 
 class QuestionOptionInline(admin.TabularInline):
     model = QuestionOption
