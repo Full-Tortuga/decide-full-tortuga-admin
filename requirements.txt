@@ -21,3 +21,4 @@ gunicorn
 selenium==3.14.0
 python-telegram-bot==13.9.0
 python-dotenv
+dnspython
