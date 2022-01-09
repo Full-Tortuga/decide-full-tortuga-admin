@@ -55,7 +55,6 @@ DATABASES = {
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
 
-# Baseline configuration.
 AUTH_LDAP_SERVER_URI = 'ldap://:389'
 
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
@@ -77,6 +76,6 @@ AUTH_LDAP_USER_ATTR_MAP = {
 # superuser.
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'django_auth_ldap.backend.LDAPBackend',
+    'base.backends.AuthBackend',
 ]

@@ -16,6 +16,15 @@ class BoothView(TemplateView):
         context = super().get_context_data(**kwargs)
         vid = kwargs.get('voting_id', 0)
 
+        context['token'] = ''
+        context['user'] = json.dumps({})
+
+        if self.request.user.is_authenticated:
+            token = self.request.session['auth-token']
+            user = self.request.user
+            context['token'] = token
+            context['user'] = json.dumps({"id": user.id})
+
         try:
             voting = get_object_or_404(Voting,id=vid)
             

@@ -30,22 +30,6 @@
 
             <!-- Register -->
             <b-form @submit="onSubmitLogin" v-if="signup">
-                <b-form-group label="{% trans "Username" %}" label-for="username">
-                    <b-form-input
-                        id="username"
-                        type="text"
-                        v-model="form.username"
-                        autocomplete="username"
-                        required />
-                </b-form-group>
-                <b-form-group label="{% trans "Password" %}" label-for="password">
-                    <b-form-input
-                        id="password"
-                        type="password"
-                        autocomplete="current-password"
-                        v-model="form.password"
-                        required />
-                </b-form-group>
                 <b-button type="submit" variant="primary">{% trans "Login" %}</b-button>
             </b-form>
 
@@ -87,6 +71,9 @@
 
     <script>
         var voting = {{voting|safe}};
+        var token = "{{token|safe}}";
+        var user = {{user|safe}};
+
         var app = new Vue({
             delimiters: ['[[', ']]'],
             el: '#app-booth',
@@ -98,8 +85,8 @@
                 alertShow: false,
                 alertMsg: "",
                 alertLvl: "info",
-                token: null,
-                user: null,
+                token,
+                user,
                 form: {
                     username: '',
                     password: ''
@@ -116,14 +103,9 @@
             },
             methods: {
                 init() {
-                    var cookies = document.cookie.split("; ");
-                    cookies.forEach((c) => {
-                        var cs = c.split("=");
-                        if (cs[0] == 'decide' && cs[1]) {
-                            this.token = cs[1];
-                            this.getUser();
-                        }
-                    });
+                    if(this.token) {
+                        this.signup = false
+                    }
                 },
                 postData(url, data) {
                     // Default options are marked with *
@@ -150,34 +132,11 @@
                 },
                 onSubmitLogin(evt) {
                     evt.preventDefault();
-                    this.postData("{% url "gateway" "authentication" "/login/" %}", this.form)
-                        .then(data => {
-                            document.cookie = 'decide='+data.token+';';
-                            this.token = data.token;
-                            this.getUser();
-                        })
-                        .catch(error => {
-                            this.showAlert("danger", '{% trans "Error: " %}' + error);
-                        });
-                },
-                getUser(evt) {
-                    var data = {token: this.token};
-                    this.postData("{% url "gateway" "authentication" "/getuser/" %}", data)
-                        .then(data => {
-                            this.user = data;
-                            this.signup = false;
-                        }).catch(error => {
-                            this.showAlert("danger", '{% trans "Error: " %}' + error);
-                        });
+                    location.href = "/authentication/login_form"
+                     
                 },
                 decideLogout(evt) {
-                    evt.preventDefault();
-                    var data = {token: this.token};
-                    this.postData("{% url "gateway" "authentication" "/logout/" %}", data);
-                    this.token = null;
-                    this.user = null;
-                    document.cookie = 'decide=;';
-                    this.signup = true;
+                   location.href = "/authentication/userlogout/"
                 },
                 decideEncrypt() {
                     var bigmsg = BigInt.fromJSONObject(this.selected.toString());
