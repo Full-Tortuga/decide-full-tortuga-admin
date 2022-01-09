@@ -17,8 +17,12 @@ jobs:
     services:
       mongodb:
         image: mongo:3.4.23
+        env:
+          MONGO_INITDB_DATABASE: decide
         ports:
           - 27017:27017
+        options: --health-cmd mongo --health-interval 10s --health-timeout 5s --health-retries 5
+
       ldap:
         image: carvilgar1us/decideldap
         ports:
@@ -49,7 +53,7 @@ jobs:
       - name: Test administration module
         run: |
           cd decide
-          coverage run --branch --source=./administration/ ./manage.py test --settings=local_settings administration --keepdb --verbosity=2
+          coverage run --branch --source=./administration/ ./manage.py test administration --keepdb --verbosity=2
           coverage xml
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.1.0
