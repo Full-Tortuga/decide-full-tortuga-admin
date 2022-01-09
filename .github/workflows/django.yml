@@ -41,5 +41,7 @@ jobs:
         run: |
           cp ./decide/local_settings.example.py ./decide/local_settings.py
       - name: Test administration module
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
           python ./decide/manage.py test administration
