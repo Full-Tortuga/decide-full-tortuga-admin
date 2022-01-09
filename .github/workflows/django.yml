@@ -49,7 +49,7 @@ jobs:
       - name: Test administration module
         run: |
           cd decide
-          coverage run --branch --source=./administration/ ./manage.py test administration --keepdb --verbosity=2
+          coverage run --branch --source=./administration/ ./manage.py test -settings=decide.test_settings administration --keepdb --verbosity=2
           coverage xml
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.1.0
