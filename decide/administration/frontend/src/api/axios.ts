@@ -2,7 +2,11 @@ import Axios from "axios";
 
 import { sessionUtils } from "utils";
 
-const API_URL = "http://localhost:8000/administration/api";
+const BASE_URL = window.location.href.includes("localhost")
+  ? "http://localhost:8000/administration"
+  : window.location.origin + "/administration";
+
+const API_URL = BASE_URL + "/api";
 
 export const axios = Axios.create({
   baseURL: API_URL,
@@ -19,7 +23,7 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 403) {
+    if (error.response?.status === 403 || error.response?.status === 401) {
       sessionUtils.removeToken();
       window.location.reload();
     }
@@ -33,7 +37,6 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    // todo: handle errors
     const message = error.response?.data?.message || error.message;
     console.warn(message);
     return Promise.reject(error);

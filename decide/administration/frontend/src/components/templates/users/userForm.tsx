@@ -7,11 +7,13 @@ import { utils } from "utils";
 import { userType } from "types";
 
 import { Input } from "components/01-atoms";
+import { Severity } from "components/01-atoms/Notification";
 import { ModalPage, Modal } from "components/02-molecules";
 
 const Component = (props: {
   initialUser?: userType.User;
   refetch: () => void;
+  notify?: (type: Severity, message: string) => void;
 }) => {
   const editMode = React.useMemo(
     () => !!props.initialUser?.id,
@@ -22,7 +24,6 @@ const Component = (props: {
     control,
     getValues,
     trigger,
-    setError,
     clearErrors,
     formState: { errors },
     reset,
@@ -45,12 +46,13 @@ const Component = (props: {
 
   const onSubmitFailed = (e: any) => {
     clearErrors();
-    setError("username", { type: "manual", message: e });
+    props.notify?.("error", "Submit failed: \n" + e);
   };
 
   const onSubmitSuccess = () => {
     setSent(!sent);
     props.refetch();
+    props.notify?.("success", editMode ? "User updated" : "User created");
     reset({});
   };
 
