@@ -28,6 +28,7 @@ class MixnetViewSet(viewsets.ModelViewSet):
 
         auths = request.data.get("auths")
         voting = request.data.get("voting")
+        type = request.data.get("type")
         key = request.data.get("key", {"p": 0, "g": 0})
         position = request.data.get("position", 0)
         p, g = int(key["p"]), int(key["g"])
@@ -40,7 +41,7 @@ class MixnetViewSet(viewsets.ModelViewSet):
                                               me=isme)
             dbauths.append(a)
 
-        mn = Mixnet(voting_id=voting, auth_position=position)
+        mn = Mixnet(voting_id=voting, auth_position=position, type=type)
         mn.save()
 
         for a in dbauths:
@@ -75,8 +76,9 @@ class Shuffle(APIView):
         """
 
         position = request.data.get("position", 0)
-        mn = get_object_or_404(Mixnet, voting_id=voting_id, auth_position=position)
-
+        type = request.data.get("type")
+        mn = get_object_or_404(Mixnet, voting_id=voting_id, auth_position=position, type=type)
+        
         msgs = request.data.get("msgs", [])
         pk = request.data.get("pk", None)
         if pk:
@@ -109,7 +111,8 @@ class Decrypt(APIView):
         """
 
         position = request.data.get("position", 0)
-        mn = get_object_or_404(Mixnet, voting_id=voting_id, auth_position=position)
+        type = request.data.get("type")
+        mn = get_object_or_404(Mixnet, voting_id=voting_id, auth_position=position,type=type)
 
         msgs = request.data.get("msgs", [])
         pk = request.data.get("pk", None)

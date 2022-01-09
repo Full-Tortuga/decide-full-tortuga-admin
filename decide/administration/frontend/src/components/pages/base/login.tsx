@@ -3,8 +3,9 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Box } from "@mui/material";
 
 import { authApi } from "api";
-import { sessionUtils } from "utils";
+import { sessionUtils, utils } from "utils";
 
+import { Severity } from "components/01-atoms/Notification";
 import { Input, Button } from "components/01-atoms";
 import Page from "../page";
 
@@ -21,19 +22,35 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm<LoginInputs>();
 
+  const [notifications, setNotifications] = React.useState<
+    { type: Severity; message: string }[]
+  >([]);
+
+  const notify = (type: Severity, message: string) => {
+    setNotifications((prev) => [...prev, { type, message }]);
+  };
+
   const onSubmitFailed = (e: any) => {
     if (!e.response) {
       setError("password", { type: "manual", message: "Server Error" });
       setError("username", { type: "manual", message: "" });
+      notify("error", "Server Error");
     }
     if (e?.response?.status === 400) {
       setError("password", {
         type: "manual",
-        message: e.response.data.non_field_errors[0],
+        message: e.response.data?.password || "",
       });
       setError("username", {
         type: "manual",
+        message: e.response.data?.username || "",
       });
+      notify(
+        "error",
+        "ERRORS: " + utils.parseErrors(e) ||
+          e.response.data.non_field_errors[0] ||
+          "Unknown error"
+      );
     }
   };
 
@@ -51,7 +68,7 @@ const LoginPage = () => {
   };
 
   return (
-    <Page title="Log In">
+    <Page title="Log In" notifications={notifications}>
       <Box className="flex flex-col w-60 mx-auto my-4">
         <form
           className="space-y-5"

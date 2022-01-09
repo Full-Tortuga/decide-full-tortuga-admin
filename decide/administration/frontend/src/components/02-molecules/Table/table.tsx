@@ -6,22 +6,30 @@ const Component = (props: {
   rows: any[];
   columns: GridColDef[];
   setSelected: any;
+  initialSelection?: number[];
 }) => {
   const filterRows = React.useCallback(
     (ids: any[]) => {
-      console.log(ids);
       return props.rows.filter((row: any) => ids.includes(row.id));
     },
     [props.rows]
   );
 
   const [selectionModel, setSelectionModel] =
-    React.useState<GridSelectionModel>([]);
+    React.useState<GridSelectionModel>(props.initialSelection || []);
+
+  const updateSelectionModel = React.useCallback(
+    (newSelection: GridSelectionModel) => {
+      setSelectionModel(newSelection);
+      props.setSelected(filterRows(newSelection));
+    },
+    [props, filterRows]
+  );
 
   React.useEffect(() => {
-    props.setSelected(filterRows(selectionModel));
+    updateSelectionModel(selectionModel);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectionModel, filterRows, props.setSelected]);
+  }, [props.rows]);
 
   return (
     <div className="w-full">
@@ -29,9 +37,10 @@ const Component = (props: {
         autoHeight
         rows={props.rows}
         columns={props.columns}
+        pageSize={10}
         checkboxSelection
-        selectionModel={selectionModel}
-        onSelectionModelChange={(e) => setSelectionModel(e)}
+        selectionModel={props.initialSelection || selectionModel}
+        onSelectionModelChange={(e) => updateSelectionModel(e)}
       />
     </div>
   );

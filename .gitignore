@@ -8,6 +8,7 @@ __pycache__/
 
 # ide
 .vscode
+.idea
 
 # Distribution / packaging
 .Python
@@ -57,7 +58,7 @@ coverage.xml
 
 # Django stuff:
 *.log
-local_settings.py
+decide/local_settings.py
 
 migrations/
 
@@ -106,6 +107,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
 
 .vagrant
 

@@ -16,6 +16,11 @@ const Component = (props: { control: any }) => {
     ],
   });
 
+  const handleInitialValue = (field: { onChange: any; value: any }) => {
+    if (field.value) setValue(field.value);
+    else field.onChange(value);
+  };
+
   const updateDesc = (e: any) => {
     const newValue = { ...value, desc: e.target.value };
     setValue(newValue);
@@ -66,48 +71,55 @@ const Component = (props: { control: any }) => {
               !!v.options && v.options.length > 1,
           },
         }}
-        render={({ field, fieldState }) => (
-          <>
-            <FormLabel>{"Question".toLowerCase()}</FormLabel>
-            <TextField
-              autoComplete="off"
-              onChange={(e) => field.onChange(updateDesc(e))}
-              type="text"
-              label="question"
-              required
-              error={fieldState.invalid}
-              helperText={fieldState.error?.message}
-            />
-
-            <FormLabel className="mt-10">{"Options".toLowerCase()}</FormLabel>
-            {value.options.map((o, i) => (
-              <div className="flex flex-row items-center">
-                <TextField
-                  key={i}
-                  autoComplete="off"
-                  onChange={(e) =>
-                    field.onChange(updateOption(o.number, e.target.value))
-                  }
-                  value={o.option}
-                  type="text"
-                  label={`option ${o.number}`}
-                  required
-                  error={fieldState.invalid}
-                  helperText={fieldState.error?.message}
-                />
-                {i > 1 && (
-                  <IconButton
-                    onClick={() => field.onChange(removeOption(o.number))}
-                    icon={<Remove />}
-                    title="Remove Option"
+        render={({ field, fieldState }) => {
+          handleInitialValue(field);
+          return (
+            <>
+              <FormLabel>{"Question".toLowerCase()}</FormLabel>
+              <TextField
+                autoComplete="off"
+                onChange={(e) => field.onChange(updateDesc(e))}
+                type="text"
+                label="question"
+                required
+                error={fieldState.invalid}
+                helperText={fieldState.error?.message}
+                value={field.value?.desc || ""}
+              />
+              <FormLabel className="mt-10">{"Options".toLowerCase()}</FormLabel>
+              {(field.value as votingType.Question)?.options.map((o, i) => (
+                <div className="flex flex-row items-center">
+                  <TextField
+                    key={i}
+                    autoComplete="off"
+                    onChange={(e) =>
+                      field.onChange(updateOption(o.number, e.target.value))
+                    }
+                    value={field.value?.options?.[i]?.option || ""}
+                    type="text"
+                    label={`option ${o.number}`}
+                    required
+                    error={fieldState.invalid}
+                    helperText={fieldState.error?.message}
                   />
-                )}
-              </div>
-            ))}
-            <hr />
-            <IconButton onClick={addOption} icon={<Add />} title="Add Option" />
-          </>
-        )}
+                  {i > 1 && (
+                    <IconButton
+                      onClick={() => field.onChange(removeOption(o.number))}
+                      icon={<Remove />}
+                      title="Remove Option"
+                    />
+                  )}
+                </div>
+              ))}
+              <hr />
+              <IconButton
+                onClick={() => field.onChange(addOption())}
+                icon={<Add />}
+                title="Add Option"
+              />
+            </>
+          );
+        }}
       />
     </>
   );
