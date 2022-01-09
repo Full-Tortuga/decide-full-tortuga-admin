@@ -59,7 +59,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
           cd decide
-          coverage run --branch --source=./administration/ ./manage.py test administration --noinput -v 2
+          coverage run --branch --source=./administration/ ./manage.py test --settings=decide.test_settings administration --noinput -v 2
           coverage xml
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.1.0
