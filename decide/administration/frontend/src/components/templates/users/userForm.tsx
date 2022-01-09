@@ -24,7 +24,6 @@ const Component = (props: {
     control,
     getValues,
     trigger,
-    setError,
     clearErrors,
     formState: { errors },
     reset,
@@ -47,8 +46,7 @@ const Component = (props: {
 
   const onSubmitFailed = (e: any) => {
     clearErrors();
-    setError("username", { type: "manual", message: e });
-    props.notify?.("error", "Submit failed: " + e);
+    props.notify?.("error", "Submit failed: \n" + e);
   };
 
   const onSubmitSuccess = () => {
@@ -59,8 +57,6 @@ const Component = (props: {
   };
 
   const onSubmit: SubmitHandler<userType.UserFormFields> = (data) => {
-    console.log("submit:", data);
-
     if (Object.keys(errors).length === 0)
       if (editMode && props.initialUser?.id) {
         userApi

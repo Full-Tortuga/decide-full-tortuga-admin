@@ -1,4 +1,11 @@
-[![Build Status](https://travis-ci.com/wadobo/decide.svg?branch=master)](https://travis-ci.com/wadobo/decide) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&utm_medium=referral&utm_content=wadobo/decide&utm_campaign=Badge_Grade) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&utm_medium=referral&utm_content=wadobo/decide&utm_campaign=Badge_Coverage)
+[![Admin Build CI](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/django.yml/badge.svg?branch=main)](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/django.yml)
+[![Admin Frontend CI](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/react.yml/badge.svg?branch=main)](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/react.yml)
+
+[![Test Deployment CD](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/herokuDevelop.yml/badge.svg?branch=main)](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/herokuDevelop.yml)
+[![Test Deployment CD](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/herokuMain.yml/badge.svg?branch=main)](https://github.com/Full-Tortuga/decide-full-tortuga-admin/actions/workflows/herokuMain.yml)
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/a9e07b14853a487d82a187bc69365d50)](https://www.codacy.com/gh/Full-Tortuga/decide-full-tortuga-admin/dashboard?utm_source=github.com&utm_medium=referral&utm_content=Full-Tortuga/decide-full-tortuga-admin&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/a9e07b14853a487d82a187bc69365d50)](https://www.codacy.com/gh/Full-Tortuga/decide-full-tortuga-admin/dashboard?utm_source=github.com&utm_medium=referral&utm_content=Full-Tortuga/decide-full-tortuga-admin&utm_campaign=Badge_Coverage)
 
 Plataforma voto electrónico educativa
 
@@ -67,7 +74,8 @@ fichero requirements.txt:
     pip install -r requirements.txt
 
 En caso de fallo al instalar las dependencias, es necesario instalas el paquete wheel y volver al comando anterior:
-pip install wheel
+
+    pip install wheel
 
 Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
@@ -143,6 +151,7 @@ La consola debe de devolver:
 \#
 \# LDAPv3
 \# base <dc=decide, dc=org> with scope subtree
+
 \# filter: (objectclass=\*)
 \# requesting: ALL
 \#

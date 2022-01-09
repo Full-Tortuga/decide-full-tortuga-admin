@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import django_heroku
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +32,16 @@ ALLOWED_HOSTS = ["*"]
 LOGIN_URL = '/authentication/login_form/'
 LOGIN_REDIRECT_URL = '/authentication/bienvenida/'
 
+# LDAP
+AUTH_LDAP_SERVER_URI = 'ldap://:389'
+
+AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
+AUTH_LDAP_BIND_PASSWORD = 'decide'
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    'ou=people,dc=decide,dc=org',
+    ldap.SCOPE_SUBTREE,
+    '(uid=%(user)s)',
+)
 # Application definition
 
 INSTALLED_APPS = [
@@ -97,6 +109,20 @@ APIS = {
     'voting': BASEURL,
 }
 
+APIS = {
+    'administration': BASEURL,
+    'authentication': BASEURL,
+    'base': BASEURL,
+    'booth': BASEURL,
+    'census': BASEURL,
+    'mixnet': BASEURL,
+    'postproc': BASEURL,
+    'store': BASEURL,
+    'visualizer': BASEURL,
+    'voting': BASEURL,
+}
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # added to solve CORS
     'django.middleware.common.CommonMiddleware',  # added to solve CORS
@@ -140,10 +166,13 @@ WSGI_APPLICATION = 'decide.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'prueba',
-        'CLIENT': {
-            'host': '127.0.0.1',
-        }
+        "CLIENT": {
+            "name": 'decide',
+            "host": 'mongodb+srv://decide:@decide.3vypb.mongodb.net/decide?retryWrites=true&w=majority',
+            "username": 'decide',
+            "password": 'decide',
+            "authMechanism": "SCRAM-SHA-1",
+        },
     }
 }
 

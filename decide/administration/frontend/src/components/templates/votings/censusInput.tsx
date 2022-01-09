@@ -21,11 +21,10 @@ const Component = (props: { control: any }) => {
     userApi
       .getUsers()
       .then((response) => {
-        console.log(response);
         setUsers(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        setUsers([]);
       });
   }, [refetch]);
 
@@ -33,6 +32,7 @@ const Component = (props: { control: any }) => {
     <Controller
       name="census"
       control={props.control}
+      rules={{ required: true }}
       render={({ field, fieldState }) => (
         <>
           <FormLabel>{"Census".toLowerCase()}</FormLabel>

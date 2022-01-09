@@ -20,7 +20,7 @@ const LinkTab = (props: {
   return (
     <Link to={props.href || "."}>
       <Tooltip title={props.label || ""}>
-        <Tab {...props} />
+        <Tab icon={props.icon} />
       </Tooltip>
     </Link>
   );
@@ -33,13 +33,9 @@ const Menu = (props: { hidden: boolean }) => {
 
   React.useEffect(() => {
     const tab = location.pathname.split("/")[1];
-    if (tab === "") {
-      setValue(0);
-    } else if (tab === "users") {
-      setValue(1);
-    } else if (tab === "votings") {
-      setValue(2);
-    }
+    if (tab === "" || tab === "home") setValue(0);
+    else if (tab === "users") setValue(1);
+    else if (tab === "votings") setValue(2);
   }, [location]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {

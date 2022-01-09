@@ -85,6 +85,8 @@ const UsersPage = () => {
   };
 
   const handleChangeActive = (value: boolean) => {
+    notify("info", "Loading...");
+
     userApi
       .updateUsersActive(idList, value)
       .then((response) => {
@@ -96,6 +98,8 @@ const UsersPage = () => {
       );
   };
   const handleChangeRole = (value: boolean, role: "Staff" | "Superuser") => {
+    notify("info", "Loading...");
+
     userApi
       .updateUsersRole(idList, value, role)
       .then((response) => {
@@ -133,7 +137,6 @@ const UsersPage = () => {
             icon: <Delete />,
             title: "Delete",
             onClick: () => {
-              console.log("delete");
               handleDelete();
             },
           },
@@ -150,7 +153,6 @@ const UsersPage = () => {
                 : "Mark as Active",
             disabled: selectionState.active === "mixed",
             onClick: () => {
-              console.log("switch active");
               selectionState.active === "true"
                 ? handleChangeActive(false)
                 : handleChangeActive(true);
@@ -167,7 +169,6 @@ const UsersPage = () => {
               selectionState.staff === "true" ? "Remove Staff" : "Make Staff",
             disabled: selectionState.staff === "mixed",
             onClick: () => {
-              console.log("switch staff");
               selectionState.staff === "true"
                 ? handleChangeRole(false, "Staff")
                 : handleChangeRole(true, "Staff");
@@ -186,7 +187,6 @@ const UsersPage = () => {
                 : "Make SuperUser",
             disabled: selectionState.su === "mixed",
             onClick: () => {
-              console.log("switch staff");
               selectionState.su === "true"
                 ? handleChangeRole(false, "Superuser")
                 : handleChangeRole(true, "Superuser");
