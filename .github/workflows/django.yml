@@ -53,6 +53,8 @@ jobs:
           python manage.py makemigrations
           python manage.py migrate
       - name: Test administration module
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
           cd decide
           coverage run --branch --source=./administration/ ./manage.py test administration --keepdb -v 2

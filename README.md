@@ -74,7 +74,8 @@ fichero requirements.txt:
     pip install -r requirements.txt
 
 En caso de fallo al instalar las dependencias, es necesario instalas el paquete wheel y volver al comando anterior:
-pip install wheel
+
+    pip install wheel
 
 Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
@@ -150,6 +151,7 @@ La consola debe de devolver:
 \#
 \# LDAPv3
 \# base <dc=decide, dc=org> with scope subtree
+
 \# filter: (objectclass=\*)
 \# requesting: ALL
 \#
