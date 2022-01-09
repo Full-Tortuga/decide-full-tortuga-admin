@@ -6,8 +6,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from .models import Question, QuestionOption, Voting
-from .serializers import SimpleVotingSerializer, VotingSerializer
+from .models import BinaryQuestion, BinaryQuestionOption, BinaryVoting, MultipleQuestion, MultipleQuestionOption, MultipleVoting, Question, QuestionOption, ScoreQuestion, ScoreQuestionOption, ScoreVoting, Voting
+from .serializers import (BinaryVotingSerializer, MultipleVotingSerializer, SimpleBinaryVotingSerializer, SimpleMultipleVotingSerializer, 
+                          SimpleVotingSerializer, VotingSerializer, SimpleScoreVotingSerializer,ScoreVotingSerializer)
 from base.perms import UserIsStaff
 from base.models import Auth
 
@@ -62,6 +63,271 @@ class VotingUpdate(generics.RetrieveUpdateDestroyAPIView):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         voting = get_object_or_404(Voting, pk=voting_id)
+        msg = ''
+        st = status.HTTP_200_OK
+        if action == 'start':
+            if voting.start_date:
+                msg = 'Voting already started'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.start_date = timezone.now()
+                voting.save()
+                msg = 'Voting started'
+        elif action == 'stop':
+            if not voting.start_date:
+                msg = 'Voting is not started'
+                st = status.HTTP_400_BAD_REQUEST
+            elif voting.end_date:
+                msg = 'Voting already stopped'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.end_date = timezone.now()
+                voting.save()
+                msg = 'Voting stopped'
+        elif action == 'tally':
+            if not voting.start_date:
+                msg = 'Voting is not started'
+                st = status.HTTP_400_BAD_REQUEST
+            elif not voting.end_date:
+                msg = 'Voting is not stopped'
+                st = status.HTTP_400_BAD_REQUEST
+            elif voting.tally:
+                msg = 'Voting already tallied'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.tally_votes(request.auth.key)
+                msg = 'Voting tallied'
+        else:
+            msg = 'Action not found, try with start, stop or tally'
+            st = status.HTTP_400_BAD_REQUEST
+        return Response(msg, status=st)
+
+class BinaryVotingView(generics.ListCreateAPIView):
+    queryset = BinaryVoting.objects.all()
+    serializer_class = BinaryVotingSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_fields = ('id', )
+
+    def get(self, request, *args, **kwargs):
+        version = request.version
+        if version not in settings.ALLOWED_VERSIONS:
+            version = settings.DEFAULT_VERSION
+        if version == 'v2':
+            self.serializer_class = SimpleBinaryVotingSerializer
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.permission_classes = (UserIsStaff,)
+        self.check_permissions(request)
+        for data in ['name', 'desc', 'question', 'question_opt']:
+            if not data in request.data:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        question = BinaryQuestion(desc=request.data.get('question'))
+        question.save()
+        for idx, q_opt in enumerate(request.data.get('question_opt')):
+            opt = BinaryQuestionOption(question=question, option=q_opt, number=idx)
+            opt.save()
+        voting = BinaryVoting(name=request.data.get('name'), desc=request.data.get('desc'),
+                question=question, type='BV')
+        voting.save()
+
+        auth, _ = Auth.objects.get_or_create(url=settings.BASEURL,
+                                          defaults={'me': True, 'name': 'test auth'})
+        auth.save()
+        voting.auths.add(auth)
+        return Response({}, status=status.HTTP_201_CREATED)
+
+class BinaryVotingUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BinaryVoting.objects.all()
+    serializer_class = BinaryVotingSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    permission_classes = (UserIsStaff,)
+
+    def put(self, request, voting_id, *args, **kwars):
+        action = request.data.get('action')
+        if not action:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        voting = get_object_or_404(BinaryVoting, pk=voting_id)
+        msg = ''
+        st = status.HTTP_200_OK
+        if action == 'start':
+            if voting.start_date:
+                msg = 'Voting already started'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.start_date = timezone.now()
+                voting.save()
+                msg = 'Voting started'
+        elif action == 'stop':
+            if not voting.start_date:
+                msg = 'Voting is not started'
+                st = status.HTTP_400_BAD_REQUEST
+            elif voting.end_date:
+                msg = 'Voting already stopped'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.end_date = timezone.now()
+                voting.save()
+                msg = 'Voting stopped'
+        elif action == 'tally':
+            if not voting.start_date:
+                msg = 'Voting is not started'
+                st = status.HTTP_400_BAD_REQUEST
+            elif not voting.end_date:
+                msg = 'Voting is not stopped'
+                st = status.HTTP_400_BAD_REQUEST
+            elif voting.tally:
+                msg = 'Voting already tallied'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.tally_votes(request.auth.key)
+                msg = 'Voting tallied'
+        else:
+            msg = 'Action not found, try with start, stop or tally'
+            st = status.HTTP_400_BAD_REQUEST
+        return Response(msg, status=st)
+
+## Multiple
+class MultipleVotingView(generics.ListCreateAPIView):
+    queryset = MultipleVoting.objects.all()
+    serializer_class = MultipleVotingSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_fields = ('id', )
+
+    def get(self, request, *args, **kwargs):
+        version = request.version
+        if version not in settings.ALLOWED_VERSIONS:
+            version = settings.DEFAULT_VERSION
+        if version == 'v2':
+            self.serializer_class = SimpleMultipleVotingSerializer
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.permission_classes = (UserIsStaff,)
+        self.check_permissions(request)
+        for data in ['name', 'desc', 'question', 'question_opt']:
+            if not data in request.data:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        question = MultipleQuestion(desc=request.data.get('question'))
+        question.save()
+        for idx, q_opt in enumerate(request.data.get('question_opt')):
+            opt = MultipleQuestionOption(question=question, option=q_opt, number=idx)
+            opt.save()
+        voting = MultipleVoting(name=request.data.get('name'), desc=request.data.get('desc'),
+                question=question)
+        voting.save()
+
+        auth, _ = Auth.objects.get_or_create(url=settings.BASEURL,
+                                          defaults={'me': True, 'name': 'test auth'})
+        auth.save()
+        voting.auths.add(auth)
+        return Response({}, status=status.HTTP_201_CREATED)
+
+class MultipleVotingUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MultipleVoting.objects.all()
+    serializer_class = MultipleVotingSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    permission_classes = (UserIsStaff,)
+
+    def put(self, request, voting_id, *args, **kwars):
+        action = request.data.get('action')
+        if not action:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        voting = get_object_or_404(MultipleVoting, pk=voting_id)
+        msg = ''
+        st = status.HTTP_200_OK
+        if action == 'start':
+            if voting.start_date:
+                msg = 'Voting already started'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.start_date = timezone.now()
+                voting.save()
+                msg = 'Voting started'
+        elif action == 'stop':
+            if not voting.start_date:
+                msg = 'Voting is not started'
+                st = status.HTTP_400_BAD_REQUEST
+            elif voting.end_date:
+                msg = 'Voting already stopped'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.end_date = timezone.now()
+                voting.save()
+                msg = 'Voting stopped'
+        elif action == 'tally':
+            if not voting.start_date:
+                msg = 'Voting is not started'
+                st = status.HTTP_400_BAD_REQUEST
+            elif not voting.end_date:
+                msg = 'Voting is not stopped'
+                st = status.HTTP_400_BAD_REQUEST
+            elif voting.tally:
+                msg = 'Voting already tallied'
+                st = status.HTTP_400_BAD_REQUEST
+            else:
+                voting.tally_votes(request.auth.key)
+                msg = 'Voting tallied'
+        else:
+            msg = 'Action not found, try with start, stop or tally'
+            st = status.HTTP_400_BAD_REQUEST
+        return Response(msg, status=st)
+
+class ScoreVotingView(generics.ListCreateAPIView):
+    queryset = ScoreVoting.objects.all()
+    serializer_class = ScoreVotingSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_fields = ('id', )
+
+    def get(self, request, *args, **kwargs):
+        version = request.version
+        if version not in settings.ALLOWED_VERSIONS:
+            version = settings.DEFAULT_VERSION
+        if version == 'v2':
+            self.serializer_class = SimpleScoreVotingSerializer
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.permission_classes = (UserIsStaff,)
+        self.check_permissions(request)
+        for data in ['name', 'desc', 'question', 'question_opt']:
+            if not data in request.data:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        question = ScoreQuestion(desc=request.data.get('question'))
+        question.save()
+        for idx, q_opt in enumerate(request.data.get('question_opt')):
+            opt = ScoreQuestionOption(question=question, option=q_opt, number=idx)
+            opt.save()
+        voting = ScoreVoting(name=request.data.get('name'), desc=request.data.get('desc'),
+                question=question, type='SV')
+        voting.save()
+
+        auth, _ = Auth.objects.get_or_create(url=settings.BASEURL,
+                                          defaults={'me': True, 'name': 'test auth'})
+        auth.save()
+        voting.auths.add(auth)
+        return Response({}, status=status.HTTP_201_CREATED)
+
+class ScoreVotingUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ScoreVoting.objects.all()
+    serializer_class = ScoreVotingSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    permission_classes = (UserIsStaff,)
+
+    def put(self, request, voting_id, *args, **kwars):
+        action = request.data.get('action')
+        if not action:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        voting = get_object_or_404(ScoreVoting, pk=voting_id)
         msg = ''
         st = status.HTTP_200_OK
         if action == 'start':

@@ -1,3 +1,4 @@
+[![Decide CI/CD](https://github.com/Full-Tortuga/decide-full-tortuga-autenticacion/actions/workflows/heroku.yml/badge.svg?branch=master)](https://github.com/Full-Tortuga/decide-full-tortuga-autenticacion/actions/workflows/heroku.yml)
 [![Build Status](https://travis-ci.com/wadobo/decide.svg?branch=master)](https://travis-ci.com/wadobo/decide) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&utm_medium=referral&utm_content=wadobo/decide&utm_campaign=Badge_Grade) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/94a85eaa0e974c71af6899ea3b0d27e0)](https://www.codacy.com/app/Wadobo/decide?utm_source=github.com&utm_medium=referral&utm_content=wadobo/decide&utm_campaign=Badge_Coverage)
 
 Plataforma voto electrónico educativa
@@ -67,7 +68,8 @@ fichero requirements.txt:
     pip install -r requirements.txt
 
 En caso de fallo al instalar las dependencias, es necesario instalas el paquete wheel y volver al comando anterior:
-pip install wheel
+
+    pip install wheel
 
 Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
 
@@ -93,6 +95,21 @@ siguiente manera:
 También debemos lanzar el panel de control, para ello dentro de la carpeta decide_panel ejecutamos:
 
     npm start
+
+## Nuevo panel de administración
+
+Para configurar el nuevo panel de control de administración se deben seguir los siguientes pasos. (se deben haber instalado los nuevos requirements y configurado la nueva base de datos tal y como se describe previamente)
+
+Se recuerda que se debe copiar el archivo de configuración local de ejemplo:
+
+- `cp local_settings.example.py local_settings.py`
+
+### setup
+
+- `cd /decide/administration/frontend`
+- `npm install && npm run build`
+- abrir `http://localhost:8000/administration` en el navegador
+- hacer login con un superusuario
 
 # Pasos a seguir para configurar y iniciar el cliente LDAP
 
@@ -128,6 +145,7 @@ La consola debe de devolver:
 \#
 \# LDAPv3
 \# base <dc=decide, dc=org> with scope subtree
+
 \# filter: (objectclass=\*)
 \# requesting: ALL
 \#
@@ -242,7 +260,7 @@ adding new entry "uid=foobar,ou=people,dc=decide,dc=org"
 adding new entry "cn=foobar,ou=groups,dc=decide,dc=org"
 ```
 
-## Dependencias Djando para LDAP
+## Dependencias Django para LDAP
 
 Para finalizar, debe instalar las dependencias que django necesarias para la comunicación con el cliente LDAP.
 Para ello, borre su local_settings.py y ejecute el comando pip para instalar las nuevas dependencias:
@@ -255,6 +273,8 @@ una vez finalizada la instalación copie el local settings que se le ofrece como
 
 Puede probar que funcione haciendo una petición desde Postman
 ![alt text](https://i.imgur.com/3a4xwaZ.png)
+
+---
 
 ## Ejecutar con docker
 
