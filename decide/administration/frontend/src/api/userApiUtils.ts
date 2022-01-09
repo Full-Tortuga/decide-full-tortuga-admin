@@ -6,13 +6,13 @@ const userApi = {
   getUsers: () => axios.get("/users"),
   deleteUsers: (idList: number[]) =>
     axios.delete("/users", {
-      data: { idList: idList },
+      data: { idList },
     }),
 
   // bulk role/status operations
   updateUsersActive: (idList: number[], value: boolean) =>
     axios.post("/users/state", {
-      idList: idList,
+      idList,
       state: "Active",
       value: value ? "True" : "False",
     }),
@@ -22,7 +22,7 @@ const userApi = {
     role: "Staff" | "Superuser"
   ) =>
     axios.post("/users/state", {
-      idList: idList,
+      idList,
       state: role,
       value: value ? "True" : "False",
     }),

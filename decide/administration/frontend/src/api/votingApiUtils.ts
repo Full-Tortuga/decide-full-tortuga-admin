@@ -7,7 +7,7 @@ const votingApi = {
   getQuestions: () => axios.get("/voting/question"),
   deleteQuestions: (idList: number[]) =>
     axios.delete("/voting/questions", {
-      data: { idList: idList },
+      data: { idList },
     }),
   deleteAllQuestions: () => axios.delete(`/voting/question`),
 
@@ -26,25 +26,25 @@ const votingApi = {
   getVotings: () => axios.get(`/votings`),
   deleteVotings: (idList: number[]) =>
     axios.delete("/votings", {
-      data: { idList: idList },
+      data: { idList },
     }),
   deleteAllVotings: () => axios.delete(`/votings`),
 
   startVotings: (idList: number[]) =>
     axios.put("/votings", {
-      idList: idList,
+      idList,
       action: "start",
     }),
 
   stopVotings: (idList: number[]) =>
     axios.put("/votings", {
-      idList: idList,
+      idList,
       action: "stop",
     }),
 
   tallyVotings: (idList: number[]) =>
     axios.put("/votings", {
-      idList: idList,
+      idList,
       action: "tally",
     }),
 
