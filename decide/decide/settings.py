@@ -140,7 +140,7 @@ WSGI_APPLICATION = 'decide.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'prueba',
+        'NAME': 'decide',
         'CLIENT': {
             'host': '127.0.0.1',
         }
