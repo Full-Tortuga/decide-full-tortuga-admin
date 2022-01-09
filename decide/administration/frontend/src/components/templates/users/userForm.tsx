@@ -57,8 +57,6 @@ const Component = (props: {
   };
 
   const onSubmit: SubmitHandler<userType.UserFormFields> = (data) => {
-    console.log("submit:", data);
-
     if (Object.keys(errors).length === 0)
       if (editMode && props.initialUser?.id) {
         userApi

@@ -4,22 +4,22 @@ import time
 import random
 
 '''README:
+Preconfiguración:
 
-Para poder ejecutar este test, se debe crear un superusuario
-con el siguiente comando:
+- ./manage.py flush
+- ./manage.py makemigrations
+- ./manage.py migrate
 
-./manage.py createsuperuser
+- ./manage.py createsuperuser
+
+- ./manage.py runserver
 
 con datos:
     username: admin
     password: qwerty
 y hacer bypass de la restriccion de contraseña
 
-Entrar en http://localhost:8000/administration/users
-iniciar sesión con el usuario admin
-y si hubiera más usuarios creados, hay que eliminarlos
-antes de realizar los tests
-
+- python seleniumT.py
 '''
 
 

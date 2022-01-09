@@ -60,7 +60,6 @@ const Component = (props: {
   };
 
   const onSubmit: SubmitHandler<votingType.VotingFormFields> = (data) => {
-    console.log("submit:", data);
     if (Object.keys(errors).length === 0)
       if (editMode && props.initialVoting?.id) {
         votingApi

@@ -55,7 +55,6 @@ const LoginPage = () => {
   };
 
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
-    console.log("Login:", data.username);
     authApi
       .login(data.username, data.password)
       .then((r) => {
