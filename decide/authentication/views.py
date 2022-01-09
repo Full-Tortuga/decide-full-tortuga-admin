@@ -29,7 +29,7 @@ from django.urls import reverse
 from django.db import models
 
 import ldap
-from local_settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD
+from decide.settings import AUTH_LDAP_SERVER_URI, AUTH_LDAP_BIND_DN, AUTH_LDAP_BIND_PASSWORD
 
 
 class GetUserView(APIView):
