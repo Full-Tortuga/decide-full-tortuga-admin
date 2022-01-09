@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import django_heroku
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +32,16 @@ ALLOWED_HOSTS = ["*"]
 LOGIN_URL = '/authentication/login_form/'
 LOGIN_REDIRECT_URL = '/authentication/bienvenida/'
 
+# LDAP
+AUTH_LDAP_SERVER_URI = 'ldap://:389'
+
+AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
+AUTH_LDAP_BIND_PASSWORD = 'decide'
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    'ou=people,dc=decide,dc=org',
+    ldap.SCOPE_SUBTREE,
+    '(uid=%(user)s)',
+)
 # Application definition
 
 INSTALLED_APPS = [

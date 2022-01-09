@@ -9,7 +9,7 @@ from rest_framework.authtoken.models import Token
 # from base.tests import BaseTestCase
 from base import mods
 
-from local_settings import AUTH_LDAP_SERVER_URI
+from decide.settings import AUTH_LDAP_SERVER_URI
 
 class AuthTestCase(APITestCase):
 
