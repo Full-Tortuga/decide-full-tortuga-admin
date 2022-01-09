@@ -3,8 +3,7 @@ from selenium.webdriver.common.by import By
 import time
 import random
 
-'''
-README:
+'''README:
 
 Para poder ejecutar este test, se debe crear un superusuario
 con el siguiente comando:
@@ -76,8 +75,8 @@ def incorrect_log_in(driver, cont):
             By.XPATH, '//*[@id="content"]/div/form/button').click()
         time.sleep(1)
         elemento = driver.find_element(
-            By.XPATH, '//*[@id="content"]/div/form/div[2]/p')
-        error_text = 'Unable to log in with provided credentials.'
+            By.XPATH, '//*[@id="Notifications"]/div/div/div[2]')
+        error_text = 'ERRORS: non_field_errors:Unable to log in with provided credentials.'
         if elemento.text == error_text:
             print("Test correctamente realizado\n")
         return cont
@@ -132,7 +131,7 @@ def make_staff(driver, cont):
         time.sleep(2)
         driver.find_element(
             By.XPATH, '//*[@id="actions"]/div/button[5]').click()
-        #driver.find_element(By.XPATH, '')
+        # driver.find_element(By.XPATH, '')
         print("Test correctamente realizado\n")
 
         return cont
@@ -153,7 +152,7 @@ def make_superuser(driver, cont):
         driver.find_element(
             By.XPATH, '//*[@id="actions"]/div/button[6]').click()
         # print(element)
-        #driver.find_element(By.XPATH, '')
+        # driver.find_element(By.XPATH, '')
         print("Test correctamente realizado\n")
         return cont
     except Exception as e:
@@ -383,3 +382,6 @@ if __name__ == "__main__":
     cont2 = delete_voting(driver, cont2)
     print("Se han realizado los test de Votings")
     print("Se han encontrado: " + str(cont2) + " errores \n\n")
+
+    print("TESTS FINISHED")
+    print("Se han encontrado: " + str(cont + cont2) + " errores \n\n")
