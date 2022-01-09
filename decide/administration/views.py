@@ -1,19 +1,24 @@
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
-from rest_framework.status import *
+
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_201_CREATED, HTTP_403_FORBIDDEN
 from rest_framework import parsers, renderers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from base.models import Auth, Key
-from authentication.serializers import UserSerializer
-from administration.serializers import *
-from base.serializers import AuthSerializer, KeySerializer
-from voting.serializers import VotingSerializer
-from .serializers import CensusSerializer
+
 from base.perms import IsAdminAPI
-from voting.models import Question
+
+from base.serializers import KeySerializer, AuthSerializer
+from voting.serializers import VotingSerializer
+from .serializers import AdminQuestionSerializer, AdminVotingGetSerializer, AdminVotingSerializer, CensusSerializer, UserAdminSerializer, UserSerializer, UserUpdateSerializer
+
+from base.models import Auth, Key
+from voting.models import Question, Voting, QuestionOption
+from census.models import Census
+
 from utils.utils import is_valid
 
 
@@ -82,7 +87,7 @@ class VotingAPI(APIView):
             for voter_id in id_users:
                 census = Census(voting_id=voting_id, voter_id=voter_id)
                 census.save()
-        return Response({"id": voting_id, "name": voting.name}, status=HTTP_200_OK)
+        return Response({"id": voting_id, "name": voting.name}, status=HTTP_201_CREATED)
 
     def put(self, request):
 
@@ -92,6 +97,7 @@ class VotingAPI(APIView):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         msg = ''
         st = status.HTTP_200_OK
+
         if action == 'start':
             votings = Voting.objects.filter(
                 id__in=votings_id, start_date__isnull=True)
@@ -104,7 +110,6 @@ class VotingAPI(APIView):
             else:
                 msg = 'All votings all already started'
                 st = status.HTTP_400_BAD_REQUEST
-
         elif action == 'stop':
             votings = Voting.objects.filter(
                 id__in=votings_id, start_date__isnull=False, end_date__isnull=True)
@@ -135,12 +140,12 @@ class VotingAPI(APIView):
     def delete(self, request):
         if request.data.get("idList") is None:
             Voting.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The format of the ids list is not correct')
             Voting.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class VotingsAPI(APIView):
@@ -202,7 +207,7 @@ class VotingsAPI(APIView):
 
     def delete(self, request, voting_id):
         Voting.objects.all().filter(id=voting_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class QuestionsAPI(APIView):
@@ -218,17 +223,17 @@ class QuestionsAPI(APIView):
         question_serializer = AdminQuestionSerializer(data=request.data)
         is_valid(question_serializer.is_valid(), question_serializer.errors)
         question_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
             Question.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The format of the ids list is not correct')
             Question.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class QuestionAPI(APIView):
@@ -249,7 +254,7 @@ class QuestionAPI(APIView):
 
     def delete(self, request, question_id):
         Question.objects.all().filter(id=question_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class CensussAPI(APIView):
@@ -263,16 +268,16 @@ class CensussAPI(APIView):
         census_serializer = CensusSerializer(data=request.data)
         is_valid(census_serializer.is_valid(), census_serializer.errors)
         census_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
             Census.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
-            ids = request.get("idList")
+            ids = request.data.get("idList")
             Census.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class CensusAPI(APIView):
@@ -294,7 +299,7 @@ class CensusAPI(APIView):
 
     def delete(self, request, census_id):
         Census.objects.all().filter(id=census_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class AuthsAPI(APIView):
@@ -308,17 +313,17 @@ class AuthsAPI(APIView):
         auth_serializer = AuthSerializer(data=request.data)
         is_valid(auth_serializer.is_valid(), auth_serializer.errors)
         auth_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
             Auth.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             Auth.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class AuthAPI(APIView):
@@ -340,7 +345,7 @@ class AuthAPI(APIView):
 
     def delete(self, request, auth_id):
         Auth.objects.all().filter(id=auth_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class KeysAPI(APIView):
@@ -354,17 +359,17 @@ class KeysAPI(APIView):
         key_serializer = KeySerializer(data=request.data)
         is_valid(key_serializer.is_valid(), key_serializer.errors)
         key_serializer.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
             Key.objects.all().delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
         else:
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             Key.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class KeyAPI(APIView):
@@ -385,7 +390,7 @@ class KeyAPI(APIView):
 
     def delete(self, request, key_id):
         Key.objects.all().filter(id=key_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class UsersAPI(APIView):
@@ -404,7 +409,7 @@ class UsersAPI(APIView):
                     last_name=fields['last_name'], email=fields['email'], is_staff=False)
         user.set_password(request.data['password'])
         user.save()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_201_CREATED)
 
     def delete(self, request):
         if request.data.get("idList") is None:
@@ -414,7 +419,7 @@ class UsersAPI(APIView):
             ids = request.data.get("idList")
             is_valid(len(ids) > 0, 'The ids list can not be empty')
             User.objects.filter(id__in=ids).delete()
-            return Response({}, status=HTTP_200_OK)
+            return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class UserAPI(APIView):
@@ -439,7 +444,7 @@ class UserAPI(APIView):
 
     def delete(self, request, user_id):
         User.objects.all().filter(is_superuser=False, id=user_id).delete()
-        return Response({}, status=HTTP_200_OK)
+        return Response({}, status=HTTP_204_NO_CONTENT)
 
 
 class LoginAuthAPI(APIView):

@@ -21,11 +21,10 @@ const Component = (props: { control: any }) => {
     userApi
       .getUsers()
       .then((response) => {
-        console.log(response);
         setUsers(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        setUsers([]);
       });
   }, [refetch]);
 
