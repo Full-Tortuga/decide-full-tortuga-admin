@@ -18,13 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_swagger.views import get_swagger_view
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.shortcuts import redirect
+from django.conf import settings
 
 schema_view = get_swagger_view(title='Decide API')
+
+PANEL_URI = settings.PANEL_URI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('doc/', schema_view),
     path('gateway/', include('gateway.urls')),
+    path('panel/', lambda request: redirect(PANEL_URI)),
 ]
 
 for module in settings.MODULES:

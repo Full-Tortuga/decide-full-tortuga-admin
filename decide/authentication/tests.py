@@ -3,13 +3,19 @@ from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-# from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
+# from selenium.common.exceptions import NoSuchElementException
+# from selenium.webdriver.common.action_chains import ActionChains
 # from selenium import webdriver
 # from selenium.webdriver.common.keys import Keys
 # from base.tests import BaseTestCase
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.chrome.options import Options
+# from django.test.testcases import LiveServerTestCase
 from base import mods
 
-from decide.settings import AUTH_LDAP_SERVER_URI
 
 class AuthTestCase(APITestCase):
 
@@ -280,65 +286,117 @@ class AuthTestCase(APITestCase):
             '/authentication/users/100/', format='json')
         self.assertEqual(response.status_code, 404)
 
-
     def test_differentpasswords_register(self):
-        data = {'username':'testingUser', 'password': '123', 'password2':'456'}
+        data = {'username': 'testingUser',
+                'password': '123', 'password2': '456'}
         response = self.client.post(
             '/authentication/register_user/', data, format='json')
         msg = response.json()['error']
         self.assertEqual(msg, 'Contraseñas no coinciden')
-        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.status_code, 400)
 
     def test_registeruser_form(self):
-        data = {'username':'testingUser', 'password': '123', 'password2':'123'}
+        data = {'username': 'testingUser',
+                'password': '123', 'password2': '123'}
         response = self.client.post(
             '/authentication/register_user/', data, format='json')
         self.assertEqual(response.status_code, 302)
 
     def test_loginuser_form(self):
-        data_login = {'username':'testingUser', 'password': '123'}
+        data_login = {'username': 'testingUser', 'password': '123'}
         response = self.client.post(
             '/authentication/login_form/', data_login, format='json')
         self.assertEqual(response.status_code, 200)
 
     def test_registeruser_existingusername(self):
-        data_login = {'username':'voter1', 'password': '123456', 'password2':'123456'}
+        data_login = {'username': 'voter1',
+                      'password': '123456', 'password2': '123456'}
         response = self.client.post(
             '/authentication/register_user/', data_login, format='json')
         msg = response.json()['error']
         self.assertEqual(msg, 'Ya existe este nombre de usuario')
         self.assertEqual(response.status_code, 400)
 
-    #
-    #   TODO: Arreglar tests, estos tests asumen que el sistema ya tiene registrado un usuario 'foobar' en ldap,
-    #   lo cual es erroneo, tiene que registrarse dicho usuario en el setup de los tests
-    #
-    # def test_login_ldap_positive(self):
-    #     body_form = {'username': 'foobar', 'password': 'test'}
-    #     response = self.client.post(
-    #         '/authentication/loginLDAP/', body_form, format='json')
-    #     self.assertEqual(response.status_code, 200)
-    # def test_login_ldap_negative(self):
-    #     body_form = {'username': 'foobar', 'password': 'contrasenyaMal'}
-    #     response = self.client.post(
-    #         '/authentication/loginLDAP/', body_form, format='json')
-    #     self.assertEqual(response.status_code, 400)
+    def test_login_ldap_positive(self):
+        body_form = {'username': 'foobar', 'password': 'test'}
+        response = self.client.post(
+            '/authentication/loginLDAP/', body_form, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_ldap_negative(self):
+        body_form = {'username': 'foobar', 'password': 'contrasenyaMal'}
+        response = self.client.post(
+            '/authentication/loginLDAP/', body_form, format='json')
+        self.assertEqual(response.status_code, 400)
 
 
+# class SeleniumLandingPageTestCase(LiveServerTestCase):
+#     def setUp(self):
+#         self.base = BaseTestCase()
+#         self.base.setUp()
+#         chrome_options = Options()
+#         chrome_options.add_argument("--window-size=1920,1080")
+#         chrome_options.headless = True
+#         self.driver = webdriver.Chrome(chrome_options=chrome_options)
 
-# class SeleniumTestCase(StaticLiveServerTestCase):
+#     def tearDown(self):
+#         self.driver.quit()
+
+#     def test_good_redirects_menu(self):
+
+#         self.driver.get(f'{self.live_server_url}/authentication/welcome')
+#         self.driver.find_element_by_id("methodsbutton").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/welcome/#portfolio')
+
+#         self.driver.find_element_by_id("aboutbutton").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/welcome/#about')
+
+#         self.driver.find_element_by_class_name("navbar-brand").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/welcome/#page-top')
+
+#     def test_redirects_signin(self):
+#         self.driver.get(f'{self.live_server_url}/authentication/welcome')
+
+#         self.driver.find_element_by_id("signinbutton").click()
+#         self.driver.find_element_by_id("ldaplogin").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+
+#         self.driver.execute_script("window.history.go(-1)")
+#         self.driver.find_element_by_id("signinbutton").click()
+#         self.driver.find_element_by_id("userlogin").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+
+#     def test_redirects_signup(self):
+#         self.driver.get(f'{self.live_server_url}/authentication/welcome')
+#         self.driver.find_element_by_id("signupbutton").click()
+#         self.driver.find_element_by_id("signupuser").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+
+#     def test_redirects_logout(self):
+#         self.driver.get(f'{self.live_server_url}/authentication/welcome')
+#         self.driver.find_element_by_id("signinbutton").click()
+#         self.driver.find_element_by_id("userlogin").click()
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/login_form/')
+
+#         self.driver.find_element_by_name('username').send_keys("noadmin")
+#         self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+#         self.driver.find_element_by_id("signoffbutton").click()
+#         self.assertEqual(self.driver.current_url,f'{self.live_server_url}/authentication/userlogout/')
+
+# class SeleniumTestCase(LiveServerTestCase):
 
 #     def setUp(self):
 #         self.base = BaseTestCase()
 #         self.base.setUp()
 
 #         options = webdriver.ChromeOptions()
-#         options.add_argument("--no-sandbox")
-#         options.add_argument("--disable-dev-shm-usage")
-#         options.add_argument("--headless")
+#         # options.add_argument("--no-sandbox")
+#         # options.add_argument("--disable-dev-shm-usage")
+#         # options.add_argument("--headless")
 #         self.driver = webdriver.Chrome(options=options)
-#         super().setUp()            
-            
+#         super().setUp()
+
 #     def tearDown(self):
 #         super().tearDown()
 #         self.driver.close()
@@ -347,7 +405,7 @@ class AuthTestCase(APITestCase):
 
 #     def test_register_user(self):
 #         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
-#         self.driver.find_elements_by_class_name("controller")[1].click()
+#         self.driver.find_element(By.CSS_SELECTOR, "p:nth-child(4) > .link").click()
 
 #         self.driver.find_element_by_name('username').send_keys("userUser")
 #         self.driver.find_element_by_name('password').send_keys("asd123")
@@ -357,12 +415,53 @@ class AuthTestCase(APITestCase):
 
 #         self.driver.find_element_by_name('username').send_keys("userUser")
 #         self.driver.find_element_by_name('password').send_keys("asd123",Keys.ENTER)
-        
+
 #         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
 
-#     def test_login_success(self):                    
+#     def test_login_success(self):
 #         self.driver.get(f'{self.live_server_url}/authentication/login_form/')
 #         self.driver.find_element_by_name('username').send_keys("noadmin")
 #         self.driver.find_element_by_name('password').send_keys("qwerty",Keys.ENTER)
-        
 #         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/bienvenida/')
+
+# class SeleniumLDAPViewTestCase(LiveServerTestCase):
+
+#     def setUp(self):
+#         self.base = BaseTestCase()
+#         self.base.setUp()
+
+#         options = webdriver.ChromeOptions()
+#         # options.add_argument("--no-sandbox")
+#         # options.add_argument("--disable-dev-shm-usage")
+#         # options.add_argument("--headless")
+#         self.driver = webdriver.Chrome(options=options)
+#         super().setUp()
+
+#     def tearDown(self):
+#         super().tearDown()
+#         self.driver.close()
+#         self.driver.quit()
+#         self.base.tearDown()
+
+#     def test_login_ldap_positive(self):
+#         self.driver.get(f"{self.live_server_url}/authentication/login_form/")
+#         self.driver.find_element(By.LINK_TEXT, "here").click()
+#         self.driver.find_element(By.NAME, "username").send_keys("foobar")
+#         self.driver.find_element(By.NAME, "password").send_keys("test")
+#         self.driver.find_element(By.NAME, "password").send_keys(Keys.ENTER)
+
+#         #Si el usuario inicia sesion de manera exitosa se muestra Welcome usuario en la esquina superior derecha
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/loginLDAP/')
+#         self.assertTrue(self.driver.find_element_by_xpath('/html/body/nav/div/div/ul[3]'))
+#         self.assertTrue(self.driver.find_element_by_xpath('/html/body/nav/div/div/ul[3]/ul/li[2]/a').get_attribute('innerHTML')=="Welcome foo")
+
+#     def test_login_ldap_negative(self):
+#         self.driver.get(f"{self.live_server_url}/authentication/login_form/")
+#         self.driver.find_element(By.LINK_TEXT, "here").click()
+#         self.driver.find_element(By.NAME, "username").send_keys("foobar")
+#         self.driver.find_element(By.NAME, "password").send_keys("contrasenyaMAl")
+#         self.driver.find_element(By.NAME, "password").send_keys(Keys.ENTER)
+
+#         #Si el usuario inicia sesion de manera exitosa no se muestra Welcome usuario en la esquina superior derecha (mismo xpath que para el test positivo)
+#         self.assertTrue(self.driver.current_url==f'{self.live_server_url}/authentication/loginLDAP/')
+#         self.assertRaises(NoSuchElementException, self.driver.find_element_by_xpath, '/html/body/nav/div/div/ul[3]')

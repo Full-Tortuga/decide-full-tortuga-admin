@@ -1,10 +1,4 @@
-import random
-from django.contrib.auth.models import User
-from django.test import TestCase
-from rest_framework.test import APIClient
-
 from .models import Census
-from base import mods
 from base.tests import BaseTestCase
 
 
@@ -19,14 +13,15 @@ class CensusTestCase(BaseTestCase):
         super().tearDown()
         self.census = None
 
-    def test_check_vote_permissions(self):
-        response = self.client.get('/census/{}/?voter_id={}&type=V'.format(1, 2), format='json')
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.json(), 'Invalid voter')
+    def test_get_all_votings(self):
+        # with voting_id=0 we get all votings
+        response1 = self.client.get('/census/{}/'.format(0), format='json')
+        self.assertEqual(response1.status_code, 200)
 
-        response = self.client.get('/census/{}/?voter_id={}&type=V'.format(1, 1), format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), 'Valid voter')
+        response2 = self.client.get('/census/{}/'.format(1), format='json')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertEqual(response1.json(), response2.json())
 
     def test_list_voting(self):
         response = self.client.get('/census/?voting_id={}&type=V'.format(1), format='json')

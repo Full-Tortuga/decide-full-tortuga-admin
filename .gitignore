@@ -28,6 +28,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+migrations/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -59,8 +60,6 @@ coverage.xml
 # Django stuff:
 *.log
 decide/local_settings.py
-
-migrations/
 
 # Flask stuff:
 instance/
@@ -111,5 +110,8 @@ ENV/
 
 .vagrant
 
-# new db migrations
-decide/*/migrations/0001_initial.py
+#backups
+decide/backups/backups/*
+
+#migrations
+decide/*/migrations

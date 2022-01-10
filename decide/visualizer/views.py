@@ -93,9 +93,11 @@ class VisualizerViewBinary(TemplateView):
     def get_context_data(self,voting_id, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
+            print("HOLA TRY")
             voting = get_object_or_404(BinaryVoting,pk=voting_id)
             context['voting'] = json.dumps(BinaryVoting.toJson(voting))
         except:
+            print("HOLA CATCH")
             raise Http404
 
         return context

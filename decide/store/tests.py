@@ -206,3 +206,99 @@ class StoreTextCase(BaseTestCase):
         self.voting.save()
         response = self.client.post('/store/', data, format='json')
         self.assertEqual(response.status_code, 401)
+    
+    def test_voto_actualizado(self):
+        VOTING_ID = 1234
+        USUARIO = 69
+        TYPE = 'V'
+
+        #Creamos el usuario
+        user = self.get_or_create_user(USUARIO)
+
+        #Creamos la votación
+        voting = self.gen_voting(VOTING_ID, TYPE)
+
+        #Añadimos el usuario al censo
+        census = Census(voting_id = VOTING_ID, voter_id = USUARIO, type = TYPE)
+        census.save()
+
+        #Votamos
+        a1 = random.randint(50, 300)
+        b1 = random.randint(50, 300)
+        vote = Vote(voting_id = VOTING_ID, voter_id = USUARIO, a = a1, b = b1, type = TYPE)
+        vote.save()
+        self.login()
+        response = self.client.get('/store/?voting_id={}&voter_id={}&type={}'.format(VOTING_ID, USUARIO, TYPE), format='json')
+        self.assertEqual(response.status_code, 200)
+
+        #Borramos el voto actual
+        voto_registrado = Vote.objects.filter(voting_id=VOTING_ID, voter_id=USUARIO, type=TYPE)
+        voto_registrado.delete()
+
+        #Votamos de nuevo
+        a2 = a1
+        b2 = b1
+        vote = Vote(voting_id = VOTING_ID, voter_id = USUARIO, a = a2, b = b2, type = TYPE)
+        vote.save()
+        
+        response = self.client.get('/store/?voting_id={}&voter_id={}&type={}'.format(VOTING_ID, USUARIO, TYPE), format='json')
+        self.assertEqual(response.status_code, 200)
+
+        #Comprobamos que el voto se ha guardado correctamente, siendo solo un voto
+        
+        response = self.client.get('/store/?voting_id={}&voter_id={}&type={}'.format(VOTING_ID, USUARIO, TYPE), format='json')
+        self.assertEqual(response.status_code, 200)
+        votes = response.json()
+
+        self.assertEqual(len(votes), 1)
+        self.assertEqual(votes[0]["voting_id"], VOTING_ID)
+        self.assertEqual(votes[0]["voter_id"], USUARIO)
+        self.assertEqual(votes[0]["type"], TYPE)
+
+
+    def test_voto_actualizado_error_votacion_cerrada(self):
+        VOTING_ID = 1267
+        USUARIO = 90
+        TYPE = 'V'
+
+        #Creamos el usuario
+        user = self.get_or_create_user(USUARIO)
+
+        #Creamos la votación
+        voting = self.gen_voting(VOTING_ID, TYPE)
+
+        #Añadimos el usuario al censo
+        census = Census(voting_id = VOTING_ID, voter_id = USUARIO, type = TYPE)
+        census.save()
+
+        #Votamos
+        a1 = random.randint(50, 300)
+        b1 = random.randint(50, 300)
+        vote = Vote(voting_id = VOTING_ID, voter_id = USUARIO, a = a1, b = b1, type = TYPE)
+        vote.save()
+        self.login()
+        response = self.client.get('/store/?voting_id={}&voter_id={}&type={}'.format(VOTING_ID, USUARIO, TYPE), format='json')
+        self.assertEqual(response.status_code, 200)
+
+        #Borramos el voto actual
+        voto_registrado = Vote.objects.filter(voting_id=VOTING_ID, voter_id=USUARIO, type=TYPE)
+        voto_registrado.delete()
+
+        #Cerramos la votación
+        self.voting.end_date = timezone.now() - datetime.timedelta(days=1)
+        self.voting.save()
+
+        #Intentamos votar de nuevo y da error
+        a2 = random.randint(50, 300)
+        b2 = random.randint(50, 300)
+        vote = {
+            "voting_id": VOTING_ID,
+            "voter_id": USUARIO,
+            "a": a2,
+            "b": b2,
+            "type": TYPE
+        }
+        self.login(user=user.username)
+        response = self.client.post('/store/', vote, format='json')
+        self.assertEqual(response.status_code, 400)
+

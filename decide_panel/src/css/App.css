@@ -1,21 +1,13 @@
 html {
-  background-color: #141d22 !important;
+  background: linear-gradient(#2a323d, transparent);
+  background-color: #154c69;
+  height: 100%;
+  width: 100%;
 }
 
 html body {
-  background-color: #141d22 !important;
-}
-
-#principal {
-  margin-top: 300px;
-  margin-left: 25%;
-}
-
-.card.jsx-3327870985 {
-  background: linear-gradient(
-    4deg,
-    #095656 -63.59%,
-    #000000 -20.3%,
-    #176ccf 70.46%
-  ) !important;
+  background: linear-gradient(#2a323d, transparent);
+  background-color: #154c69;
+  height: 100%;
+  width: 100%;
 }

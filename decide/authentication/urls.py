@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework import routers
 
-from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion, LDAPSignInView,RegisterUserView,landingpage
+from .views import BienvenidaView, GetUserView, LogoutView, RegisterView, LDAPLogin, SignInView, cerrarsesion,RegisterUserView,landingpage
 from . import views
 
 router = routers.DefaultRouter()
