@@ -1,17 +1,17 @@
+from base import mods
 
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.status import (
-        HTTP_200_OK,
-        HTTP_201_CREATED,
-        HTTP_400_BAD_REQUEST,
-        HTTP_401_UNAUTHORIZED,
-        HTTP_500_INTERNAL_SERVER_ERROR,
-        HTTP_302_FOUND
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_302_FOUND
 )
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -50,6 +50,7 @@ class LogoutView(APIView):
 
         return Response({})
 
+
 class RegisterView(APIView):
     def post(self, request):
         key = request.data.get('token', '')
@@ -76,7 +77,6 @@ class LDAPLogin(APIView):
     Class to authenticate a user via LDAP and
     then creating a login session
     """
-    authentication_classes = ()
 
     def post(self, request):
         """
@@ -84,7 +84,6 @@ class LDAPLogin(APIView):
         :param request:
         :return:
         """
-
         try:
             # Probamos la conexion con el servidor con las siguientes instrucciones
             con = ldap.initialize(AUTH_LDAP_SERVER_URI)
@@ -95,72 +94,64 @@ class LDAPLogin(APIView):
                                         password=request.data['password'])
                 login(request, user_obj,
                       backend='django_auth_ldap.backend.LDAPBackend')
-                data = {'detail': 'User logged in successfully'}
-                status = HTTP_200_OK
+
+                # Añadir token al sesion para poder votar, en otro caso el votar con un usuario registrado con ldap resulta en un panic
+                if user_obj and request.content_type == 'application/x-www-form-urlencoded':
+                    user_data = {
+                        'username': request.data['username'],
+                        'password': request.data['password'],
+                    }
+                    token = mods.post('authentication',
+                                      entry_point='/login/', json=user_data)
+                    request.session['auth-token'] = token['token']
+
+                return render(request, 'welcome.html', status=HTTP_200_OK)
             except AttributeError:
-                data = {'detail': 'Credenciales mal'}
-                status = HTTP_400_BAD_REQUEST
+                return render(request, 'welcome.html', status=HTTP_400_BAD_REQUEST)
         except ldap.SERVER_DOWN:
-            data = {'detail': 'Problema con el servicio LDAP'}
-            status = HTTP_500_INTERNAL_SERVER_ERROR
-        return render(request, 'welcome.html', status=status)
-
-
-class LDAPLogout(APIView):
-    """
-    Class for logging out a user by clearing his/her session
-    """
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        """
-        Api to logout a user
-        :param request:
-        :return:
-        """
-        logout(request)
-        data = {'detail': 'User logged out successfully'}
-        return Response(data, status=200)
-
-
-class LDAPSignInView(LoginView):
-    template_name = 'login_ldap_view.html'
+            return render(request, 'welcome.html', status=HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class SignInView(LoginView):
     template_name = 'form.html'
 
+
 class RegisterUserView(APIView):
     def post(self, request):
         username = request.data.get('username', '')
-        email= request.data.get('email','')
-        firstname = request.data.get('firstname','')
-        lastname = request.data.get('lastname','')
+        email = request.data.get('email', '')
+        firstname = request.data.get('firstname', '')
+        lastname = request.data.get('lastname', '')
         pwd = request.data.get('password', '')
-        pwd2 = request.data.get('password2','')
-        if not pwd==pwd2:
-            response = Response({'error': 'Contraseñas no coinciden'}, HTTP_400_BAD_REQUEST)
+        pwd2 = request.data.get('password2', '')
+        if not pwd == pwd2:
+            response = Response(
+                {'error': 'Contraseñas no coinciden'}, HTTP_400_BAD_REQUEST)
             response['Location'] = reverse('sign_in')
             return response
         if User.objects.filter(username=username).count() > 0:
-            response = Response({'error': 'Ya existe este nombre de usuario', 'username': username}, HTTP_400_BAD_REQUEST)
+            response = Response({'error': 'Ya existe este nombre de usuario',
+                                'username': username}, HTTP_400_BAD_REQUEST)
             response['Location'] = reverse('sign_in')
             return response
 
         try:
-            user = User(username=username,email=email,first_name=firstname,last_name=lastname)
+            user = User(username=username, email=email,
+                        first_name=firstname, last_name=lastname)
             user.set_password(pwd)
             user.save()
             token, _ = Token.objects.get_or_create(user=user)
         except IntegrityError:
             return Response({}, status=HTTP_400_BAD_REQUEST)
-        response = Response({'user_pk': user.pk, 'token': token.key}, HTTP_302_FOUND)
+        response = Response(
+            {'user_pk': user.pk, 'token': token.key}, HTTP_302_FOUND)
         response['Location'] = reverse('sign_in')
-        
+
         return response
 
+
 class BienvenidaView(TemplateView):
-   template_name = 'welcome.html'
+    template_name = 'welcome.html'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -174,6 +165,7 @@ def cerrarsesion(request):
     logout(request)
     messages.success(request, F"Su sesión se ha cerrado correctamente")
     return render(request, "welcome.html")
+
 
 def landingpage(request):
     return render(request, "welcome.html")

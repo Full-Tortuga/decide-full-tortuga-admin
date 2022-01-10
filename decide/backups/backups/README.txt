@@ -1,0 +1,1 @@
+Directorio en el cual se localizan todos los backups creados de la base de datos de decide.

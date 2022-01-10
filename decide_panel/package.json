@@ -3,31 +3,52 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cypress/code-coverage": "^3.9.12",
+    "@cypress/instrument-cra": "^1.4.0",
     "@nextui-org/react": "*",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.24.0",
+    "babel-plugin-istanbul": "^6.1.1",
+    "chart.js": "^3.7.0",
+    "cypress": "8.4.1",
+    "env-cmd": "^10.1.0",
+    "eslint-plugin-cypress": "^2.12.1",
     "primeflex": "^3.1.0",
     "primeicons": "^5.0.0",
     "primereact": "^7.0.1",
     "react": "^17.0.2",
+    "react-chartjs-2": "^4.0.0",
     "react-dom": "^17.0.2",
     "react-scripts": "^4.0.3",
     "react-transition-group": "^4.4.2",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "env-cmd -f .env.prod react-scripts -r @cypress/instrument-cra start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cypress:open": "cypress open",
+    "test:e2e": "cypress run",
+    "start:local": "env-cmd -f .env.local react-scripts -r @cypress/instrument-cra start"
   },
   "eslintConfig": {
+    "env": {
+      "cypress/globals": true
+    },
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "plugins": [
+      "cypress"
     ]
+  },
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false
   },
   "browserslist": {
     "production": [
@@ -40,5 +61,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@cypress/code-coverage": "^3.9.12",
+    "@cypress/instrument-cra": "^1.4.0",
+    "babel-plugin-istanbul": "^6.1.1",
+    "cypress": "^8.4.1",
+    "eslint-plugin-cypress": "^2.12.1"
   }
 }

@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
-import os
 import django_heroku
+import os
+
+# Dependencias para el incremento de ldap
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
@@ -68,7 +70,25 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.QueryParameterVersioning'
 }
 
+AUTH_LDAP_SERVER_URI = 'ldap://:389'
+
+AUTH_LDAP_BIND_DN = 'cn=admin,dc=decide,dc=org'
+AUTH_LDAP_BIND_PASSWORD = 'decide'
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    'ou=people,dc=decide,dc=org',
+    ldap.SCOPE_SUBTREE,
+    '(uid=%(user)s)',
+)
+
+# Populate the Django user from the LDAP directory.
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'cn',
+    'last_name': 'sn',
+    'email': 'mail',
+}
+
 AUTHENTICATION_BACKENDS = [
+    'django_auth_ldap.backend.LDAPBackend',
     'base.backends.AuthBackend',
 ]
 
@@ -84,6 +104,7 @@ MODULES = [
     'postproc',
     'store',
     'visualizer',
+    'backups'
 ]
 
 ENV_DEVELOP = os.environ.get('ENV_DEVELOP', False)
@@ -236,4 +257,11 @@ if os.path.exists("config.jsonnet"):
         vars()[k] = v
 
 INSTALLED_APPS = INSTALLED_APPS + MODULES
-django_heroku.settings(locals())
+
+
+NOSE_ARGS = [
+    '--with-xunit'
+]
+django_heroku.settings(locals(), test_runner=False)
+
+PANEL_URI = "https://decide-full-tortuga-front.herokuapp.com"
