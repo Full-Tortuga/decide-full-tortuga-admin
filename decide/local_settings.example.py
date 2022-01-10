@@ -27,6 +27,7 @@ MODULES = [
     'store',
     'visualizer',
     'voting',
+    'backups'
 ]
 
 

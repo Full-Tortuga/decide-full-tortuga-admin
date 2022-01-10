@@ -58,7 +58,7 @@ Para configurar el proyecto, podremos crearnos un fichero local_settings.py basa
 local_settings.example.py, donde podremos configurar la ruta de nuestras apps o escoger que módulos
 ejecutar.
 
-Se hará uso de la base de datos MongoDB, para el correcto funcionamiento de la aplicación será necesaria la instalación de dicha base de datos siguiendo las instrucciones de la documentación oficial según el SO que estemos utilizando:
+Se hará uso de la base de datos MongoDB. Para el correcto funcionamiento de la aplicación será necesaria la instalación de dicha base de datos siguiendo las instrucciones de la documentación oficial según el SO que estemos utilizando:
 
 Windows: - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 
@@ -77,8 +77,6 @@ En caso de fallo al instalar las dependencias, es necesario instalas el paquete 
 
     pip install wheel
 
-Entramos en la carpeta del proyecto (cd decide) y realizamos las migraciones correspondientes para preparar la base de datos:
-
 Además, será necesario instalar las dependencias correspondientes al panel de control desarrollado con
 React. Para ello, primero se deberán tener instaldas las siguientes librerías de js con sus correspondientes
 versiones: Node=14.15.0, npm=7.8.0.
@@ -96,11 +94,11 @@ realizamos la primera migración para preparar la base de datos que utilizaremos
 Por último, ya podremos ejecutar el módulos o módulos seleccionados en la configuración de la
 siguiente manera:
 
-    ./manage.py runserver
+    ./manage.py runserver --settings=decide.test_settings
 
 También debemos lanzar el panel de control, para ello dentro de la carpeta decide_panel ejecutamos:
 
-    npm start
+    npm run start:local
 
 ## Nuevo panel de administración
 
@@ -136,16 +134,21 @@ Abra un nuevo contenedor con el cliente mínimo de open ldap en su equipo, para 
 
 ```sh
 docker run  -p 389:389 \
-            -d carvilgar1us/decideldap
+            -d carvilgar1us/ldapdecide
 ```
 
-Para verificar que el contenedor está corriendo correctamente el servicio slapd, pruebe el siguiente
+Esta nueva imagen ya contiene un usuario por defecto con credenciales **username = foobar & password = test**.Para verificar que el contenedor está corriendo correctamente el servicio slapd, pruebe el siguiente
 comando en su máquina HOST.
 
 ```sh
-ldapsearch -x -b "dc=decide, dc=org" -H ldap://:389
+docker exec -it <CONTAINER_ID> slapcat
 ```
 
+deberá ver las domain component de decide.org y el miembro foobar ya instanciado.
+
+## Añadir objetos a la organización
+
+Estos pasos son **OPCIONALES** ya que la imagen trae un usuario para utilizar los servicios LDAP.
 La consola debe de devolver:
 \# extended LDIF
 \#
@@ -172,8 +175,6 @@ cn: admin
 description: LDAP administrator
 
 Si es lo que usted ha obtenido entonces puede continuar.
-
-## Añadir objetos a la organización
 
 ### Organitational Units
 

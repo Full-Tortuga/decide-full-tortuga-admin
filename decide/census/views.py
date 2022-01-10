@@ -1,5 +1,4 @@
-from django.db.utils import IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import Error
 from rest_framework import generics
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
@@ -7,12 +6,12 @@ from rest_framework.status import (
     HTTP_201_CREATED as ST_201,
     HTTP_204_NO_CONTENT as ST_204,
     HTTP_400_BAD_REQUEST as ST_400,
-    HTTP_401_UNAUTHORIZED as ST_401,
     HTTP_409_CONFLICT as ST_409
 )
 
 from base.perms import UserIsStaff
 from .models import Census
+from django.contrib.auth.models import User
 
 
 class CensusCreate(generics.ListCreateAPIView):
@@ -51,9 +50,21 @@ class CensusDetail(generics.RetrieveDestroyAPIView):
         return Response('Voters deleted from census', status=ST_204)
 
     def retrieve(self, request, voting_id, *args, **kwargs):
-        voter = request.GET.get('voter_id')
+        voters = []
         try:
-            Census.objects.get(voting_id=voting_id, voter_id=voter)
-        except ObjectDoesNotExist:
-            return Response('Invalid voter', status=ST_401)
-        return Response('Valid voter')
+            if voting_id == 0 or voting_id == None:
+                census = Census.objects.all()
+            else:
+                census = Census.objects.filter(voting_id=voting_id)
+            for c in census:
+                try:
+                    user = User.objects.get(id=c.voter_id)
+                    voters.append({'id': user.id, 'username': user.username,
+                                   'first_name': user.first_name, 'last_name': user.last_name,
+                                   'email': user.email, 'gender': c.gender, 'region': c.region,
+                                   'voting_id': c.voting_id})
+                except User.DoesNotExist:
+                    continue
+        except Error:
+            return Response('Invalid voting', status=ST_400)
+        return Response(voters)
